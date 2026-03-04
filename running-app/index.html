@@ -117,11 +117,11 @@
           </div>
           <div>
             <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1 text-center">POWER</label>
-            <input type="number" name="power" id="powerInput" placeholder="Auto" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-accent font-medium dark:text-accent transition placeholder-accent/40">
+            <input type="number" name="power" id="powerInput" placeholder="Auto" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-accent font-medium dark:text-accent transition">
           </div>
           <div>
             <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1 text-center">CADENCE</label>
-            <input type="number" name="cadence" id="cadenceInput" placeholder="Auto" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-accent font-medium dark:text-accent transition placeholder-accent/40">
+            <input type="number" name="cadence" id="cadenceInput" placeholder="Auto" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-accent font-medium dark:text-accent transition">
           </div>
         </div>
 
@@ -195,24 +195,22 @@
 
     document.getElementById('dateInput').valueAsDate = new Date();
 
-    // ✅ ฟังก์ชันสำหรับคำนวณ Cadence และ Power อัตโนมัติ
+    // ✅ ระบบคำนวณอัตโนมัติ 
     function calculateAutoMetrics() {
-      const dist = parseFloat(document.getElementById('distInput').value);
+      const dist = parseFloat(document.getElementById('distInput').value) || 0;
       const h = parseInt(document.getElementById('hInput').value) || 0;
       const m = parseInt(document.getElementById('mInput').value) || 0;
-      const stride = parseFloat(document.getElementById('strideInput').value);
+      const stride = parseFloat(document.getElementById('strideInput').value) || 0;
       const totalMins = (h * 60) + m;
 
       const cadenceInput = document.getElementById('cadenceInput');
       const powerInput = document.getElementById('powerInput');
 
-      // 1. คำนวณ Power อัตโนมัติ (ต้องการแค่ระยะทางและเวลา)
+      // 1. คำนวณ Power อัตโนมัติ (ต้องการระยะทางและเวลา)
       if (dist > 0 && totalMins > 0) {
-        // ประเมิน Power โดยอิงจากความเร็ว (Speed in m/s)
         const speedMs = (dist * 1000) / (totalMins * 60);
-        const estPower = Math.round(65 * speedMs); // สมมติน้ำหนักมาตรฐานเพื่อแปลงเป็นวัตต์
+        const estPower = Math.round(65 * speedMs); // ประเมิน Power อิงจากความเร็ว
         
-        // เติมให้เฉพาะถ้าผู้ใช้ยังไม่ได้พิมพ์เอง หรือเป็นค่าที่ระบบเคยเติมให้
         if (!powerInput.value || powerInput.dataset.auto === 'true') {
           powerInput.value = estPower;
           powerInput.dataset.auto = 'true';
@@ -222,7 +220,7 @@
         delete powerInput.dataset.auto;
       }
 
-      // 2. คำนวณ Cadence อัตโนมัติ (ต้องการระยะทาง, เวลา, และความยาวก้าว)
+      // 2. คำนวณ Cadence อัตโนมัติ (ต้องการระยะทาง, เวลา, และ Stride)
       if (dist > 0 && totalMins > 0 && stride > 0) {
         const cadence = Math.round((dist * 1000) / (totalMins * stride));
         
@@ -236,10 +234,17 @@
       }
     }
 
-    // ✅ ลบสถานะ 'auto' ถ้าผู้ใช้จงใจแก้ไขตัวเลขเอง
-    document.getElementById('powerInput').addEventListener('input', function() { delete this.dataset.auto; });
-    document.getElementById('cadenceInput').addEventListener('input', function() { delete this.dataset.auto; });
-
+    // เคลียร์สถานะ 'auto' ถ้าผู้ใช้จงใจแก้ไขตัวเลขเอง
+    document.addEventListener("DOMContentLoaded", function() {
+      const powerInput = document.getElementById('powerInput');
+      const cadenceInput = document.getElementById('cadenceInput');
+      if(powerInput) {
+        powerInput.addEventListener('input', function() { delete this.dataset.auto; });
+      }
+      if(cadenceInput) {
+        cadenceInput.addEventListener('input', function() { delete this.dataset.auto; });
+      }
+    });
 
     async function handleFormSubmit(e, form) {
       e.preventDefault();
@@ -278,7 +283,7 @@
         document.getElementById('hInput').value = "";
         document.getElementById('mInput').value = "";
         
-        // ล้างสถานะ auto หลังกด save
+        // ✅ เคลียร์สถานะ auto หลังกด save
         delete document.getElementById('powerInput').dataset.auto;
         delete document.getElementById('cadenceInput').dataset.auto;
 
