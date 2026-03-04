@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>2PFamily Central Hub</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #fbfaf7;          /* off-white */
+      --paper: #ffffff;       /* card */
+      --ink: #2a2018;         /* coffee ink */
+      --muted: #7b6b5f;       /* secondary */
+      --line: #ede6dd;        /* border */
+      --accent: #8b5e34;      /* coffee brown */
+      --accent-2:#c2a27f;     /* latte */
+      --shadow: 0 14px 34px rgba(32,24,16,.07);
+      --radius: 18px;
+      --ring: 0 0 0 5px rgba(139,94,52,.12);
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: "Kanit", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--ink);
+      letter-spacing:.15px;
+
+      /* warm minimal background glow */
+      background:
+        radial-gradient(1200px 520px at 50% 0%, rgba(194,162,127,.10), transparent 70%),
+        radial-gradient(900px 420px at 12% 14%, rgba(139,94,52,.06), transparent 65%),
+        var(--bg);
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    .container{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 22px 30px;
+    }
+
+    /* Top Nav */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 10px 0 8px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:600;
+      letter-spacing:.9px;
+      text-transform:uppercase;
+      font-size: 12.5px;
+      color: #8a7a6f;
+    }
+    .brand .dot{
+      width:10px; height:10px;
+      border-radius:999px;
+      background: var(--accent);
+      box-shadow: var(--ring);
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      gap:18px;
+      font-size: 13px;
+      color: #84766c;
+    }
+    .nav a{
+      padding: 8px 10px;
+      border-radius: 999px;
+      transition: .18s ease;
+      outline: none;
+    }
+    .nav a:hover{
+      background: rgba(139,94,52,.08);
+      color: var(--ink);
+    }
+    .nav a:focus-visible{
+      box-shadow: var(--ring);
+      background: rgba(139,94,52,.08);
+    }
+
+    /* Hero */
+    .hero{
+      text-align:center;
+      padding: 66px 0 20px;
+    }
+    .hero .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      color: var(--accent);
+      font-weight:600;
+      font-size: 12.5px;
+      letter-spacing:.6px;
+      text-transform: uppercase;
+    }
+
+    /* ✅ font ของ "Simple hub for family projects." แก้ตรงนี้ */
+    .hero h1{
+      margin: 16px auto 12px;
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(44px, 5.2vw, 72px);
+      font-weight: 500;
+      letter-spacing: .8px;
+      line-height: 1.05;
+      max-width: 920px;
+      color: #3a2a1e;
+    }
+
+    .hero p{
+      margin: 0 auto;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.85;
+      font-weight: 300;
+    }
+
+    .divider{
+      width: 86px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-2), transparent);
+      margin: 26px auto 0;
+      border-radius: 999px;
+    }
+
+    /* Chips (Show All...) */
+    .chips{
+      display:flex;
+      justify-content:center;
+      gap:16px;
+      flex-wrap:wrap;
+      margin: 34px 0 18px;
+      color: #8a7a6f;
+      font-size: 13px;
+    }
+    .chip{
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: .18s ease;
+      cursor:pointer;
+      user-select:none;
+      background: transparent;
+    }
+    .chip.active{
+      color: var(--ink);
+      border-color: var(--line);
+      background: #fff;
+      box-shadow: 0 10px 26px rgba(32,24,16,.06);
+    }
+    .chip:hover{
+      border-color: var(--line);
+      background: rgba(255,255,255,.70);
+    }
+    .chip:focus-visible{
+      outline: none;
+      box-shadow: var(--ring);
+    }
+
+    /* Project grid */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      align-items: stretch;
+      padding: 10px 0 10px;
+    }
+
+    .card{
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      min-height: 216px;
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* Minimal “thumbnail” - เอา gradient สีน้ำตาลออกแล้ว */
+    .thumb{
+      height: 120px;
+      background: transparent;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+
+    .icon{
+      font-size: 34px;
+      transform: translateY(2px);
+      filter: saturate(1.05);
+    }
+
+    .card .body{
+      padding: 14px 16px 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .title{
+      font-weight: 600;
+      font-size: 15px;
+      line-height: 1.25;
+      margin:0;
+      letter-spacing:.2px;
+    }
+
+    .desc{
+      margin:0;
+      color: var(--muted);
+      font-size: 12.9px;
+      line-height: 1.62;
+    }
+
+    .meta{
+      margin-top:auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding-top: 12px;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: #8a7a6f;
+      font-size: 12px;
+      background: rgba(251,250,247,.65);
+    }
+
+    .go{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(139,94,52,.08);
+      border: 1px solid rgba(139,94,52,.18);
+      transition: .18s ease;
+      white-space:nowrap;
+    }
+
+    .card:hover{
+      transform: translateY(-5px);
+      border-color: rgba(139,94,52,.26);
+      box-shadow: 0 20px 46px rgba(32,24,16,.11);
+    }
+    .card:hover .go{
+      background: rgba(139,94,52,.12);
+      border-color: rgba(139,94,52,.30);
+    }
+    .card:focus-visible{
+      outline:none;
+      box-shadow: var(--ring);
+    }
+
+    /* Footer */
+    footer{
+      text-align:center;
+      color: #a0968b;
+      font-size: 12px;
+      padding: 32px 0 10px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px){
+      .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 540px){
+      .topbar{ flex-direction:column; align-items:flex-start; }
+      .nav{ gap:10px; flex-wrap:wrap; }
+      .hero{ padding-top: 44px; }
+      .grid{ grid-template-columns: 1fr; }
+      .card{ min-height: 206px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="brand">
+        <span class="dot"></span>
+        <span>AW2P</span>
+      </div>
+
+      <nav class="nav" aria-label="primary">
+        <a href="#" onclick="scrollToSection('home'); return false;">Home</a>
+        <a href="#" onclick="scrollToSection('projects'); return false;">Projects</a>
+        <a href="library/index.html">Library</a>
+        <a href="#" onclick="scrollToSection('contact'); return false;">Contact</a>
+      </nav>
+    </div>
+
+    <section class="hero" id="home">
+      <div class="kicker">AW2P Home Server</div>
+      <h1>Simple hub for family projects.</h1>
+      <p>
+        ศูนย์รวมโปรเจกต์ของครอบครัว
+      </p>
+      <div class="divider"></div>
+    </section>
+
+    <div class="chips" aria-label="filters">
+      <div class="chip active" data-filter="all" onclick="applyFilter('all')">Show All</div>
+      <div class="chip" data-filter="kids" onclick="applyFilter('kids')">Kids</div>
+      <div class="chip" data-filter="sport" onclick="applyFilter('sport')">Sport</div>
+      <div class="chip" data-filter="work" onclick="applyFilter('work')">Work</div>
+      <div class="chip" data-filter="lab" onclick="applyFilter('lab')">Lab</div>
+    </div>
+
+    <section id="projects" style="padding-top:6px;">
+      <div class="grid" id="projectGrid">
+        <a class="card" href="space-game/index.html" data-group="kids">
+          <div class="thumb"><div class="icon">🚀</div></div>
+          <div class="body">
+            <p class="title">Space Explorer</p>
+            <p class="desc">เกมสำรวจอวกาศแสนสนุกสำหรับน้องพรีเมี่ยม</p>
+            <div class="meta">
+              <span class="tag">👶 Kids</span>
+              <span class="go">Open <span aria-hidden="true">→</span></span>
+            </div>
+          </div>
+        </a>
+
+        <a class="card" href="running-app/index.html" data-group="sport">
+          <div class="thumb"><div class="icon">🏃</div></div>
+          <div class="body">
+            <p class="title">Running Program</p>
+            <p class="desc">ตารางซ้อม Buriram Half Marathon + Dashboard</p>
+            <div class="meta">
+              <span class="tag">🏅 Sport</span>
+              <span class="go">Open <span aria-hidden="true">→</span></span>
+            </div>
+          </div>
+        </a>
+
+        <a class="card" href="coffee-shop/index.html" data-group="work">
+          <div class="thumb"><div class="icon">☕</div></div>
+          <div class="body">
+            <p class="title">Specialty Coffee</p>
+            <p class="desc">POS Beta System สำหรับร้านกาแฟ (ทดลอง)</p>
+            <div class="meta">
+              <span class="tag">🧾 Work</span>
+              <span class="go">Open <span aria-hidden="true">→</span></span>
+            </div>
+          </div>
+        </a>
+
+        <a class="card" href="library/index.html" data-group="lab">
+          <div class="thumb"><div class="icon">📚</div></div>
+          <div class="body">
+            <p class="title">Library Lab</p>
+            <p class="desc">คลังหนังสือ + ไฮไลท์/โน้ต (GAS API)</p>
+            <div class="meta">
+              <span class="tag">🧠 Lab</span>
+              <span class="go">Open <span aria-hidden="true">→</span></span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <footer id="contact">
+      Powered by Caddy & Cloudflare • 2026
+    </footer>
+  </div>
+
+  <script>
+    function scrollToSection(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    function setActiveChip(filter){
+      document.querySelectorAll(".chip").forEach(c => {
+        c.classList.toggle("active", c.dataset.filter === filter);
+      });
+    }
+
+    function applyFilter(filter){
+      setActiveChip(filter);
+      const cards = document.querySelectorAll("#projectGrid .card");
+      cards.forEach(card => {
+        const g = card.dataset.group || "all";
+        const show = (filter === "all") || (g === filter);
+        card.style.display = show ? "flex" : "none";
+      });
+    }
+  </script>
+</body>
+</html>

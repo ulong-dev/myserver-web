@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { 
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            page: '#FCFBF9',       // พื้นหลัง Off-white แบบหน้า Home
+            card: '#FFFFFF',       // สีการ์ด
+            primary: '#33302E',    // สีตัวอักษรหลัก (ดำอมน้ำตาล)
+            muted: '#9E9892',      // สีตัวอักษรรอง
+            accent: '#A68A79',     // สีน้ำตาลจากโลโก้ AW2P
+            borderLight: '#F3F0EC' // สีเส้นขอบอ่อนๆ
+          },
+          fontFamily: {
+            sans: ['Sarabun', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          },
+          boxShadow: {
+            'glow': '0 20px 40px -10px rgba(0,0,0,0.03)', // เงาฟุ้งๆ สไตล์การ์ดหน้า Home
+            'glow-hover': '0 30px 60px -15px rgba(0,0,0,0.06)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Sarabun:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body { font-family: 'Sarabun', sans-serif; background-color: #FCFBF9; }
+    .loader { border-top-color: #A68A79; animation: spinner 1s linear infinite; }
+    @keyframes spinner { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+    .modal-enter { animation: fadein 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes fadein { from { opacity: 0; transform: scale(0.95) translateY(10px);} to { opacity: 1; transform: scale(1) translateY(0);} }
+    
+    .action-btn { opacity: 0; transform: scale(0.9); transition: all 0.2s; }
+    .shelf-card:hover .action-btn, .book-row:hover .action-btn { opacity: 1; transform: scale(1); }
+    
+    .star-input i { cursor: pointer; transition: color 0.2s; }
+    .star-input i:hover, .star-input i.active { color: #A68A79; }
+    .ebook-mode-active { background-color: #33302E !important; color: white !important; border-color: #33302E !important; }
+
+    #interactive.viewport { position: relative; width: 100%; height: auto; overflow: hidden; text-align: center; border-radius: 16px; }
+    #interactive.viewport > canvas, #interactive.viewport > video { max-width: 100%; width: 100%; border-radius: 16px; }
+    canvas.drawingBuffer { position: absolute; top: 0; left: 0; }
+    #loading { pointer-events: none; }
+    
+    /* ซ่อน Scrollbar ให้ดูคลีน */
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+
+<body class="bg-page text-primary dark:bg-[#1C1A19] dark:text-gray-200 pb-24 transition-colors duration-500">
+
+  <div class="max-w-4xl mx-auto min-h-screen relative transition-colors duration-300">
+
+    <div class="pt-20 pb-12 px-6 text-center relative">
+      <div class="absolute top-6 right-6 flex gap-2">
+        <button onclick="openBookModal('create')" class="bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/40 px-5 py-2 rounded-full text-[13px] backdrop-blur-md transition-all text-primary dark:text-gray-300 border border-borderLight dark:border-gray-800 shadow-sm font-medium">
+          <i class="fas fa-plus mr-1"></i> Add Book
+        </button>
+        <button onclick="toggleDarkMode()" class="bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/40 w-[38px] h-[38px] rounded-full backdrop-blur-md transition-all flex items-center justify-center border border-borderLight dark:border-gray-800 shadow-sm text-primary dark:text-gray-300">
+          <i id="themeIcon" class="fas fa-moon text-sm"></i>
+        </button>
+      </div>
+
+      <div class="flex flex-col items-center justify-center group cursor-pointer" onclick="refreshData()" title="รีเฟรชหน้าแรก">
+        <div class="text-[10px] font-bold tracking-[0.25em] text-accent uppercase mb-4 flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span> Library Lab
+        </div>
+        <h1 class="text-4xl md:text-5xl font-serif text-primary dark:text-white mb-3 group-hover:opacity-80 transition-opacity">
+          My Personal Library.
+        </h1>
+        <p class="text-muted text-[13px] font-light tracking-wide">คลังปัญญาส่วนตัว ยิ่งอ่านยิ่งโง่ 😎</p>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-3 mt-10">
+        <button onclick="showBookList('all')" class="bg-white dark:bg-[#252322] px-5 py-2 rounded-full shadow-sm border border-borderLight dark:border-gray-800 text-[12px] font-medium text-primary dark:text-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2">
+          <span class="text-muted font-light">ทั้งหมด</span> <span id="statTotal" class="font-bold">0</span>
+        </button>
+        <button onclick="showBookList('read')" class="bg-white dark:bg-[#252322] px-5 py-2 rounded-full shadow-sm border border-borderLight dark:border-gray-800 text-[12px] font-medium text-primary dark:text-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2">
+          <span class="text-muted font-light">อ่านจบ</span> <span id="statRead" class="font-bold">0</span>
+        </button>
+        <button onclick="showAllNotes()" class="bg-white dark:bg-[#252322] px-5 py-2 rounded-full shadow-sm border border-borderLight dark:border-gray-800 text-[12px] font-medium text-primary dark:text-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2">
+          <span class="text-muted font-light">บันทึก</span> <span id="statNotes" class="font-bold">0</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="px-6 mb-10 flex flex-col md:flex-row gap-3 justify-center items-center z-10 relative">
+      <button id="btnEbookMode" onclick="toggleEbookMode()" class="bg-white dark:bg-[#252322] text-primary dark:text-gray-300 border border-borderLight dark:border-gray-800 px-6 py-3 rounded-full text-[13px] font-medium shadow-sm flex items-center gap-2 transition-all hover:shadow-md shrink-0">
+        <i class="fas fa-tablet-alt text-muted"></i> eBook Mode
+      </button>
+
+      <div class="bg-white dark:bg-[#252322] rounded-full shadow-sm border border-borderLight dark:border-gray-800 flex items-center px-2 py-1.5 w-full max-w-lg transition-all focus-within:shadow-md focus-within:border-accent/30">
+        <select id="searchCategory" onchange="handleSearch()" class="bg-transparent text-primary dark:text-gray-300 text-[13px] py-1.5 px-4 focus:ring-0 outline-none cursor-pointer border-r border-borderLight dark:border-gray-800 font-medium appearance-none">
+          <option value="">ทุกหมวด</option>
+          <option value="Business">ธุรกิจ</option>
+          <option value="Self-Dev">พัฒนาตนเอง</option>
+          <option value="Novel">นิยาย</option>
+          <option value="Manga">มังงะ / คอมิค</option>
+          <option value="Tech">เทคโนโลยี</option>
+          <option value="History">ประวัติศาสตร์</option>
+          <option value="General">ทั่วไป</option>
+        </select>
+        <div class="relative w-full flex items-center">
+          <i class="fas fa-search text-muted ml-4 text-sm"></i>
+          <input type="text" id="searchInput"
+                 class="bg-transparent text-primary dark:text-gray-200 text-[13px] block w-full pl-3 p-2 outline-none placeholder-muted font-light"
+                 placeholder="ค้นหาชื่อหนังสือ..." onkeyup="handleSearch()">
+        </div>
+      </div>
+    </div>
+
+    <div id="loading" class="hidden flex justify-center py-12">
+      <div class="loader ease-linear rounded-full border-2 border-t-2 border-borderLight h-10 w-10"></div>
+    </div>
+    
+    <div id="resultsArea" class="px-6 space-y-6 pb-20"></div>
+  </div>
+
+  <div class="fixed bottom-8 right-8 w-14 h-14 bg-primary dark:bg-white text-white dark:text-primary rounded-full flex items-center justify-center shadow-glow cursor-pointer hover:scale-105 transition-transform z-40" onclick="openNoteModal()">
+    <i class="fas fa-pen"></i>
+  </div>
+
+  <div id="noteModal" class="fixed inset-0 bg-white/80 dark:bg-[#1C1A19]/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#252322] w-full max-w-md rounded-[24px] shadow-glow-hover modal-enter overflow-hidden border border-borderLight dark:border-gray-800 relative">
+      <button onclick="closeModals()" class="absolute top-5 right-5 text-muted hover:text-primary dark:hover:text-white transition w-8 h-8 flex items-center justify-center rounded-full bg-page dark:bg-[#1C1A19]"><i class="fas fa-times"></i></button>
+      
+      <div class="pt-8 px-8 pb-4">
+        <h3 class="font-serif text-2xl text-primary dark:text-white mb-1">Take a Note</h3>
+        <p class="text-[12px] text-muted font-light">บันทึกไอเดียที่ได้จากการอ่าน</p>
+      </div>
+      
+      <form id="noteForm" onsubmit="handleNoteSubmit(event)" class="p-8 pt-2 space-y-5">
+        <div>
+          <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">หนังสือ</label>
+          <select id="bookSelect" name="bookId" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-page dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition" required></select>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">เลขหน้า</label>
+          <input type="number" name="pageNo" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition" required>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">เนื้อหา</label>
+          <textarea name="content" rows="4" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition" required></textarea>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">Tags</label>
+          <input type="text" name="tags" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition" placeholder="#idea, #quote">
+        </div>
+        <button type="submit" id="btnSaveNote" class="w-full bg-primary dark:bg-white text-white dark:text-primary text-[13px] font-medium tracking-wide py-4 rounded-2xl hover:opacity-90 transition mt-4">บันทึกข้อมูล</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="bookModal" class="fixed inset-0 bg-white/80 dark:bg-[#1C1A19]/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#252322] w-full max-w-md rounded-[24px] shadow-glow-hover modal-enter overflow-hidden max-h-[90vh] overflow-y-auto border border-borderLight dark:border-gray-800 relative scrollbar-hide">
+      
+      <button onclick="closeModals()" class="absolute top-5 right-5 z-20 text-muted hover:text-primary dark:hover:text-white transition w-8 h-8 flex items-center justify-center rounded-full bg-page dark:bg-[#1C1A19]"><i class="fas fa-times"></i></button>
+
+      <div class="pt-8 px-8 pb-4 sticky top-0 bg-white dark:bg-[#252322] z-10">
+        <h3 class="font-serif text-2xl text-primary dark:text-white mb-1" id="bookModalTitle">Add Book</h3>
+        <p class="text-[12px] text-muted font-light" id="bookModalSubtitle">เพิ่มเล่มใหม่เข้าคลัง</p>
+      </div>
+      
+      <div class="px-8 pb-8 space-y-6">
+        <div id="isbnSection" class="bg-page dark:bg-[#1C1A19] p-5 rounded-[20px] border border-borderLight dark:border-gray-800">
+          <label class="text-[10px] font-bold text-accent uppercase tracking-[0.1em] mb-3 block"><i class="fas fa-barcode mr-1"></i> สแกน ISBN</label>
+          <div class="flex gap-2 mb-2">
+            <input type="text" id="isbnInput" class="flex-1 p-3 border border-borderLight dark:border-gray-700 rounded-xl bg-white dark:bg-[#252322] text-[13px] dark:text-gray-200 outline-none placeholder-muted focus:border-accent transition" placeholder="ISBN 13 หลัก...">
+            <button onclick="startQuagga()" type="button" class="bg-white dark:bg-[#252322] border border-borderLight dark:border-gray-700 hover:border-accent text-primary dark:text-gray-200 px-4 rounded-xl transition shadow-sm"><i class="fas fa-camera"></i></button>
+            <button onclick="handleIsbnSearch()" id="btnIsbn" type="button" class="bg-primary dark:bg-white text-white dark:text-primary px-5 rounded-xl transition shadow-sm text-[13px] font-medium">ค้นหา</button>
+          </div>
+          <div id="interactive" class="viewport hidden border border-borderLight mt-3"></div>
+          <div id="scanStatus" class="text-[11px] text-center text-muted mt-2 hidden">กำลังประมวลผลกล้อง...</div>
+        </div>
+
+        <form id="bookForm" onsubmit="handleBookSubmit(event)" class="space-y-5">
+          <input type="hidden" name="mode" id="bookMode" value="create">
+          <input type="hidden" name="bookId" id="editBookId">
+          <input type="hidden" name="rating" id="inputRating" value="0">
+
+          <div>
+            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">ชื่อหนังสือ</label>
+            <input type="text" name="title" id="inputTitle" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition" required>
+          </div>
+
+          <div>
+            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">รูปปก (URL)</label>
+            <input type="text" name="coverUrl" id="inputCover" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none placeholder-borderLight focus:border-accent transition">
+          </div>
+
+          <div class="flex items-center gap-3 p-4 bg-page dark:bg-[#1C1A19] rounded-2xl border border-borderLight dark:border-gray-800">
+            <input type="checkbox" id="inputIsEbook" name="isEbook" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary cursor-pointer accent-primary">
+            <label for="inputIsEbook" class="text-[13px] font-medium text-primary dark:text-gray-300 cursor-pointer">
+              อ่านแบบ eBook (Digital)
+            </label>
+          </div>
+
+          <div class="flex gap-4">
+            <div class="flex-1">
+              <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">ความชอบ</label>
+              <div class="flex gap-1.5 text-lg mt-3 text-borderLight dark:text-gray-700 star-input" id="starInputGroup">
+                <i class="fas fa-star" onclick="setRating(1)"></i>
+                <i class="fas fa-star" onclick="setRating(2)"></i>
+                <i class="fas fa-star" onclick="setRating(3)"></i>
+                <i class="fas fa-star" onclick="setRating(4)"></i>
+                <i class="fas fa-star" onclick="setRating(5)"></i>
+              </div>
+            </div>
+            <div class="flex-1">
+              <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">หมวดหมู่</label>
+              <select name="category" id="inputCategory" class="w-full mt-2 p-3 border border-borderLight dark:border-gray-700 rounded-xl bg-white dark:bg-[#1C1A19] text-[13px] text-primary dark:text-gray-200 outline-none focus:border-accent transition" required>
+                <option value="Business">ธุรกิจ / บริหาร</option>
+                <option value="Self-Dev">พัฒนาตนเอง</option>
+                <option value="Novel">นิยาย / เรื่องแต่ง</option>
+                <option value="Manga">มังงะ / คอมิค</option>
+                <option value="Tech">เทคโนโลยี</option>
+                <option value="History">ประวัติศาสตร์</option>
+                <option value="General" selected>ทั่วไป</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">ผู้แต่ง</label>
+            <input type="text" name="author" id="inputAuthor" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition">
+          </div>
+
+          <div class="flex space-x-4">
+            <div class="flex-1">
+              <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">จำนวนหน้า</label>
+              <input type="number" name="pages" id="inputPages" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition">
+            </div>
+            <div class="flex-1">
+              <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">สถานะ</label>
+              <select name="status" id="inputStatus" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition">
+                <option value="Reading">กำลังอ่าน</option>
+                <option value="Done">อ่านจบแล้ว</option>
+                <option value="To Read" selected>ดองไว้ก่อน</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" id="btnSaveBook" class="w-full bg-primary dark:bg-white text-white dark:text-primary text-[13px] font-medium tracking-wide py-4 rounded-2xl hover:opacity-90 transition mt-6">บันทึกเข้าคลัง</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="statusModal" class="fixed inset-0 bg-white/80 dark:bg-[#1C1A19]/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-[#252322] w-full max-w-sm rounded-[24px] shadow-glow-hover modal-enter overflow-hidden border border-borderLight dark:border-gray-800 relative">
+      <button onclick="closeModals()" class="absolute top-5 right-5 text-muted hover:text-primary dark:hover:text-white transition w-8 h-8 flex items-center justify-center rounded-full bg-page dark:bg-[#1C1A19]"><i class="fas fa-times"></i></button>
+      
+      <div class="pt-8 px-8 pb-4 text-center">
+        <div class="w-12 h-12 bg-page dark:bg-[#1C1A19] rounded-full flex items-center justify-center mx-auto mb-4 border border-borderLight dark:border-gray-800">
+          <i class="fas fa-sync-alt text-muted text-lg"></i>
+        </div>
+        <h3 class="font-serif text-2xl text-primary dark:text-white mb-1">Update Status</h3>
+      </div>
+
+      <form id="statusForm" onsubmit="handleStatusSubmit(event)" class="px-8 pb-8 space-y-5 text-left">
+        <input type="hidden" name="rating" id="inputRatingStatus" value="0">
+
+        <div>
+          <select id="bookSelectUpdate" name="bookId" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-page dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition hidden" required></select>
+        </div>
+
+        <div>
+          <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1 text-center block mb-3">สถานะล่าสุด</label>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="cursor-pointer">
+              <input type="radio" name="status" value="Reading" class="peer sr-only">
+              <div class="text-center p-3 rounded-xl border border-borderLight dark:border-gray-700 peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white text-[11px] text-muted transition-all">กำลังอ่าน</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="status" value="Done" class="peer sr-only">
+              <div class="text-center p-3 rounded-xl border border-borderLight dark:border-gray-700 peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white text-[11px] text-muted transition-all">จบแล้ว</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="status" value="To Read" class="peer sr-only">
+              <div class="text-center p-3 rounded-xl border border-borderLight dark:border-gray-700 peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white text-[11px] text-muted transition-all">ดองไว้</div>
+            </label>
+          </div>
+        </div>
+
+        <div class="text-center mt-6">
+          <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] mb-2 block">ให้คะแนน</label>
+          <div class="flex justify-center gap-2 text-2xl text-borderLight dark:text-gray-700 star-input" id="starInputGroupStatus">
+            <i class="fas fa-star" onclick="setRatingStatus(1)"></i>
+            <i class="fas fa-star" onclick="setRatingStatus(2)"></i>
+            <i class="fas fa-star" onclick="setRatingStatus(3)"></i>
+            <i class="fas fa-star" onclick="setRatingStatus(4)"></i>
+            <i class="fas fa-star" onclick="setRatingStatus(5)"></i>
+          </div>
+        </div>
+
+        <button type="submit" id="btnUpdateStatus" class="w-full bg-primary dark:bg-white text-white dark:text-primary text-[13px] font-medium tracking-wide py-4 rounded-2xl hover:opacity-90 transition mt-6 shadow-sm">อัปเดต</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Config เดิม ไม่เปลี่ยน
+    const API_URL = "https://script.google.com/macros/s/AKfycbyfDj7axGwEbp03yGispxR0k3fb-Xu0NtF6MG4hqdIKlMZoCiko4QYSMbLjwZo-PwxY/exec";
+
+    function swalLoading({ title="Loading...", html="Please wait", footer="" } = {}) {
+      return Swal.fire({ title, html, footer, allowOutsideClick: false, allowEscapeKey: false, didOpen: () => Swal.showLoading(), customClass: { popup: 'rounded-3xl' } });
+    }
+
+    function swalError(err, { title="Error", footer="ตรวจสอบการเชื่อมต่อ" } = {}) {
+      const msg = (err && err.message) ? err.message : String(err);
+      const html = `<div style="text-align:center; font-size:14px; font-weight:300;">${msg}</div>`;
+      return Swal.fire({ icon:"error", title, html, footer, confirmButtonText:"OK", confirmButtonColor:"#33302E", customClass: { popup: 'rounded-3xl' } });
+    }
+
+    function swalSuccess({ title="Success", html="", footer="" } = {}) {
+      return Swal.fire({ icon: "success", title, html, footer, timer: 1500, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
+    }
+
+    async function apiPost(action, data = {}) {
+      const url = new URL(API_URL);
+      url.searchParams.set("action", action);
+      const body = new URLSearchParams();
+      Object.entries(data).forEach(([k, v]) => body.append(k, v ?? ""));
+      const res = await fetch(url.toString(), { method: "POST", body, redirect: "follow", cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.message || "API error");
+      return json.data ?? json.message ?? json;
+    }
+
+    var bookCache = {};
+    var isEbookMode = false;
+    var searchTimeout;
+
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark'); updateIcon(true);
+    } else {
+      document.documentElement.classList.remove('dark'); updateIcon(false);
+    }
+
+    function toggleDarkMode() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark'); localStorage.theme = 'light'; updateIcon(false);
+      } else {
+        document.documentElement.classList.add('dark'); localStorage.theme = 'dark'; updateIcon(true);
+      }
+    }
+
+    function updateIcon(isDark) {
+      const icon = document.getElementById('themeIcon');
+      if (isDark) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); }
+      else { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
+    }
+
+    window.onload = function() { refreshData(); };
+
+    async function refreshData() {
+      document.getElementById('searchInput').value = "";
+      document.getElementById('searchCategory').value = "";
+      isEbookMode = false; updateEbookModeUI();
+      document.getElementById('loading').classList.remove('hidden');
+
+      try {
+        const [books, stats, home] = await Promise.all([
+          apiPost("getBookList"), apiPost("getDashboardStats"), apiPost("getHomePageData")
+        ]);
+        populateBooks(books); updateDashboard(stats); displayHomePage(home);
+      } catch (err) {
+        document.getElementById('resultsArea').innerHTML = `<div class="text-center text-muted py-10 text-[13px]">ไม่สามารถโหลดข้อมูลได้</div>`;
+      } finally {
+        document.getElementById('loading').classList.add('hidden');
+      }
+    }
+
+    function toggleEbookMode() {
+      isEbookMode = !isEbookMode; updateEbookModeUI(); handleSearch();
+    }
+
+    function updateEbookModeUI() {
+      const btn = document.getElementById('btnEbookMode');
+      if (isEbookMode) { btn.classList.add('ebook-mode-active'); btn.innerHTML = '<i class="fas fa-check text-white"></i> EBOOK ONLY'; } 
+      else { btn.classList.remove('ebook-mode-active'); btn.innerHTML = '<i class="fas fa-tablet-alt text-muted"></i> eBook Mode'; }
+    }
+
+    function setRating(score) {
+      document.getElementById('inputRating').value = score;
+      const stars = document.getElementById('starInputGroup').children;
+      for (let i = 0; i < 5; i++) { (i < score) ? stars[i].classList.add('active') : stars[i].classList.remove('active'); }
+    }
+
+    function setRatingStatus(score) {
+      document.getElementById('inputRatingStatus').value = score;
+      const stars = document.getElementById('starInputGroupStatus').children;
+      for (let i = 0; i < 5; i++) { (i < score) ? stars[i].classList.add('active') : stars[i].classList.remove('active'); }
+    }
+
+    function renderStars(rating) {
+      if (!rating || rating === 0) return '<div class="h-3"></div>';
+      let html = '<div class="flex text-accent text-[10px] gap-0.5">';
+      for (let i = 1; i <= 5; i++) {
+        if (i <= rating) html += '<i class="fas fa-star"></i>';
+      }
+      html += '</div>';
+      return html;
+    }
+
+    function updateDashboard(stats) {
+      document.getElementById("statTotal").innerText = stats.totalBooks;
+      document.getElementById("statRead").innerText = stats.readCount;
+      document.getElementById("statNotes").innerText = stats.totalNotes;
+    }
+
+    function renderImageOrIcon(url) {
+      return (url && url.length > 5)
+        ? `<img src="${url}" loading="lazy" class="w-full h-full object-cover">`
+        : `<div class="w-full h-full bg-page dark:bg-[#1C1A19] flex items-center justify-center text-borderLight dark:text-gray-800"><i class="fas fa-book text-4xl"></i></div>`;
+    }
+
+    function displayHomePage(books) {
+      const container = document.getElementById('resultsArea');
+      container.innerHTML = "";
+      if (isEbookMode) books = (books || []).filter(b => b.isEbook === 'TRUE' || b.isEbook === true);
+
+      if (!books || books.length === 0) {
+        container.innerHTML = `<div class="text-center text-muted py-20 text-[13px] font-light">The library is empty.</div>`;
+        return;
+      }
+
+      books.forEach(b => bookCache[b.id] = b);
+
+      let html = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">`;
+
+      books.forEach(book => {
+        const imgHtml = renderImageOrIcon(book.coverUrl);
+        const starsHtml = renderStars(book.rating || 0);
+        const ebookIcon = (book.isEbook === 'TRUE' || book.isEbook === true) ? '<i class="fas fa-tablet-alt ml-1 opacity-50"></i>' : '';
+        
+        let statusBadge = '';
+        if(book.status === 'Reading') statusBadge = '<span class="text-[10px] font-bold px-3 py-1 bg-accent/10 text-accent rounded-full">Reading</span>';
+        else if(book.status === 'Done') statusBadge = '<span class="text-[10px] font-bold px-3 py-1 bg-gray-100 dark:bg-gray-800 text-muted rounded-full">Done</span>';
+        else statusBadge = '<span class="text-[10px] font-bold px-3 py-1 bg-white dark:bg-[#1C1A19] border border-borderLight dark:border-gray-800 text-muted rounded-full">Queue</span>';
+
+        html += `
+          <div class="shelf-card bg-card dark:bg-[#252322] p-3 rounded-[24px] shadow-glow hover:shadow-glow-hover flex flex-col relative group transition-all duration-300 border border-transparent dark:border-gray-800 hover:-translate-y-1">
+            
+            <div class="absolute top-5 right-5 flex flex-col gap-1 z-20 action-btn">
+              <button onclick="openStatusModalWithBook('${book.id}')" class="bg-white/90 dark:bg-black/50 backdrop-blur text-primary dark:text-white hover:text-accent w-8 h-8 rounded-full shadow-sm flex items-center justify-center text-[11px] transition-colors"><i class="fas fa-sync-alt"></i></button>
+              <button onclick="openBookModal('edit', '${book.id}')" class="bg-white/90 dark:bg-black/50 backdrop-blur text-primary dark:text-white hover:text-accent w-8 h-8 rounded-full shadow-sm flex items-center justify-center text-[11px] transition-colors"><i class="fas fa-pen"></i></button>
+              <button onclick="confirmDelete('${book.id}')" class="bg-white/90 dark:bg-black/50 backdrop-blur text-red-400 hover:text-red-500 w-8 h-8 rounded-full shadow-sm flex items-center justify-center text-[11px] transition-colors"><i class="fas fa-trash"></i></button>
+            </div>
+
+            <div class="w-full aspect-[3/4] mb-4 rounded-[16px] overflow-hidden bg-page dark:bg-[#1C1A19] relative border border-borderLight dark:border-gray-800">
+              ${imgHtml}
+            </div>
+
+            <div class="px-2 pb-1 flex-1 flex flex-col justify-between">
+              <div>
+                <div class="mb-1">${starsHtml}</div>
+                <h3 class="font-bold text-primary dark:text-gray-100 text-[13px] line-clamp-2 leading-tight mb-1">${book.title || "-"}</h3>
+                <div class="text-[11px] text-muted truncate font-light">${book.author || '-'} ${ebookIcon}</div>
+              </div>
+              
+              <div class="flex justify-between items-center mt-4">
+                ${statusBadge}
+                <button onclick="openStatusModalWithBook('${book.id}')" class="text-[10px] font-medium px-3 py-1 border border-borderLight dark:border-gray-700 text-primary dark:text-gray-300 rounded-full hover:bg-page dark:hover:bg-gray-800 transition-colors flex items-center gap-1">Open <i class="fas fa-arrow-right text-[8px] opacity-50"></i></button>
+              </div>
+            </div>
+          </div>`;
+      });
+
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    function displayResults(data) {
+      const container = document.getElementById('resultsArea');
+      container.innerHTML = "";
+      data = data || [];
+      if (isEbookMode) data = data.filter(item => (item.isEbook === 'TRUE' || item.isEbook === true));
+      if (data.length === 0) { container.innerHTML = `<div class="text-center text-muted py-20 text-[13px] font-light">No results found.</div>`; return; }
+
+      let html = `<div class="flex flex-col gap-4">`;
+
+      data.forEach(item => {
+        if (item.type === 'book') {
+          bookCache[item.id] = item;
+          const listImg = item.coverUrl ? `<img src="${item.coverUrl}" loading="lazy" class="h-24 w-16 object-cover rounded-xl shadow-sm">` : `<div class="h-24 w-16 bg-page dark:bg-[#1C1A19] rounded-xl border border-borderLight dark:border-gray-800 flex justify-center items-center text-borderLight dark:text-gray-700"><i class="fas fa-book"></i></div>`;
+          const starsHtml = renderStars(item.rating || 0);
+          const ebookIcon = (item.isEbook === 'TRUE' || item.isEbook === true) ? '<span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-primary dark:text-gray-300 rounded-md ml-2"><i class="fas fa-tablet-alt"></i> EBOOK</span>' : '';
+          
+          let statusLabel = item.status;
+
+          html += `
+            <div class="bg-card dark:bg-[#252322] p-4 rounded-[24px] shadow-sm hover:shadow-glow transition-all border border-borderLight dark:border-gray-800 flex gap-4 items-center relative group">
+              <div class="flex-shrink-0">${listImg}</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center mb-1">
+                  <h3 class="font-bold text-primary dark:text-gray-100 text-[14px] truncate">${item.bookTitle || item.title || "-"}</h3> ${ebookIcon}
+                </div>
+                <div class="text-[12px] text-muted font-light mb-1">${item.author || '-'}</div>
+                ${starsHtml}
+              </div>
+              <div class="flex flex-col items-end gap-2 shrink-0">
+                <span class="text-[10px] font-bold px-3 py-1 bg-page dark:bg-[#1C1A19] border border-borderLight dark:border-gray-800 text-muted rounded-full uppercase tracking-wider">${statusLabel}</span>
+                <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onclick="openStatusModalWithBook('${item.id}')" class="w-7 h-7 flex items-center justify-center rounded-full border border-borderLight dark:border-gray-700 text-muted hover:text-primary dark:hover:text-white transition"><i class="fas fa-sync-alt text-[10px]"></i></button>
+                  <button onclick="openBookModal('edit', '${item.id}')" class="w-7 h-7 flex items-center justify-center rounded-full border border-borderLight dark:border-gray-700 text-muted hover:text-primary dark:hover:text-white transition"><i class="fas fa-pen text-[10px]"></i></button>
+                </div>
+              </div>
+            </div>`;
+        } else {
+          // Notes
+          html += `
+            <div class="bg-card dark:bg-[#252322] p-6 rounded-[24px] shadow-sm hover:shadow-glow transition-all border border-borderLight dark:border-gray-800">
+              <div class="flex justify-between items-start mb-4">
+                <div>
+                  <h3 class="font-bold text-primary dark:text-gray-100 text-[14px]">${item.bookTitle || "-"}</h3>
+                  <div class="text-[11px] text-muted font-light mt-0.5">${item.author || '-'}</div>
+                </div>
+                <span class="text-[10px] font-bold px-3 py-1 bg-page dark:bg-[#1C1A19] text-muted rounded-full border border-borderLight dark:border-gray-800">P. ${item.page || '-'}</span>
+              </div>
+              <p class="text-[14px] text-primary dark:text-gray-300 leading-relaxed font-serif italic relative pl-4 border-l-2 border-accent/30">"${item.content || ''}"</p>
+              <div class="mt-4 flex gap-2">
+                <span class="text-[11px] text-accent font-medium">${item.tags || ''}</span>
+              </div>
+            </div>`;
+        }
+      });
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    function handleSearch() {
+      clearTimeout(searchTimeout);
+      const keyword = document.getElementById('searchInput').value;
+      const category = document.getElementById('searchCategory').value;
+      document.getElementById('loading').classList.remove('hidden');
+
+      searchTimeout = setTimeout(async function() {
+        try {
+          if (keyword === "" && category === "") {
+            const home = await apiPost("getHomePageData"); displayHomePage(home);
+          } else {
+            const res = await apiPost("searchLibrary", { keyword, category }); displayResults(res);
+          }
+        } catch (err) { } 
+        finally { document.getElementById('loading').classList.add('hidden'); }
+      }, 400);
+    }
+
+    async function showBookList(type) {
+      document.getElementById('loading').classList.remove('hidden');
+      try {
+        const filterType = (type === 'read') ? 'status' : 'all';
+        const filterValue = (type === 'read') ? 'Done' : '';
+        const res = await apiPost("getLibraryBooks", { filterType, filterValue }); displayResults(res);
+      } catch (err) { } 
+      finally { document.getElementById('loading').classList.add('hidden'); }
+    }
+
+    async function showAllNotes() {
+      document.getElementById('searchInput').value = ""; document.getElementById('searchCategory').value = "";
+      document.getElementById('loading').classList.remove('hidden');
+      try {
+        const res = await apiPost("searchLibrary", { keyword:"", category:"" }); displayResults(res);
+      } catch (err) { } 
+      finally { document.getElementById('loading').classList.add('hidden'); }
+    }
+
+    function openNoteModal() { document.getElementById('noteModal').classList.remove('hidden'); }
+    function closeModals() {
+      if (isScanning) stopQuagga();
+      document.getElementById('noteModal').classList.add('hidden');
+      document.getElementById('bookModal').classList.add('hidden');
+      document.getElementById('statusModal').classList.add('hidden');
+    }
+
+    function populateBooks(books) {
+      const select = document.getElementById("bookSelect");
+      const selectStatus = document.getElementById("bookSelectUpdate");
+      let opts = '<option value="" disabled selected>-- เลือกหนังสือ --</option>';
+      (books || []).forEach(b => { opts += `<option value="${b.id}">${b.title}</option>`; });
+      select.innerHTML = opts; selectStatus.innerHTML = opts;
+    }
+
+    function openStatusModalWithBook(bookId) {
+      document.getElementById('statusModal').classList.remove('hidden');
+      document.getElementById('bookSelectUpdate').value = bookId;
+      const book = bookCache[bookId];
+      if (book) {
+        setRatingStatus(book.rating || 0);
+        // Set radio button
+        const radios = document.getElementsByName('status');
+        for(let i=0; i<radios.length; i++){ if(radios[i].value === book.status) radios[i].checked = true; }
+      }
+    }
+
+    function openBookModal(mode, bookId) {
+      document.getElementById('bookModal').classList.remove('hidden');
+      const form = document.getElementById('bookForm');
+      const isbnSec = document.getElementById('isbnSection');
+      const title = document.getElementById('bookModalTitle');
+      const subtitle = document.getElementById('bookModalSubtitle');
+      const btn = document.getElementById('btnSaveBook');
+
+      if (mode === 'edit') {
+        const book = bookCache[bookId] || {};
+        isbnSec.classList.add('hidden');
+        title.innerHTML = 'Edit Book'; subtitle.innerHTML = 'แก้ไขข้อมูลหนังสือ'; btn.innerText = "Save Changes";
+        document.getElementById('bookMode').value = 'edit';
+        document.getElementById('editBookId').value = bookId;
+        document.getElementById('inputTitle').value = book.title || book.bookTitle || "";
+        document.getElementById('inputCover').value = book.coverUrl || "";
+        document.getElementById('inputAuthor').value = book.author || "";
+        document.getElementById('inputPages').value = book.pages || "";
+        document.getElementById('inputCategory').value = book.category || "General";
+        document.getElementById('inputStatus').value = book.status || "To Read";
+        setRating(book.rating || 0);
+        document.getElementById('inputIsEbook').checked = (book.isEbook === 'TRUE' || book.isEbook === true);
+      } else {
+        form.reset(); isbnSec.classList.remove('hidden');
+        title.innerHTML = 'Add Book'; subtitle.innerHTML = 'เพิ่มหนังสือใหม่เข้าคลัง'; btn.innerText = "Add to Library";
+        document.getElementById('bookMode').value = 'create'; document.getElementById('editBookId').value = "";
+        setRating(0); document.getElementById('inputIsEbook').checked = false;
+      }
+    }
+
+    async function confirmDelete(id) {
+      const ok = await Swal.fire({
+        icon: "warning", title: "Remove Book?", text: "ต้องการลบหนังสือเล่มนี้ออกจากระบบหรือไม่",
+        showCancelButton: true, confirmButtonText: "ลบข้อมูล", cancelButtonText: "ยกเลิก",
+        confirmButtonColor: "#33302E", customClass: { popup: 'rounded-3xl' }
+      });
+      if (!ok.isConfirmed) return;
+      swalLoading();
+      try { await apiPost("deleteBook", { bookId: id }); await swalSuccess(); refreshData();
+      } catch (err) { await swalError(err); }
+    }
+
+    async function handleIsbnSearch() {
+      const isbn = document.getElementById('isbnInput').value.trim();
+      const btn = document.getElementById('btnIsbn');
+      if (isbn.length < 10) return Swal.fire({ icon:"info", title:"Invalid ISBN", customClass: { popup: 'rounded-3xl' } });
+      const original = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+      swalLoading();
+      try {
+        const data = await apiPost("fetchBookByIsbn", { isbn });
+        if (data.found) {
+          document.getElementById('inputTitle').value = data.title || "";
+          document.getElementById('inputAuthor').value = data.author || "";
+          document.getElementById('inputPages').value = data.pages || "";
+          document.getElementById('inputCover').value = data.coverUrl || "";
+          await swalSuccess({ title: "Found It!" });
+        } else { await Swal.fire({ icon:"error", title:"Not Found", customClass: { popup: 'rounded-3xl' } }); }
+      } catch (err) { await swalError(err); }
+      finally { Swal.close(); btn.innerHTML = original; btn.disabled = false; }
+    }
+
+    async function handleNoteSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSaveNote'); const origin = btn.innerText;
+      btn.innerText = "Saving..."; btn.disabled = true; swalLoading();
+      try {
+        const form = e.target;
+        await apiPost("saveData", { bookId: form.bookId.value, pageNo: form.pageNo.value, content: form.content.value, tags: form.tags.value });
+        await swalSuccess(); form.reset(); closeModals(); refreshData();
+      } catch (err) { await swalError(err); }
+      finally { Swal.close(); btn.innerText = origin; btn.disabled = false; }
+    }
+
+    async function handleBookSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSaveBook'); const origin = btn.innerText;
+      btn.innerText = "Saving..."; btn.disabled = true;
+      const mode = document.getElementById('bookMode').value;
+      const payload = {
+        title: e.target.title.value, author: e.target.author.value, pages: e.target.pages.value,
+        status: e.target.status.value, category: e.target.category.value, coverUrl: e.target.coverUrl.value,
+        rating: document.getElementById('inputRating').value || "0",
+        isEbook: document.getElementById('inputIsEbook').checked ? "TRUE" : "FALSE"
+      };
+      swalLoading();
+      try {
+        if (mode === "edit") { payload.bookId = document.getElementById('editBookId').value; await apiPost("updateBook", payload); } 
+        else { await apiPost("saveNewBook", payload); }
+        await swalSuccess(); document.getElementById('bookForm').reset(); setRating(0); closeModals(); refreshData();
+      } catch (err) { await swalError(err); }
+      finally { Swal.close(); btn.innerText = origin; btn.disabled = false; }
+    }
+
+    async function handleStatusSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnUpdateStatus'); const origin = btn.innerText;
+      btn.innerText = "Updating..."; btn.disabled = true; swalLoading();
+      try {
+        const form = e.target;
+        const statusVal = form.querySelector('input[name="status"]:checked')?.value || "To Read";
+        await apiPost("updateBookStatus", { bookId: form.bookId.value, status: statusVal, rating: document.getElementById('inputRatingStatus').value || "0" });
+        await swalSuccess(); form.reset(); closeModals(); refreshData();
+      } catch (err) { await swalError(err); }
+      finally { Swal.close(); btn.innerText = origin; btn.disabled = false; }
+    }
+
+    var isScanning = false;
+    function startQuagga() {
+      const viewport = document.getElementById('interactive'); const status = document.getElementById('scanStatus');
+      if (isScanning) { stopQuagga(); return; }
+      viewport.classList.remove('hidden'); status.classList.remove('hidden'); isScanning = true;
+      Quagga.init({
+        inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#interactive'), constraints: { facingMode: "environment", width: 640, height: 480 } },
+        decoder: { readers: ["ean_reader", "code_128_reader", "code_39_reader"] }, locate: true
+      }, function(err) {
+        if (err) { Swal.fire({ icon:"error", title:"Camera Error", customClass: { popup: 'rounded-3xl' } }); stopQuagga(); return; }
+        Quagga.start();
+      });
+      Quagga.onDetected(function(result) {
+        var code = result.codeResult.code;
+        if (code && code.length >= 5) {
+          document.getElementById('isbnInput').value = code; stopQuagga();
+          if (navigator.vibrate) navigator.vibrate(200); setTimeout(handleIsbnSearch, 400);
+        }
+      });
+    }
+    function stopQuagga() {
+      try { Quagga.stop(); } catch(e){}
+      document.getElementById('interactive').classList.add('hidden'); document.getElementById('scanStatus').classList.add('hidden'); isScanning = false;
+    }
+  </script>
+</body>
+</html>

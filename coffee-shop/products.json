@@ -1,0 +1,114 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "category": "coffee",
+      "name": "Latte เย็น",
+      "basePrice": 65,
+      "popular": true,
+      "image": "assets/menu/latte_iced.jpg"
+    },
+    {
+      "id": 2,
+      "category": "coffee",
+      "name": "Latte ร้อน",
+      "basePrice": 55,
+      "image": "assets/menu/latte_hot.jpg"
+    },
+    {
+      "id": 3,
+      "category": "coffee",
+      "name": "Americano เย็น",
+      "basePrice": 55,
+      "popular": true,
+      "image": "assets/menu/americano_iced.jpg"
+    },
+    {
+      "id": 4,
+      "category": "coffee",
+      "name": "Americano ร้อน",
+      "basePrice": 50,
+      "popular": true,
+      "image": "assets/menu/americano_hot.jpg"
+    },
+    {
+      "id": 5,
+      "category": "coffee",
+      "name": "Cappuccino เย็น",
+      "basePrice": 60,
+      "image": "assets/menu/cappuccino_iced.jpg"
+    },
+    {
+      "id": 6,
+      "category": "coffee",
+      "name": "Cappuccino ร้อน",
+      "basePrice": 55,
+      "image": "assets/menu/cappuccino_hot.jpg"
+    },
+    {
+      "id": 7,
+      "category": "coffee",
+      "name": "Espresso เย็น",
+      "basePrice": 45,
+      "image": "assets/menu/espresso_iced.jpg"
+    },
+    {
+      "id": 8,
+      "category": "coffee",
+      "name": "Espresso ร้อน",
+      "basePrice": 40,
+      "image": "assets/menu/espresso_hot.jpg"
+    },
+    {
+      "id": 9,
+      "category": "non_coffee",
+      "name": "โกโก้เย็น",
+      "basePrice": 60,
+      "image": "assets/menu/cocoa_iced.jpg"
+    },
+    {
+      "id": 10,
+      "category": "tea",
+      "name": "ชาเขียว เย็น",
+      "basePrice": 55,
+      "image": "assets/menu/greentea_iced.jpg"
+    },
+    {
+      "id": 11,
+      "category": "tea",
+      "name": "ชาดำ เย็น",
+      "basePrice": 55,
+      "image": "assets/menu/blacktea_iced.jpg"
+    },
+    {
+      "id": 12,
+      "category": "soda",
+      "name": "เลมอนโซดา",
+      "basePrice": 50,
+      "image": "assets/menu/lemon_soda.jpg"
+    },
+    {
+      "id": 13,
+      "category": "bakery",
+      "name": "ครัวซองต์เนยสด",
+      "basePrice": 45,
+      "image": "assets/menu/croissant_butter.jpg"
+    },
+    {
+      "id": 14,
+      "category": "signature",
+      "name": "Ulong Dirty",
+      "basePrice": 85,
+      "popular": true,
+      "image": "assets/menu/ulong_dirty.jpg"
+    },
+    {
+      "id": "mocha_iced",
+      "name": "Mocha เย็น",
+      "category": "coffee",
+      "basePrice": 70,
+      "popular": false,
+      "image": "assets/menu/mocha_iced.jpg"
+    }
+  ]
+}

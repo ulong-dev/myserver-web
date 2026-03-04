@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🚀 สำรวจอวกาศ V4 (Kids & History Edition)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&family=Sarabun:wght@400;700&display=swap');
+
+  :root {
+    --star-yellow: #FFE566; --rocket-red: #FF6B6B; --space-blue: #0A0E2E;
+    --glow-cyan: #00F5FF; --moon-silver: #C8D8E8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Kanit', sans-serif; background: var(--space-blue);
+    overflow: hidden; height: 100dvh; width: 100vw; position: relative;
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><text y='30' font-size='30'>👽</text></svg>"), auto;
+  }
+
+  button, a, .planet-card, .quiz-opt, canvas {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><text y='30' font-size='30'>🛸</text></svg>"), pointer !important;
+  }
+
+  #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .star { position: absolute; border-radius: 50%; background: white; animation: twinkle var(--d, 3s) ease-in-out infinite; }
+  @keyframes twinkle { 0%,100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 1; transform: scale(1.4); } }
+
+  .screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; transition: opacity 0.5s; }
+  .screen.hidden { opacity: 0; pointer-events: none; }
+
+  /* ====== HOME SCREEN ====== */
+  #home-screen { gap: 20px; background: radial-gradient(ellipse at 50% 30%, #1a1060 0%, #0A0E2E 70%); }
+  .title-badge { font-size: clamp(2.2rem, 8vw, 4rem); font-weight: 900; color: var(--star-yellow); text-shadow: 0 0 30px #FFE56699; text-align: center; line-height: 1.1; }
+  .title-sub { font-size: clamp(1rem, 4vw, 1.6rem); color: var(--moon-silver); opacity: 0.85; }
+  .rocket-logo { font-size: clamp(4rem, 15vw, 7rem); animation: float 3s ease-in-out infinite; filter: drop-shadow(0 0 20px #FF6B6B88); }
+  @keyframes float { 0%,100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-15px) rotate(5deg); } }
+
+  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 0 20px; width: min(500px, 95vw); margin-top: 10px; }
+  .menu-btn {
+    background: linear-gradient(135deg, var(--from), var(--to)); border: none; border-radius: 20px; padding: 18px 12px;
+    font-family: 'Kanit'; font-size: clamp(0.85rem, 3.5vw, 1.1rem); font-weight: 700; color: white;
+    box-shadow: 0 6px 20px #0008, 0 0 0 2px rgba(255,255,255,0.1) inset;
+    display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 110px; justify-content: center;
+  }
+  .menu-btn:active { transform: scale(0.94); }
+  .menu-btn .btn-icon { font-size: clamp(1.8rem, 7vw, 2.8rem); }
+  .menu-btn.blue  { --from: #1565C0; --to: #00BCD4; } .menu-btn.green { --from: #1B5E20; --to: #4CAF50; }
+  .menu-btn.purple{ --from: #6A1B9A; --to: #E040FB; } .menu-btn.orange{ --from: #E65100; --to: #FFB300; }
+
+  .back-btn {
+    position: fixed; top: 16px; left: 16px; z-index: 100; background: rgba(255,255,255,0.12); border: 2px solid rgba(255,255,255,0.25);
+    color: white; border-radius: 50px; padding: 10px 18px; font-family: 'Kanit'; font-weight: 700; backdrop-filter: blur(10px);
+  }
+
+  /* ====== PLANETS ====== */
+  #planets-screen { background: radial-gradient(ellipse at 40% 20%, #0d1b4b 0%, #0A0E2E 70%); flex-direction: column; padding-top: 60px; overflow-y: auto; justify-content: flex-start; }
+  .screen-title { font-size: clamp(1.5rem, 6vw, 2.2rem); font-weight: 900; color: var(--star-yellow); margin-bottom: 10px; text-align: center;}
+  .planets-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 10px 16px 30px; width: min(520px, 100vw); }
+  .planet-card { background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.12); border-radius: 22px; padding: 18px 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; backdrop-filter: blur(5px); }
+  .planet-card:active { transform: scale(0.93); }
+  .p-img { width: clamp(60px, 18vw, 90px); height: clamp(60px, 18vw, 90px); border-radius: 50%; object-fit: cover; box-shadow: 0 0 15px rgba(255,255,255,0.2), inset -10px -10px 20px rgba(0,0,0,0.8); }
+  .p-name { font-size: clamp(1rem, 4vw, 1.3rem); font-weight: 700; color: white; margin-top: 5px; }
+
+  #detail-screen { background: #0A0E2E; padding: 70px 20px 20px; overflow-y: auto; justify-content: flex-start; gap: 20px; }
+  .detail-img { width: clamp(150px, 40vw, 250px); height: clamp(150px, 40vw, 250px); border-radius: 50%; object-fit: cover; box-shadow: 0 0 40px rgba(255,255,255,0.2), inset -20px -20px 40px rgba(0,0,0,0.8); animation: floatDetail 6s ease-in-out infinite; }
+  @keyframes floatDetail { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-15px)} }
+  .detail-name { font-size: clamp(2rem, 8vw, 3.5rem); font-weight: 900; color: var(--star-yellow); text-align: center; }
+  .btn-sound { background: #FF4081; border: none; padding: 10px 24px; border-radius: 20px; color: white; font-family: 'Kanit'; font-weight: 700; font-size:1.1rem; display: flex; align-items: center; gap: 8px; margin: -10px auto 10px; box-shadow: 0 4px 15px rgba(255,64,129,0.4); }
+  .btn-sound.playing { background: #4CAF50; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1)} }
+  .detail-facts { width: min(480px, 100%); display: flex; flex-direction: column; gap: 10px; }
+  .fact-card { background: rgba(255,255,255,0.07); border-left: 4px solid var(--glow-cyan); border-radius: 12px; padding: 14px 16px; color: white; line-height: 1.5; font-size: 1.1rem; }
+
+  /* ====== QUIZ ====== */
+  #quiz-screen { background: radial-gradient(ellipse at 60% 60%, #0d2b1d 0%, #0A0E2E 70%); padding: 60px 16px 20px; overflow-y: auto; justify-content: flex-start; gap: 16px; }
+  .quiz-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 20px rgba(255,255,255,0.2); margin: 10px auto; display: block; }
+  .quiz-question { font-size: 1.4rem; font-weight: 700; color: white; text-align: center; padding: 16px; background: rgba(255,255,255,0.07); border-radius: 18px; width: min(480px, 100%); }
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: min(480px, 100%); }
+  .quiz-opt { background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.2); border-radius: 16px; padding: 16px 10px; color: white; font-family: 'Kanit'; font-weight: 700; transition: 0.15s; text-align: center; font-size: 1.1rem; }
+  .quiz-opt.correct { background: #1B5E20; border-color: #4CAF50; } .quiz-opt.wrong { background: #B71C1C; border-color: #EF5350; }
+  .score-bar { display: flex; align-items: center; gap: 12px; color: var(--star-yellow); font-weight: 700; width: min(480px,100%); font-size:1.2rem; }
+  .progress-track { flex: 1; height: 12px; background: rgba(255,255,255,0.1); border-radius: 99px; } .progress-fill { height: 100%; background: #4CAF50; border-radius: 99px; transition: 0.4s; }
+
+  /* ====== RESULT ====== */
+  #result-screen { background: radial-gradient(ellipse at 50% 40%, #1a1060 0%, #0A0E2E 70%); gap: 20px; }
+  .result-trophy { font-size: 6rem; animation: float 2s infinite; }
+  .play-again-btn { background: #E040FB; border: none; border-radius: 50px; padding: 15px 30px; color: white; font-family: 'Kanit'; font-weight: 700; font-size: 1.3rem; box-shadow: 0 5px 15px rgba(224,64,251,0.4); }
+
+  /* ====== TAP GAME ====== */
+  #tap-screen { background: radial-gradient(ellipse at 50% 50%, #1a0050 0%, #0A0E2E 70%); }
+  #tap-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  
+  .tap-dashboard {
+    position: fixed; top: 60px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px;
+    font-size: 1.8rem; font-weight: 900; color: white; pointer-events: none; z-index: 200;
+  }
+  .dash-box { background: rgba(0,0,0,0.5); padding: 5px 20px; border-radius: 30px; border: 2px solid rgba(255,255,255,0.2); }
+  #tap-time-val { color: #FF6B6B; }
+  #tap-score-val { color: var(--star-yellow); }
+
+  /* ====== FACTS SCREEN ====== */
+  #rockets-screen { background: #0A0E2E; flex-direction: column; padding-top: 60px; overflow-y: auto; justify-content: flex-start; }
+  .btn-fact-sound {
+    position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+    background: #FF4081; border: none; border-radius: 50%; width: 45px; height: 45px;
+    font-size: 1.2rem; box-shadow: 0 4px 10px rgba(255,64,129,0.4); display: flex; align-items: center; justify-content: center;
+  }
+</style>
+</head>
+<body>
+
+<div id="starfield"></div>
+
+<div class="screen" id="home-screen">
+  <div class="rocket-logo">🚀</div>
+  <div class="title-badge">สำรวจอวกาศ!</div>
+  <div class="title-sub">Kids & History Edition 🌌</div>
+  <div class="menu-grid">
+    <button class="menu-btn blue" onclick="showScreen('planets-screen'); playSwoosh();">
+      <span class="btn-icon">🪐</span>ดาวเคราะห์
+    </button>
+    <button class="menu-btn green" onclick="startQuiz(); playSwoosh();">
+      <span class="btn-icon">🧠</span>ทายชื่อดาว!
+    </button>
+    <button class="menu-btn purple" onclick="showScreen('tap-screen'); startTapGame(); playSwoosh();">
+      <span class="btn-icon">⏳</span>แข่งจับดาว!<br><small style="font-size:0.75rem;opacity:0.8">ช้าลงจับง่ายขึ้น!</small>
+    </button>
+    <button class="menu-btn orange" onclick="showScreen('rockets-screen'); playSwoosh();">
+      <span class="btn-icon">🛰️</span>ความรู้ & ภารกิจ
+    </button>
+  </div>
+</div>
+
+<div class="screen hidden" id="planets-screen">
+  <button class="back-btn" onclick="stopAudio(); window.location.href='../index.html'">← กลับหน้าหลัก</button>
+  <div class="screen-title">ระบบสุริยะและจักรวาล</div>
+  <div class="planets-grid" id="planets-grid"></div>
+</div>
+
+<div class="screen hidden" id="detail-screen">
+  <button class="back-btn" onclick="stopAudio(); showScreen('planets-screen')">← กลับ</button>
+  <img class="detail-img" id="detail-img" src="" alt="">
+  <div class="detail-name" id="detail-name"></div>
+  <button class="btn-sound" id="btn-sound" onclick="speakCurrentPlanet()">🔊 ฟังคุณครู AI</button>
+  <div class="detail-facts" id="detail-facts"></div>
+</div>
+
+<div class="screen hidden" id="quiz-screen">
+  <button class="back-btn" onclick="showScreen('home-screen')">← กลับ</button>
+  <div class="score-bar"><span>⭐ <span id="quiz-score">0</span></span><div class="progress-track"><div class="progress-fill" id="quiz-progress" style="width:0%"></div></div><span id="quiz-qnum">1/8</span></div>
+  <img class="quiz-img" id="quiz-img" src="">
+  <div class="quiz-question" id="quiz-question">ภาพนี้คือดวงดาวอะไรเอ่ย?</div>
+  <div class="quiz-options" id="quiz-options"></div>
+</div>
+
+<div class="screen hidden" id="result-screen">
+  <div class="result-trophy" id="result-trophy">🏆</div>
+  <h2 style="color:#FFE566; font-size:2.5rem; text-align:center;" id="result-title">เก่งมาก!</h2>
+  <p style="color:white; font-size:1.5rem; text-align:center;" id="result-score">ได้ 0 คะแนน</p>
+  <button class="play-again-btn" onclick="replayGame()">🔄 เล่นอีกครั้ง</button>
+  <button class="play-again-btn" style="background:#00BCD4; margin-top:10px;" onclick="showScreen('home-screen')">🏠 กลับเมนูหลัก</button>
+</div>
+
+<div class="screen hidden" id="tap-screen">
+  <button class="back-btn" onclick="showScreen('home-screen');stopTapGame()">← ยอมแพ้</button>
+  <canvas id="tap-canvas"></canvas>
+  <div class="tap-dashboard">
+    <div class="dash-box">⏳ <span id="tap-time-val">30</span>s</div>
+    <div class="dash-box">⭐ <span id="tap-score-val">0</span></div>
+  </div>
+</div>
+
+<div class="screen hidden" id="rockets-screen">
+  <button class="back-btn" onclick="stopAudio(); showScreen('home-screen')">← กลับ</button>
+  <div class="screen-title">ภารกิจและความรู้อวกาศ</div>
+  <div id="space-facts-list" style="padding:10px 16px 50px; width:min(520px,100%);"></div>
+</div>
+
+<script>
+// ===== SOUND & AI VOICE =====
+function playSwoosh() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContext) return;
+  const ctx = new AudioContext(); const osc = ctx.createOscillator(); const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.type = 'sine'; osc.frequency.setValueAtTime(600, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.2);
+  gain.gain.setValueAtTime(0.2, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+  osc.start(); osc.stop(ctx.currentTime + 0.2);
+}
+
+let fullTextToSpeak = "";
+function stopAudio() {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  let btn = document.getElementById('btn-sound');
+  if(btn) { btn.classList.remove('playing'); btn.innerHTML = "🔊 ฟังคุณครู AI"; }
+}
+
+function speakText(text) {
+  if ('speechSynthesis' in window) {
+    stopAudio();
+    let msg = new SpeechSynthesisUtterance(text);
+    msg.lang = 'th-TH'; 
+    msg.rate = 0.85; // เสียงช้าๆ ให้น้องฟังชัดๆ
+    window.speechSynthesis.speak(msg);
+  }
+}
+
+function speakCurrentPlanet() {
+  let btn = document.getElementById('btn-sound');
+  btn.classList.add('playing'); btn.innerHTML = "💬 กำลังพูด...";
+  speakText(fullTextToSpeak);
+  
+  // พยายามดักจับตอนพูดจบเพื่อเปลี่ยนปุ่มกลับ
+  let utterance = new SpeechSynthesisUtterance(fullTextToSpeak);
+  utterance.lang = 'th-TH'; utterance.rate = 0.85;
+  utterance.onend = function() { stopAudio(); };
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+}
+
+// ===== REALISTIC DATA =====
+const PLANETS = [
+  { img:'https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg', name:'ดวงอาทิตย์',
+    facts:['ดาวฤกษ์ที่เป็นศูนย์กลางของเรา','ร้อนมาก อุณหภูมิผิว 5,500 องศาเซลเซียส','ใหญ่กว่าโลก 109 เท่า'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/4/4a/Mercury_in_true_color.jpg', name:'ดาวพุธ',
+    facts:['อยู่ใกล้ดวงอาทิตย์ที่สุด','ไม่มีอากาศหายใจและไม่มีลม','ตอนกลางวันร้อนจัด กลางคืนหนาวจัด'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/0/08/Venus_from_Mariner_10.jpg', name:'ดาวศุกร์',
+    facts:['ดาวที่ร้อนที่สุดในระบบสุริยะ','สว่างที่สุดบนท้องฟ้ายามค่ำคืน','หมุนรอบตัวเองกลับด้านกับโลก'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg', name:'โลก',
+    facts:['บ้านที่สวยงามของเรา','มีน้ำและออกซิเจนให้สิ่งมีชีวิต','มองจากอวกาศจะเป็นลูกแก้วสีน้ำเงิน'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg', name:'ดวงจันทร์',
+    facts:['เพื่อนสนิทที่โคจรรอบโลก','ไม่มีอากาศและไม่มีเสียง','มนุษย์เคยไปเหยียบมาแล้ว'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg', name:'ดาวอังคาร',
+    facts:['ดาวเคราะห์สีแดง','มีภูเขาไฟที่สูงที่สุดในระบบสุริยะ','มีหุ่นยนต์สำรวจของมนุษย์อยู่บนนั้น'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg', name:'ดาวพฤหัสบดี',
+    facts:['พี่ใหญ่ ใหญ่ที่สุดในระบบสุริยะ','เป็นดาวแก๊ส ไม่มีพื้นดินแข็งๆ','มีพายุจุดแดงยักษ์พัดมานานกว่า 300 ปี'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg', name:'ดาวเสาร์',
+    facts:['มีวงแหวนสวยงามทำจากน้ำแข็ง','เป็นดาวแก๊สที่เบามากจนลอยน้ำได้'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg', name:'ดาวยูเรนัส',
+    facts:['ดาวสีฟ้าอมเขียวสุดหนาวเย็น','หมุนรอบตัวเองแบบตะแคงข้าง'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/6/63/Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg', name:'ดาวเนปจูน',
+    facts:['อยู่ไกลจากดวงอาทิตย์ที่สุด','มีพายุลมแรงที่สุดในระบบสุริยะ'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/4/4f/Black_hole_-_Messier_87_crop_max_res.jpg', name:'หลุมดำ',
+    facts:['แรงโน้มถ่วงมหาศาล ดูดได้ทุกอย่าง','แม้แต่แสงสว่างก็หนีออกมาไม่ได้','เกิดจากดาวฤกษ์ดวงใหญ่ที่ระเบิดและยุบตัว'] }
+];
+
+// 🛸 เพิ่มความรู้และโครงการอวกาศของมนุษย์
+const SPACE_FACTS = [
+  { icon:'🛰️', title:'ยานสปุตนิก 1 (Sputnik 1)', text:'ดาวเทียมดวงแรกของโลกที่มนุษย์สร้างขึ้น ถูกส่งขึ้นสู่อวกาศในปี 1957 ค่ะ' },
+  { icon:'👨‍🚀', title:'โครงการอะพอลโล 11', text:'ภารกิจประวัติศาสตร์ในปี 1969 ที่พามนุษย์ไปเหยียบดวงจันทร์เป็นครั้งแรก นำโดย นีล อาร์มสตรอง ค่ะ' },
+  { icon:'🌌', title:'ยานวอยเอเจอร์ 1', text:'ยานอวกาศที่เดินทางไปไกลที่สุด ตอนนี้ออกนอกระบบสุริยะของเราไปแล้วค่ะ' },
+  { icon:'🔭', title:'กล้องเจมส์ เว็บบ์', text:'กล้องโทรทรรศน์อวกาศที่ทรงพลังที่สุด ช่วยให้เราเห็นดวงดาวที่อยู่ไกลแสนไกลได้อย่างชัดเจนค่ะ' },
+  { icon:'🔬', title:'สถานีอวกาศนานาชาติ', text:'หรือ ISS เป็นห้องทดลองขนาดยักษ์ที่ลอยอยู่ในอวกาศ มีนักบินอวกาศสลับกันขึ้นไปทำงานอยู่ตลอดเวลาค่ะ' },
+  { icon:'👽', title:'กาแล็กซีทางช้างเผือก', text:'บ้านเกิดของระบบสุริยะเรา มีดาวฤกษ์อยู่มากกว่า 2 แสนล้านดวงเลยนะคะ' }
+];
+
+// STARFIELD
+for(let i=0; i<150; i++){
+  let s = document.createElement('div'); s.className='star'; let size = Math.random()*3+1;
+  s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${size}px;height:${size}px;--d:${(Math.random()*4+2).toFixed(1)}s;animation-delay:${(Math.random()*5).toFixed(1)}s`;
+  document.getElementById('starfield').appendChild(s);
+}
+
+let lastGameMode = 'quiz';
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+// BUILD PLANETS
+function buildPlanetsGrid() {
+  const grid = document.getElementById('planets-grid'); grid.innerHTML = '';
+  PLANETS.forEach((p, i) => {
+    const div = document.createElement('div'); div.className = 'planet-card';
+    div.innerHTML = `<img src="${p.img}" class="p-img"><div class="p-name">${p.name}</div>`;
+    div.onclick = () => { playSwoosh(); showPlanetDetail(i); };
+    grid.appendChild(div);
+  });
+}
+
+function showPlanetDetail(i) {
+  const p = PLANETS[i];
+  fullTextToSpeak = "นี่คือ " + p.name + " ค่ะ. " + p.facts.join(" . ");
+  
+  document.getElementById('detail-img').src = p.img;
+  document.getElementById('detail-name').textContent = p.name;
+  document.getElementById('detail-facts').innerHTML = p.facts.map(f => `<div class="fact-card">✦ ${f}</div>`).join('');
+  showScreen('detail-screen');
+  speakCurrentPlanet();
+}
+
+// 🔊 ปรับปรุงหน้าความรู้อวกาศให้มีปุ่มกดฟังเสียงได้ทีละอัน
+function buildSpaceFacts() {
+  document.getElementById('space-facts-list').innerHTML = SPACE_FACTS.map((f, index) => `
+    <div class="fact-card" style="margin-bottom:12px; border-left-color:#FFB300; position:relative; padding-right:55px;">
+      <strong style="color:#FFB300; font-size:1.2rem;">${f.icon} ${f.title}</strong><br><span style="font-size:1.05rem;">${f.text}</span>
+      <button class="btn-fact-sound" onclick="speakFact(${index})">🔊</button>
+    </div>`).join('');
+}
+
+function speakFact(index) {
+  const f = SPACE_FACTS[index];
+  let text = f.title + " . " + f.text;
+  speakText(text);
+}
+
+// QUIZ
+let qData = [], qIdx = 0, score = 0, tQ = 10, answered = false;
+function startQuiz() {
+  lastGameMode = 'quiz'; showScreen('quiz-screen'); score = 0; qIdx = 0;
+  qData = [...PLANETS].sort(()=>Math.random()-0.5).slice(0, tQ);
+  loadQuestion();
+}
+function loadQuestion() {
+  if(qIdx >= tQ) return showQuizResult();
+  answered = false;
+  document.getElementById('quiz-score').textContent = score; document.getElementById('quiz-qnum').textContent = `${qIdx+1}/${tQ}`;
+  document.getElementById('quiz-progress').style.width = `${(qIdx/tQ)*100}%`;
+  
+  const p = qData[qIdx]; document.getElementById('quiz-img').src = p.img;
+  let opts = [p.name]; let others = PLANETS.filter(x=>x.name !== p.name).sort(()=>Math.random()-0.5).slice(0,3).map(x=>x.name);
+  opts.push(...others); opts.sort(()=>Math.random()-0.5);
+  
+  const div = document.getElementById('quiz-options'); div.innerHTML = '';
+  opts.forEach(opt => {
+    let btn = document.createElement('button'); btn.className = 'quiz-opt'; btn.textContent = opt;
+    btn.onclick = () => answerQuiz(btn, opt === p.name); div.appendChild(btn);
+  });
+}
+function answerQuiz(btn, isCorrect) {
+  if(answered) return; answered = true;
+  if(isCorrect){ btn.classList.add('correct'); score++; playSwoosh(); }
+  else { btn.classList.add('wrong'); document.querySelectorAll('.quiz-opt').forEach(b=>{ if(b.textContent===qData[qIdx].name) b.classList.add('correct'); }); }
+  setTimeout(()=>{ qIdx++; loadQuestion(); }, 1200);
+}
+function showQuizResult() {
+  document.getElementById('result-trophy').textContent = '🏆';
+  document.getElementById('result-title').textContent = 'เก่งมาก!';
+  document.getElementById('result-score').textContent = `ตอบถูก ${score} จาก ${tQ} ข้อ`;
+  showScreen('result-screen');
+}
+
+// TAP GAME (KIDS MODE - SLOWER)
+let tapAnim, tapRunning = false, tapTimerInterval;
+let timeLeft = 30, tScore = 0;
+
+function startTapGame() {
+  lastGameMode = 'tap'; tScore = 0; timeLeft = 30;
+  document.getElementById('tap-score-val').textContent = '0';
+  document.getElementById('tap-time-val').textContent = '30';
+  
+  const cvs = document.getElementById('tap-canvas'); cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+  const ctx = cvs.getContext('2d'); let objs = []; tapRunning = true;
+  
+  clearInterval(tapTimerInterval);
+  tapTimerInterval = setInterval(() => {
+    timeLeft--; document.getElementById('tap-time-val').textContent = timeLeft;
+    if(timeLeft <= 0) endTapGame();
+  }, 1000);
+  
+  function spawn() {
+    if(!tapRunning) return;
+    
+    // ⬇️ ปรับลดความเร็วการพุ่งขึ้น (vy) ให้ช้าลง และเพิ่มขนาดไอคอน (s) ให้ใหญ่ขึ้นจิ้มง่ายๆ
+    objs.push({ 
+      x: 50 + Math.random()*(cvs.width-100), 
+      y: cvs.height + 50, 
+      vy: -(2.5 + Math.random() * 2.5), // พุ่งช้าลงมากๆ
+      s: 55, // ไอคอนใหญ่ขึ้น
+      e: ['🚀','⭐','🌕','🌍','🛸','👽'][Math.floor(Math.random()*6)], 
+      a: 1, 
+      hit: false 
+    });
+    
+    // เพิ่มระยะเวลาการปล่อยดาวให้ห่างขึ้น น้องจะได้ไม่ตาลาย
+    setTimeout(spawn, 700 + Math.random() * 600); 
+  }
+  spawn();
+  
+  function draw() {
+    if(!tapRunning) return; ctx.clearRect(0,0,cvs.width,cvs.height);
+    objs = objs.filter(o => o.a > 0 && o.y > -50);
+    objs.forEach(o => {
+      if(!o.hit){ 
+        o.y += o.vy; 
+        o.vy -= 0.03; // ⬇️ ลดแรงโน้มถ่วง ดาวจะลอยอยู่ในอากาศนานขึ้น
+      } else { 
+        o.a -= 0.1; o.s += 5; 
+      }
+      ctx.save(); ctx.globalAlpha = o.a; ctx.font = `${o.s}px serif`; ctx.fillText(o.e, o.x, o.y); ctx.restore();
+    });
+    tapAnim = requestAnimationFrame(draw);
+  }
+  draw();
+  
+  cvs.ontouchstart = cvs.onmousedown = (e) => {
+    let t = e.touches ? e.touches[0] : e;
+    for(let o of objs){
+      // ขยายพื้นที่การจิ้ม (Hitbox) ให้กว้างขึ้นเป็น 70 น้องจะได้จิ้มโดนง่ายๆ
+      if(!o.hit && Math.hypot(o.x-t.clientX, o.y-t.clientY) < 70){
+        o.hit = true; tScore++; document.getElementById('tap-score-val').textContent = tScore; playSwoosh(); break;
+      }
+    }
+  };
+}
+
+function endTapGame() {
+  stopTapGame();
+  document.getElementById('result-trophy').textContent = '🛸';
+  document.getElementById('result-title').textContent = 'หมดเวลา!';
+  document.getElementById('result-score').textContent = `จับดาวได้ทั้งหมด ${tScore} ดวง ⭐`;
+  showScreen('result-screen');
+}
+
+function stopTapGame(){ 
+  tapRunning = false; 
+  cancelAnimationFrame(tapAnim); 
+  clearInterval(tapTimerInterval); 
+}
+
+function replayGame() {
+  if (lastGameMode === 'quiz') startQuiz();
+  else { showScreen('tap-screen'); startTapGame(); }
+}
+
+buildPlanetsGrid(); buildSpaceFacts();
+</script>
+</body>
+</html>

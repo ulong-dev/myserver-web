@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { 
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            page: '#FCFBF9',       
+            card: '#FFFFFF',       
+            primary: '#33302E',    
+            muted: '#9E9892',      
+            accent: '#FC4C02',     // Strava Orange
+            borderLight: '#F3F0EC' 
+          },
+          fontFamily: {
+            sans: ['Kanit', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          },
+          boxShadow: {
+            'glow': '0 20px 40px -10px rgba(0,0,0,0.04)',
+            'glow-hover': '0 30px 60px -15px rgba(0,0,0,0.08)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Kanit:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Kanit', sans-serif; background-color: #FCFBF9; }
+    
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    
+    /* Custom Range Slider */
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #FC4C02; cursor: pointer; margin-top: -8px; box-shadow: 0 2px 6px rgba(252,76,2,0.4); }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #E0E0E0; border-radius: 2px; }
+    .dark input[type=range]::-webkit-slider-runnable-track { background: #404040; }
+  </style>
+</head>
+
+<body class="bg-page text-primary dark:bg-[#121212] dark:text-gray-200 pb-24 transition-colors duration-500 selection:bg-accent/20">
+
+  <nav class="pt-8 pb-4 px-6 max-w-2xl mx-auto flex justify-between items-center z-50 sticky top-0 bg-page/80 dark:bg-[#121212]/80 backdrop-blur-md">
+    <div class="font-serif text-2xl font-semibold tracking-wide flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
+      ELITE <span class="text-muted font-light">LOG</span>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-muted dark:text-gray-400">
+        <span class="material-icons-round text-xl" id="themeIcon">dark_mode</span>
+      </button>
+      <a href="dashboard.html" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-muted dark:text-gray-400">
+        <span class="material-icons-round text-xl">insert_chart_outlined</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="max-w-2xl mx-auto px-6 mt-4">
+    <div class="bg-card dark:bg-[#1E1E1E] rounded-[32px] p-6 md:p-10 shadow-glow border border-borderLight dark:border-[#2A2A2A]">
+      <h4 class="text-xl font-semibold mb-8 text-primary dark:text-white text-center">Record Activity</h4>
+
+      <form id="runForm" onsubmit="handleFormSubmit(event, this)" class="space-y-6">
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1">DATE</label>
+            <input type="date" name="date" id="dateInput" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3.5 outline-none focus:border-accent dark:focus:border-accent text-[14px] text-primary dark:text-gray-200 transition" required>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1">TYPE</label>
+            <select name="type" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3.5 outline-none focus:border-accent dark:focus:border-accent text-[14px] text-primary dark:text-gray-200 transition appearance-none">
+              <option value="Easy">Run (Easy)</option>
+              <option value="Tempo">Run (Tempo)</option>
+              <option value="Interval">Workout</option>
+              <option value="Long">Long Run</option>
+              <option value="Race">Race</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-4">
+          <div class="h-[1px] bg-borderLight dark:bg-[#2A2A2A] flex-1"></div>
+          <span class="text-[10px] font-bold text-accent uppercase tracking-[0.15em]">Stats</span>
+          <div class="h-[1px] bg-borderLight dark:bg-[#2A2A2A] flex-1"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1">DIST (KM)</label>
+            <input type="number" step="0.01" name="distance" placeholder="0.00" class="w-full bg-white dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3.5 outline-none focus:border-accent dark:focus:border-accent text-center text-xl font-medium text-primary dark:text-white transition shadow-sm" required>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1">DURATION</label>
+            <div class="flex gap-2 items-center">
+              <input type="number" id="hInput" placeholder="hr" min="0" class="w-full bg-white dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3.5 outline-none focus:border-accent dark:focus:border-accent text-center text-xl font-medium text-primary dark:text-white transition shadow-sm">
+              <span class="text-muted font-bold">:</span>
+              <input type="number" id="mInput" placeholder="min" min="0" class="w-full bg-white dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3.5 outline-none focus:border-accent dark:focus:border-accent text-center text-xl font-medium text-primary dark:text-white transition shadow-sm" required>
+            </div>
+            <input type="hidden" name="duration" id="totalDuration">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1 text-center">HR AVG</label>
+            <input type="number" name="hr" placeholder="-" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-primary dark:text-gray-200 transition">
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1 text-center">POWER</label>
+            <input type="number" name="power" placeholder="-" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-primary dark:text-gray-200 transition">
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1 text-center">CADENCE</label>
+            <input type="number" name="cadence" placeholder="-" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-primary dark:text-gray-200 transition">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="text-[9px] font-bold text-muted uppercase tracking-[0.05em] ml-1 block mb-1 text-center">VERT OSC(cm)</label>
+            <input type="number" step="0.1" name="vertOsc" placeholder="-" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-primary dark:text-gray-200 transition">
+          </div>
+          <div>
+            <label class="text-[9px] font-bold text-muted uppercase tracking-[0.05em] ml-1 block mb-1 text-center">GCT(ms)</label>
+            <input type="number" name="gct" placeholder="-" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-primary dark:text-gray-200 transition">
+          </div>
+          <div>
+            <label class="text-[9px] font-bold text-muted uppercase tracking-[0.05em] ml-1 block mb-1 text-center">STRIDE(m)</label>
+            <input type="number" step="0.01" name="strideLen" placeholder="-" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-primary dark:text-gray-200 transition">
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-4">
+          <div class="h-[1px] bg-borderLight dark:bg-[#2A2A2A] flex-1"></div>
+          <span class="text-[10px] font-bold text-accent uppercase tracking-[0.15em]">Feeling</span>
+          <div class="h-[1px] bg-borderLight dark:bg-[#2A2A2A] flex-1"></div>
+        </div>
+
+        <div class="bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] p-5 rounded-2xl">
+          <div class="flex justify-between items-end mb-4">
+            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em]">RPE (1-10)</label>
+            <span id="rpeVal" class="text-3xl font-serif text-accent leading-none">5</span>
+          </div>
+          <input type="range" min="1" max="10" step="1" name="rpe" value="5" oninput="document.getElementById('rpeVal').innerText=this.value">
+        </div>
+
+        <div>
+          <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1">NOTES</label>
+          <textarea name="notes" rows="2" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-4 outline-none focus:border-accent dark:focus:border-accent text-[14px] text-primary dark:text-gray-200 transition resize-none placeholder-muted/50" placeholder="How did it feel?"></textarea>
+        </div>
+
+        <button type="submit" id="saveBtn" class="w-full bg-accent text-white font-medium tracking-wide py-4 rounded-full shadow-lg shadow-accent/30 hover:shadow-accent/50 hover:-translate-y-0.5 transition-all text-[15px] mt-4">
+          SAVE ACTIVITY
+        </button>
+      </form>
+
+      <div id="alertBox" class="mt-6 text-center text-sm font-medium py-3 rounded-2xl hidden" role="alert"></div>
+    </div>
+
+    <div class="text-center mt-8 pb-8">
+      <a href="dashboard.html" class="text-accent text-[13px] font-bold tracking-wide hover:opacity-80 transition-opacity">
+        VIEW DASHBOARD <span class="ml-1">&rarr;</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxQcd1Sqt1-b2gZ8pwWJhs1Ye1nWK7mV_qNWOiVEKReWJvOGY_VeCFk-l0YL-Wh0AyW/exec";
+
+    const html = document.documentElement;
+    function toggleTheme() {
+      const next = html.classList.contains('dark') ? 'light' : 'dark';
+      if (next === 'dark') { html.classList.add('dark'); } else { html.classList.remove('dark'); }
+      localStorage.setItem('elite_theme', next);
+      document.getElementById('themeIcon').innerText = next === 'dark' ? 'light_mode' : 'dark_mode';
+    }
+    
+    const saved = localStorage.getItem('elite_theme') || 'light';
+    if (saved === 'dark' || (!localStorage.getItem('elite_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      html.classList.add('dark');
+      document.getElementById('themeIcon').innerText = 'light_mode';
+    } else {
+      document.getElementById('themeIcon').innerText = 'dark_mode';
+    }
+
+    document.getElementById('dateInput').valueAsDate = new Date();
+
+    async function handleFormSubmit(e, form) {
+      e.preventDefault();
+
+      const h = parseInt(document.getElementById('hInput').value, 10) || 0;
+      const m = parseInt(document.getElementById('mInput').value, 10) || 0;
+      document.getElementById('totalDuration').value = (h * 60) + m;
+
+      const btn = document.getElementById('saveBtn');
+      const box = document.getElementById('alertBox');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> SAVING...';
+      btn.classList.add('opacity-70');
+      box.classList.add('hidden');
+      box.classList.remove('bg-green-50', 'text-green-600', 'bg-red-50', 'text-red-600', 'dark:bg-green-900/20', 'dark:bg-red-900/20');
+
+      try {
+        const payload = formToObject(form);
+
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        let out;
+        try { out = JSON.parse(text); } catch { out = { status: "success", message: text }; }
+
+        if (!res.ok || out.status === "error") throw new Error(out.message || `HTTP ${res.status}`);
+
+        form.reset();
+        document.getElementById('dateInput').valueAsDate = new Date();
+        document.getElementById('rpeVal').innerText = "5";
+        document.getElementById('hInput').value = "";
+        document.getElementById('mInput').value = "";
+
+        box.classList.add('bg-green-50', 'text-green-600', 'dark:bg-green-900/20', 'dark:text-green-400');
+        box.innerText = out.message || "✅ Activity Saved!";
+        box.classList.remove('hidden');
+        setTimeout(() => box.classList.add('hidden'), 2500);
+
+      } catch (err) {
+        box.classList.add('bg-red-50', 'text-red-600', 'dark:bg-red-900/20', 'dark:text-red-400');
+        box.innerText = `❌ ${err.message || "Failed to save"}`;
+        box.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'SAVE ACTIVITY';
+        btn.classList.remove('opacity-70');
+      }
+    }
+
+    function formToObject(form) {
+      const fd = new FormData(form);
+      const obj = Object.fromEntries(fd.entries());
+      const fields = ['distance', 'duration', 'hr', 'power', 'cadence', 'rpe', 'vertOsc', 'gct', 'strideLen'];
+      fields.forEach(f => { obj[f] = numOrBlank(obj[f]); });
+      return obj;
+    }
+
+    function numOrBlank(v) {
+      if (v === "" || v === null || v === undefined) return "";
+      const n = Number(v);
+      return Number.isFinite(n) ? n : "";
+    }
+  </script>
+</body>
+</html>

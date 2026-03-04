@@ -1,0 +1,126 @@
+2026-03-03T07:18:54Z INF Thank you for trying Cloudflare Tunnel. Doing so, without a Cloudflare account, is a quick way to experiment and try it out. However, be aware that these account-less Tunnels have no uptime guarantee, are subject to the Cloudflare Online Services Terms of Use (https://www.cloudflare.com/website-terms/), and Cloudflare reserves the right to investigate your use of Tunnels for violations of such terms. If you intend to use Tunnels in production you should use a pre-created named tunnel by following: https://developers.cloudflare.com/cloudflare-one/connections/connect-apps
+2026-03-03T07:18:54Z INF Requesting new quick Tunnel on trycloudflare.com...
+2026-03-03T07:19:03Z INF +--------------------------------------------------------------------------------------------+
+2026-03-03T07:19:03Z INF |  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |
+2026-03-03T07:19:03Z INF |  https://calculators-sales-pcs-terrorism.trycloudflare.com                                 |
+2026-03-03T07:19:03Z INF +--------------------------------------------------------------------------------------------+
+2026-03-03T07:19:03Z INF Cannot determine default configuration path. No file [config.yml config.yaml] in [~/.cloudflared ~/.cloudflare-warp ~/cloudflare-warp /etc/cloudflared /usr/local/etc/cloudflared]
+2026-03-03T07:19:03Z INF Version 2026.2.0 (Checksum f32ece46ec52d21d322077b94cdc76bdd602f3061dfaaefd7fb0aa424268cad5)
+2026-03-03T07:19:03Z INF GOOS: darwin, GOVersion: go1.24.2, GoArch: amd64
+2026-03-03T07:19:03Z INF Settings: map[ha-connections:1 protocol:quic url:http://127.0.0.1:5500]
+2026-03-03T07:19:03Z INF Autoupdate frequency is set autoupdateFreq=86400000
+2026-03-03T07:19:03Z INF Generated Connector ID: 7c6e0afb-e231-4108-9fef-7ffa052b4f51
+2026-03-03T07:19:03Z INF Initial protocol quic
+2026-03-03T07:19:03Z INF ICMP proxy will use 192.168.1.37 as source for IPv4
+2026-03-03T07:19:03Z INF ICMP proxy will use fe80::189e:6c66:5d53:303d in zone en1 as source for IPv6
+2026-03-03T07:19:03Z INF Created ICMP proxy listening on 192.168.1.37:0
+2026-03-03T07:19:03Z INF ICMP proxy will use 192.168.1.37 as source for IPv4
+2026-03-03T07:19:03Z INF ICMP proxy will use fe80::189e:6c66:5d53:303d in zone en1 as source for IPv6
+2026-03-03T07:19:03Z INF Starting metrics server on 127.0.0.1:20243/metrics
+2026-03-03T07:19:03Z INF Tunnel connection curve preferences: [X25519MLKEM768 CurveP256] connIndex=0 event=0 ip=198.41.192.107
+2026-03-03T07:19:04Z INF Registered tunnel connection connIndex=0 connection=cfb9cf3c-2310-4f5f-9118-85a08601bc21 event=0 ip=198.41.192.107 location=bkk04 protocol=quic
+::1 - - [03/Mar/2026 14:04:46] "GET / HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:05:19] "GET /space-game/index.html HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:05:23] "GET /index.html HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:05:25] "GET /library/index.html HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:05:36] "GET /running-app/index.html HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:05:40] "GET /running-app/dashboard.html HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:06:01] "GET /index.html HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:06:55] "GET /index.html HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:09:29] "GET / HTTP/1.1" 304 -
+::1 - - [03/Mar/2026 14:09:30] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:30] "GET //ws HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:33] "GET /space-game/index.html HTTP/1.1" 304 -
+::1 - - [03/Mar/2026 14:09:33] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:33] "GET /space-game/index.html/ws HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:44] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:44] "GET /coffee-shop/index.html/ws HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:44] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:44] "GET /coffee-shop/assets/menu/americano_hot.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:44] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:44] "GET /coffee-shop/assets/menu/cappuccino_hot.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:44] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:44] "GET /coffee-shop/assets/menu/latte_hot.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:44] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:44] "GET /coffee-shop/assets/menu/latte_iced.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:44] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:44] "GET /coffee-shop/assets/menu/mocha_iced.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:44] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:44] "GET /coffee-shop/assets/menu/cappuccino_iced.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:44] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:44] "GET /coffee-shop/assets/menu/espresso_iced.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:44] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:44] "GET /coffee-shop/assets/menu/americano_iced.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:44] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:44] "GET /coffee-shop/assets/menu/espresso_hot.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:45] "GET /coffee-shop/index.html HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:09:45] "GET /coffee-shop/assets/logo.png HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:09:45] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:45] "GET /coffee-shop/assets/menu/mocha_iced.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:45] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:45] "GET /coffee-shop/assets/menu/latte_iced.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:45] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:45] "GET /coffee-shop/assets/menu/espresso_iced.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:45] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:45] "GET /coffee-shop/assets/menu/latte_hot.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:45] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:45] "GET /coffee-shop/assets/menu/cappuccino_hot.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:45] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:45] "GET /coffee-shop/assets/menu/americano_iced.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:45] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:45] "GET /coffee-shop/assets/menu/cappuccino_iced.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:45] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:45] "GET /coffee-shop/assets/menu/espresso_hot.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:45] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:45] "GET /coffee-shop/assets/menu/americano_hot.jpg HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:47] code 404, message File not found
+::1 - - [03/Mar/2026 14:09:47] "GET //ws HTTP/1.1" 404 -
+::1 - - [03/Mar/2026 14:09:49] "GET / HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:09:52] "GET /running-app/index.html HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:19:48] "GET / HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:20:02] "GET / HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:21:13] "GET / HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:21:19] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:21:19] "GET /favicon.ico HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:21:34] "GET /library/index.html HTTP/1.1" 200 -
+::1 - - [03/Mar/2026 14:21:45] "GET / HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:34] "GET /library/index.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:34] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:34] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:34] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:34] "GET /apple-touch-icon.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] "GET /apple-touch-icon.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] "GET /favicon.ico HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] "GET /apple-touch-icon.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] "GET /favicon.ico HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] "GET /library/index.html HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] "GET /apple-touch-icon.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] "GET /favicon.ico HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:35] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:36] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:36] "GET /apple-touch-icon.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:36] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:25:36] "GET /favicon.ico HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:55:42] "GET / HTTP/1.1" 200 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:55:43] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:55:43] "GET /apple-touch-icon-152x152-precomposed.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:55:43] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:55:43] "GET /apple-touch-icon-152x152.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:55:44] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:55:44] "GET /apple-touch-icon-precomposed.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:55:44] code 404, message File not found
+::ffff:127.0.0.1 - - [03/Mar/2026 14:55:44] "GET /apple-touch-icon.png HTTP/1.1" 404 -
+::ffff:127.0.0.1 - - [03/Mar/2026 14:55:45] code 404, message File not found
