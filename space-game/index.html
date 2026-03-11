@@ -101,6 +101,19 @@
   #tap-time-val { color: #FF6B6B; }
   #tap-score-val { color: var(--star-yellow); }
 
+  /* 💥 เพิ่มเอฟเฟกต์หน้าจอสั่น 💥 */
+  @keyframes shakeEffect {
+    0% { transform: translate(2px, 2px) rotate(0deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    40% { transform: translate(2px, -2px) rotate(0deg); }
+    60% { transform: translate(-2px, 3px) rotate(-1deg); }
+    80% { transform: translate(-2px, -2px) rotate(1deg); }
+    100% { transform: translate(0px, 0px) rotate(0deg); }
+  }
+  .shake-screen {
+    animation: shakeEffect 0.4s ease-in-out;
+  }
+
   /* ====== FACTS SCREEN ====== */
   #rockets-screen { background: #0A0E2E; flex-direction: column; padding-top: 60px; overflow-y: auto; justify-content: flex-start; }
   .btn-fact-sound {
@@ -126,7 +139,7 @@
       <span class="btn-icon">🧠</span>ทายชื่อดาว!
     </button>
     <button class="menu-btn purple" onclick="showScreen('tap-screen'); startTapGame(); playSwoosh();">
-      <span class="btn-icon">⏳</span>แข่งจับดาว!<br><small style="font-size:0.75rem;opacity:0.8">ช้าลงจับง่ายขึ้น!</small>
+      <span class="btn-icon">⏳</span>แข่งจับดาว!<br><small style="font-size:0.75rem;opacity:0.8">ยิ่งเวลาย่อมน้อย ยิ่งเร็ว!</small>
     </button>
     <button class="menu-btn orange" onclick="showScreen('rockets-screen'); playSwoosh();">
       <span class="btn-icon">🛰️</span>ความรู้ & ภารกิจ
@@ -180,7 +193,14 @@
 </div>
 
 <script>
-// ===== SOUND & AI VOICE =====
+// ===== เสียงและ AI VOICE ที่ปรับปรุงแล้ว =====
+let availableVoices = [];
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = () => {
+    availableVoices = window.speechSynthesis.getVoices();
+  };
+}
+
 function playSwoosh() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   if (!AudioContext) return;
@@ -198,12 +218,19 @@ function stopAudio() {
   if(btn) { btn.classList.remove('playing'); btn.innerHTML = "🔊 ฟังคุณครู AI"; }
 }
 
-function speakText(text) {
+function speakText(text, onEndCallback = null) {
   if ('speechSynthesis' in window) {
     stopAudio();
     let msg = new SpeechSynthesisUtterance(text);
     msg.lang = 'th-TH'; 
-    msg.rate = 0.85; // เสียงช้าๆ ให้น้องฟังชัดๆ
+    msg.rate = 0.9;  
+    msg.pitch = 1.1; 
+
+    let thVoice = availableVoices.find(v => v.lang === 'th-TH' && (v.name.includes('Natural') || v.name.includes('Premium'))) 
+                  || availableVoices.find(v => v.lang === 'th-TH');
+    if (thVoice) msg.voice = thVoice;
+
+    if (onEndCallback) msg.onend = onEndCallback;
     window.speechSynthesis.speak(msg);
   }
 }
@@ -211,43 +238,24 @@ function speakText(text) {
 function speakCurrentPlanet() {
   let btn = document.getElementById('btn-sound');
   btn.classList.add('playing'); btn.innerHTML = "💬 กำลังพูด...";
-  speakText(fullTextToSpeak);
-  
-  // พยายามดักจับตอนพูดจบเพื่อเปลี่ยนปุ่มกลับ
-  let utterance = new SpeechSynthesisUtterance(fullTextToSpeak);
-  utterance.lang = 'th-TH'; utterance.rate = 0.85;
-  utterance.onend = function() { stopAudio(); };
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utterance);
+  speakText(fullTextToSpeak, function() { stopAudio(); });
 }
 
 // ===== REALISTIC DATA =====
 const PLANETS = [
-  { img:'https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg', name:'ดวงอาทิตย์',
-    facts:['ดาวฤกษ์ที่เป็นศูนย์กลางของเรา','ร้อนมาก อุณหภูมิผิว 5,500 องศาเซลเซียส','ใหญ่กว่าโลก 109 เท่า'] },
-  { img:'https://upload.wikimedia.org/wikipedia/commons/4/4a/Mercury_in_true_color.jpg', name:'ดาวพุธ',
-    facts:['อยู่ใกล้ดวงอาทิตย์ที่สุด','ไม่มีอากาศหายใจและไม่มีลม','ตอนกลางวันร้อนจัด กลางคืนหนาวจัด'] },
-  { img:'https://upload.wikimedia.org/wikipedia/commons/0/08/Venus_from_Mariner_10.jpg', name:'ดาวศุกร์',
-    facts:['ดาวที่ร้อนที่สุดในระบบสุริยะ','สว่างที่สุดบนท้องฟ้ายามค่ำคืน','หมุนรอบตัวเองกลับด้านกับโลก'] },
-  { img:'https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg', name:'โลก',
-    facts:['บ้านที่สวยงามของเรา','มีน้ำและออกซิเจนให้สิ่งมีชีวิต','มองจากอวกาศจะเป็นลูกแก้วสีน้ำเงิน'] },
-  { img:'https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg', name:'ดวงจันทร์',
-    facts:['เพื่อนสนิทที่โคจรรอบโลก','ไม่มีอากาศและไม่มีเสียง','มนุษย์เคยไปเหยียบมาแล้ว'] },
-  { img:'https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg', name:'ดาวอังคาร',
-    facts:['ดาวเคราะห์สีแดง','มีภูเขาไฟที่สูงที่สุดในระบบสุริยะ','มีหุ่นยนต์สำรวจของมนุษย์อยู่บนนั้น'] },
-  { img:'https://upload.wikimedia.org/wikipedia/commons/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg', name:'ดาวพฤหัสบดี',
-    facts:['พี่ใหญ่ ใหญ่ที่สุดในระบบสุริยะ','เป็นดาวแก๊ส ไม่มีพื้นดินแข็งๆ','มีพายุจุดแดงยักษ์พัดมานานกว่า 300 ปี'] },
-  { img:'https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg', name:'ดาวเสาร์',
-    facts:['มีวงแหวนสวยงามทำจากน้ำแข็ง','เป็นดาวแก๊สที่เบามากจนลอยน้ำได้'] },
-  { img:'https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg', name:'ดาวยูเรนัส',
-    facts:['ดาวสีฟ้าอมเขียวสุดหนาวเย็น','หมุนรอบตัวเองแบบตะแคงข้าง'] },
-  { img:'https://upload.wikimedia.org/wikipedia/commons/6/63/Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg', name:'ดาวเนปจูน',
-    facts:['อยู่ไกลจากดวงอาทิตย์ที่สุด','มีพายุลมแรงที่สุดในระบบสุริยะ'] },
-  { img:'https://upload.wikimedia.org/wikipedia/commons/4/4f/Black_hole_-_Messier_87_crop_max_res.jpg', name:'หลุมดำ',
-    facts:['แรงโน้มถ่วงมหาศาล ดูดได้ทุกอย่าง','แม้แต่แสงสว่างก็หนีออกมาไม่ได้','เกิดจากดาวฤกษ์ดวงใหญ่ที่ระเบิดและยุบตัว'] }
+  { img:'https://upload.wikimedia.org/wikipedia/commons/b/b4/The_Sun_by_the_Atmospheric_Imaging_Assembly_of_NASA%27s_Solar_Dynamics_Observatory_-_20100819.jpg', name:'ดวงอาทิตย์', facts:['ดาวฤกษ์ที่เป็นศูนย์กลางของเรา','ร้อนมาก อุณหภูมิผิว 5,500 องศาเซลเซียส','ใหญ่กว่าโลก 109 เท่า'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/4/4a/Mercury_in_true_color.jpg', name:'ดาวพุธ', facts:['อยู่ใกล้ดวงอาทิตย์ที่สุด','ไม่มีอากาศหายใจและไม่มีลม','ตอนกลางวันร้อนจัด กลางคืนหนาวจัด'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/0/08/Venus_from_Mariner_10.jpg', name:'ดาวศุกร์', facts:['ดาวที่ร้อนที่สุดในระบบสุริยะ','สว่างที่สุดบนท้องฟ้ายามค่ำคืน','หมุนรอบตัวเองกลับด้านกับโลก'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg', name:'โลก', facts:['บ้านที่สวยงามของเรา','มีน้ำและออกซิเจนให้สิ่งมีชีวิต','มองจากอวกาศจะเป็นลูกแก้วสีน้ำเงิน'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg', name:'ดวงจันทร์', facts:['เพื่อนสนิทที่โคจรรอบโลก','ไม่มีอากาศและไม่มีเสียง','มนุษย์เคยไปเหยียบมาแล้ว'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/0/02/OSIRIS_Mars_true_color.jpg', name:'ดาวอังคาร', facts:['ดาวเคราะห์สีแดง','มีภูเขาไฟที่สูงที่สุดในระบบสุริยะ','มีหุ่นยนต์สำรวจของมนุษย์อยู่บนนั้น'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/2/2b/Jupiter_and_its_shrunken_Great_Red_Spot.jpg', name:'ดาวพฤหัสบดี', facts:['พี่ใหญ่ ใหญ่ที่สุดในระบบสุริยะ','เป็นดาวแก๊ส ไม่มีพื้นดินแข็งๆ','มีพายุจุดแดงยักษ์พัดมานานกว่า 300 ปี'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg', name:'ดาวเสาร์', facts:['มีวงแหวนสวยงามทำจากน้ำแข็ง','เป็นดาวแก๊สที่เบามากจนลอยน้ำได้'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/3/3d/Uranus2.jpg', name:'ดาวยูเรนัส', facts:['ดาวสีฟ้าอมเขียวสุดหนาวเย็น','หมุนรอบตัวเองแบบตะแคงข้าง'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/6/63/Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg', name:'ดาวเนปจูน', facts:['อยู่ไกลจากดวงอาทิตย์ที่สุด','มีพายุลมแรงที่สุดในระบบสุริยะ'] },
+  { img:'https://upload.wikimedia.org/wikipedia/commons/4/4f/Black_hole_-_Messier_87_crop_max_res.jpg', name:'หลุมดำ', facts:['แรงโน้มถ่วงมหาศาล ดูดได้ทุกอย่าง','แม้แต่แสงสว่างก็หนีออกมาไม่ได้','เกิดจากดาวฤกษ์ดวงใหญ่ที่ระเบิดและยุบตัว'] }
 ];
 
-// 🛸 เพิ่มความรู้และโครงการอวกาศของมนุษย์
 const SPACE_FACTS = [
   { icon:'🛰️', title:'ยานสปุตนิก 1 (Sputnik 1)', text:'ดาวเทียมดวงแรกของโลกที่มนุษย์สร้างขึ้น ถูกส่งขึ้นสู่อวกาศในปี 1957 ค่ะ' },
   { icon:'👨‍🚀', title:'โครงการอะพอลโล 11', text:'ภารกิจประวัติศาสตร์ในปี 1969 ที่พามนุษย์ไปเหยียบดวงจันทร์เป็นครั้งแรก นำโดย นีล อาร์มสตรอง ค่ะ' },
@@ -292,7 +300,6 @@ function showPlanetDetail(i) {
   speakCurrentPlanet();
 }
 
-// 🔊 ปรับปรุงหน้าความรู้อวกาศให้มีปุ่มกดฟังเสียงได้ทีละอัน
 function buildSpaceFacts() {
   document.getElementById('space-facts-list').innerHTML = SPACE_FACTS.map((f, index) => `
     <div class="fact-card" style="margin-bottom:12px; border-left-color:#FFB300; position:relative; padding-right:55px;">
@@ -330,12 +337,20 @@ function loadQuestion() {
     btn.onclick = () => answerQuiz(btn, opt === p.name); div.appendChild(btn);
   });
 }
+
 function answerQuiz(btn, isCorrect) {
   if(answered) return; answered = true;
-  if(isCorrect){ btn.classList.add('correct'); score++; playSwoosh(); }
-  else { btn.classList.add('wrong'); document.querySelectorAll('.quiz-opt').forEach(b=>{ if(b.textContent===qData[qIdx].name) b.classList.add('correct'); }); }
-  setTimeout(()=>{ qIdx++; loadQuestion(); }, 1200);
+  if(isCorrect){ 
+    btn.classList.add('correct'); score++; playSwoosh(); 
+    speakText("ยอดเยี่ยม! ถูกต้องครับ"); 
+  } else { 
+    btn.classList.add('wrong'); 
+    document.querySelectorAll('.quiz-opt').forEach(b=>{ if(b.textContent===qData[qIdx].name) b.classList.add('correct'); }); 
+    speakText("อ๊ะ ยังไม่ใช่ครับ ลองดูข้อต่อไปนะ"); 
+  }
+  setTimeout(()=>{ qIdx++; loadQuestion(); }, 2000);
 }
+
 function showQuizResult() {
   document.getElementById('result-trophy').textContent = '🏆';
   document.getElementById('result-title').textContent = 'เก่งมาก!';
@@ -343,7 +358,7 @@ function showQuizResult() {
   showScreen('result-screen');
 }
 
-// TAP GAME (KIDS MODE - SLOWER)
+// TAP GAME
 let tapAnim, tapRunning = false, tapTimerInterval;
 let timeLeft = 30, tScore = 0;
 
@@ -364,19 +379,27 @@ function startTapGame() {
   function spawn() {
     if(!tapRunning) return;
     
-    // ⬇️ ปรับลดความเร็วการพุ่งขึ้น (vy) ให้ช้าลง และเพิ่มขนาดไอคอน (s) ให้ใหญ่ขึ้นจิ้มง่ายๆ
+    let timeRatio = (30 - timeLeft) / 30; 
+    let currentVy = -(2.5 + Math.random() * 2.5) - (timeRatio * 3.5); 
+    
+    let goodItems = ['🚀','⭐','🌕','🌍','🛸'];
+    let badItems = ['☄️','👽']; 
+    
+    let itemType = Math.random() < 0.75 ? goodItems[Math.floor(Math.random()*goodItems.length)] : badItems[Math.floor(Math.random()*badItems.length)];
+
     objs.push({ 
       x: 50 + Math.random()*(cvs.width-100), 
       y: cvs.height + 50, 
-      vy: -(2.5 + Math.random() * 2.5), // พุ่งช้าลงมากๆ
-      s: 55, // ไอคอนใหญ่ขึ้น
-      e: ['🚀','⭐','🌕','🌍','🛸','👽'][Math.floor(Math.random()*6)], 
+      vy: currentVy, 
+      s: 55, 
+      e: itemType, 
       a: 1, 
-      hit: false 
+      hit: false,
+      isBad: badItems.includes(itemType) 
     });
     
-    // เพิ่มระยะเวลาการปล่อยดาวให้ห่างขึ้น น้องจะได้ไม่ตาลาย
-    setTimeout(spawn, 700 + Math.random() * 600); 
+    let spawnDelay = 700 - (timeRatio * 400) + Math.random() * 300; 
+    setTimeout(spawn, Math.max(150, spawnDelay)); 
   }
   spawn();
   
@@ -386,9 +409,10 @@ function startTapGame() {
     objs.forEach(o => {
       if(!o.hit){ 
         o.y += o.vy; 
-        o.vy -= 0.03; // ⬇️ ลดแรงโน้มถ่วง ดาวจะลอยอยู่ในอากาศนานขึ้น
+        o.vy -= 0.03; 
       } else { 
-        o.a -= 0.1; o.s += 5; 
+        o.a -= 0.1; 
+        o.s += 5; // ขยายขนาดขึ้นตอนกดโดน
       }
       ctx.save(); ctx.globalAlpha = o.a; ctx.font = `${o.s}px serif`; ctx.fillText(o.e, o.x, o.y); ctx.restore();
     });
@@ -398,10 +422,29 @@ function startTapGame() {
   
   cvs.ontouchstart = cvs.onmousedown = (e) => {
     let t = e.touches ? e.touches[0] : e;
-    for(let o of objs){
-      // ขยายพื้นที่การจิ้ม (Hitbox) ให้กว้างขึ้นเป็น 70 น้องจะได้จิ้มโดนง่ายๆ
+    for(let i = objs.length - 1; i >= 0; i--){
+      let o = objs[i];
       if(!o.hit && Math.hypot(o.x-t.clientX, o.y-t.clientY) < 70){
-        o.hit = true; tScore++; document.getElementById('tap-score-val').textContent = tScore; playSwoosh(); break;
+        o.hit = true; 
+        
+        if (o.isBad) {
+          tScore = Math.max(0, tScore - 1); 
+          o.e = '💥'; // 💥 เปลี่ยนเป็นรูประเบิดเมื่อกดโดน 💥
+          speakText("ระวัง!"); 
+          
+          // 💥 ทำให้หน้าจอสั่น 💥
+          let screenEl = document.getElementById('tap-screen');
+          screenEl.classList.remove('shake-screen'); 
+          void screenEl.offsetWidth; // รีเซ็ตแอนิเมชันให้เล่นซ้ำได้
+          screenEl.classList.add('shake-screen');
+          
+        } else {
+          tScore++; 
+          playSwoosh(); 
+        }
+        
+        document.getElementById('tap-score-val').textContent = tScore; 
+        break; 
       }
     }
   };
