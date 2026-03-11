@@ -124,3 +124,4 @@
 ::ffff:127.0.0.1 - - [03/Mar/2026 14:55:44] code 404, message File not found
 ::ffff:127.0.0.1 - - [03/Mar/2026 14:55:44] "GET /apple-touch-icon.png HTTP/1.1" 404 -
 ::ffff:127.0.0.1 - - [03/Mar/2026 14:55:45] code 404, message File not found
+2026-03-04T11:44:43Z ERR Failed to refresh DNS local resolver error="lookup region1.v2.argotunnel.com: i/o timeout"

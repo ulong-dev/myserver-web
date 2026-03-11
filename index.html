@@ -5,22 +5,73 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>2PFamily Central Hub</title>
 
+  <script>
+    const savedTheme = localStorage.getItem('aw2p_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <style>
-    :root{
-      --bg: #fbfaf7;          /* off-white */
-      --paper: #ffffff;       /* card */
-      --ink: #2a2018;         /* coffee ink */
-      --muted: #7b6b5f;       /* secondary */
-      --line: #ede6dd;        /* border */
-      --accent: #8b5e34;      /* coffee brown */
-      --accent-2:#c2a27f;     /* latte */
+    :root {
+      /* ==== Light Mode Variables ==== */
+      --bg: #fbfaf7;          
+      --paper: #ffffff;       
+      --ink: #2a2018;         
+      --muted: #7b6b5f;       
+      --line: #ede6dd;        
+      --accent: #8b5e34;      
+      --accent-2:#c2a27f;     
       --shadow: 0 14px 34px rgba(32,24,16,.07);
       --radius: 18px;
       --ring: 0 0 0 5px rgba(139,94,52,.12);
+      
+      --glow-1: rgba(194,162,127,.10);
+      --glow-2: rgba(139,94,52,.06);
+      --nav-text: #8a7a6f;
+      --h1-text: #3a2a1e;
+      --chip-bg-hover: rgba(255,255,255,.70);
+      --chip-bg-active: #fff;
+      --chip-shadow: 0 10px 26px rgba(32,24,16,.06);
+      --tag-bg: rgba(251,250,247,.65);
+      --go-bg: rgba(139,94,52,.08);
+      --go-border: rgba(139,94,52,.18);
+      --go-bg-hover: rgba(139,94,52,.12);
+      --go-border-hover: rgba(139,94,52,.30);
+      --card-hover-border: rgba(139,94,52,.26);
+      --card-hover-shadow: 0 20px 46px rgba(32,24,16,.11);
+      --footer-text: #a0968b;
+    }
+
+    [data-theme="dark"] {
+      /* ==== Dark Mode Variables ==== */
+      --bg: #1c1815;
+      --paper: #28231f;
+      --ink: #eae0d5;
+      --muted: #9e8f82;
+      --line: #3b322c;
+      --accent: #dca776;
+      --accent-2: #8a6a4d;
+      --shadow: 0 14px 34px rgba(0,0,0,.25);
+      --ring: 0 0 0 5px rgba(220,167,118,.15);
+      
+      --glow-1: rgba(220,167,118,.05);
+      --glow-2: rgba(220,167,118,.03);
+      --nav-text: #a39589;
+      --h1-text: #f9f6f0;
+      --chip-bg-hover: rgba(255,255,255,.05);
+      --chip-bg-active: #38302b;
+      --chip-shadow: 0 10px 26px rgba(0,0,0,.3);
+      --tag-bg: rgba(0,0,0,.15);
+      --go-bg: rgba(220,167,118,.1);
+      --go-border: rgba(220,167,118,.2);
+      --go-bg-hover: rgba(220,167,118,.15);
+      --go-border-hover: rgba(220,167,118,.35);
+      --card-hover-border: rgba(220,167,118,.4);
+      --card-hover-shadow: 0 20px 46px rgba(0,0,0,.4);
+      --footer-text: #786c62;
     }
 
     *{ box-sizing:border-box; }
@@ -30,11 +81,12 @@
       font-family: "Kanit", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       color: var(--ink);
       letter-spacing:.15px;
+      transition: background-color 0.4s ease, color 0.4s ease; /* Smooth Theme Transition */
 
       /* warm minimal background glow */
       background:
-        radial-gradient(1200px 520px at 50% 0%, rgba(194,162,127,.10), transparent 70%),
-        radial-gradient(900px 420px at 12% 14%, rgba(139,94,52,.06), transparent 65%),
+        radial-gradient(1200px 520px at 50% 0%, var(--glow-1), transparent 70%),
+        radial-gradient(900px 420px at 12% 14%, var(--glow-2), transparent 65%),
         var(--bg);
     }
 
@@ -61,7 +113,8 @@
       letter-spacing:.9px;
       text-transform:uppercase;
       font-size: 12.5px;
-      color: #8a7a6f;
+      color: var(--nav-text);
+      transition: color 0.3s;
     }
     .brand .dot{
       width:10px; height:10px;
@@ -75,7 +128,8 @@
       align-items:center;
       gap:18px;
       font-size: 13px;
-      color: #84766c;
+      color: var(--nav-text);
+      transition: color 0.3s;
     }
     .nav a{
       padding: 8px 10px;
@@ -84,12 +138,34 @@
       outline: none;
     }
     .nav a:hover{
-      background: rgba(139,94,52,.08);
+      background: var(--go-bg);
       color: var(--ink);
     }
     .nav a:focus-visible{
       box-shadow: var(--ring);
-      background: rgba(139,94,52,.08);
+      background: var(--go-bg);
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle {
+      background: transparent;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 6px;
+      margin-left: 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease;
+      outline: none;
+    }
+    .theme-toggle:hover {
+      background: var(--go-bg);
+    }
+    .theme-toggle:focus-visible {
+      box-shadow: var(--ring);
     }
 
     /* Hero */
@@ -108,7 +184,6 @@
       text-transform: uppercase;
     }
 
-    /* ✅ font ของ "Simple hub for family projects." แก้ตรงนี้ */
     .hero h1{
       margin: 16px auto 12px;
       font-family: "Cormorant Garamond", serif;
@@ -117,7 +192,8 @@
       letter-spacing: .8px;
       line-height: 1.05;
       max-width: 920px;
-      color: #3a2a1e;
+      color: var(--h1-text);
+      transition: color 0.3s;
     }
 
     .hero p{
@@ -144,14 +220,14 @@
       gap:16px;
       flex-wrap:wrap;
       margin: 34px 0 18px;
-      color: #8a7a6f;
+      color: var(--nav-text);
       font-size: 13px;
     }
     .chip{
       padding: 9px 12px;
       border-radius: 999px;
       border: 1px solid transparent;
-      transition: .18s ease;
+      transition: .18s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
       cursor:pointer;
       user-select:none;
       background: transparent;
@@ -159,12 +235,12 @@
     .chip.active{
       color: var(--ink);
       border-color: var(--line);
-      background: #fff;
-      box-shadow: 0 10px 26px rgba(32,24,16,.06);
+      background: var(--chip-bg-active);
+      box-shadow: var(--chip-shadow);
     }
     .chip:hover{
       border-color: var(--line);
-      background: rgba(255,255,255,.70);
+      background: var(--chip-bg-hover);
     }
     .chip:focus-visible{
       outline: none;
@@ -187,13 +263,13 @@
       box-shadow: var(--shadow);
       overflow:hidden;
       position:relative;
-      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color 0.3s ease;
       min-height: 216px;
       display:flex;
       flex-direction:column;
     }
 
-    /* Minimal “thumbnail” - เอา gradient สีน้ำตาลออกแล้ว */
+    /* Minimal “thumbnail” */
     .thumb{
       height: 120px;
       background: transparent;
@@ -249,9 +325,10 @@
       padding: 7px 10px;
       border-radius: 999px;
       border: 1px solid var(--line);
-      color: #8a7a6f;
+      color: var(--nav-text);
       font-size: 12px;
-      background: rgba(251,250,247,.65);
+      background: var(--tag-bg);
+      transition: background-color 0.3s, color 0.3s;
     }
 
     .go{
@@ -263,20 +340,20 @@
       color: var(--accent);
       padding: 7px 10px;
       border-radius: 999px;
-      background: rgba(139,94,52,.08);
-      border: 1px solid rgba(139,94,52,.18);
-      transition: .18s ease;
+      background: var(--go-bg);
+      border: 1px solid var(--go-border);
+      transition: .18s ease, background-color 0.3s, border-color 0.3s;
       white-space:nowrap;
     }
 
     .card:hover{
       transform: translateY(-5px);
-      border-color: rgba(139,94,52,.26);
-      box-shadow: 0 20px 46px rgba(32,24,16,.11);
+      border-color: var(--card-hover-border);
+      box-shadow: var(--card-hover-shadow);
     }
     .card:hover .go{
-      background: rgba(139,94,52,.12);
-      border-color: rgba(139,94,52,.30);
+      background: var(--go-bg-hover);
+      border-color: var(--go-border-hover);
     }
     .card:focus-visible{
       outline:none;
@@ -286,9 +363,10 @@
     /* Footer */
     footer{
       text-align:center;
-      color: #a0968b;
+      color: var(--footer-text);
       font-size: 12px;
       padding: 32px 0 10px;
+      transition: color 0.3s;
     }
 
     /* Responsive */
@@ -318,6 +396,8 @@
         <a href="#" onclick="scrollToSection('projects'); return false;">Projects</a>
         <a href="library/index.html">Library</a>
         <a href="#" onclick="scrollToSection('contact'); return false;">Contact</a>
+        
+        <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle Night Mode" id="themeBtn">🌙</button>
       </nav>
     </div>
 
@@ -396,6 +476,20 @@
   </div>
 
   <script>
+    // --- โหลดไอคอนปุ่ม Theme ทันทีที่โหลดสคริปต์เสร็จ ---
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('themeBtn').innerText = document.documentElement.getAttribute('data-theme') === 'dark' ? '🌕' : '🌙';
+    });
+
+    // --- ฟังก์ชันสลับ Theme ---
+    function toggleTheme() {
+      const html = document.documentElement;
+      const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('aw2p_theme', newTheme);
+      document.getElementById('themeBtn').innerText = newTheme === 'dark' ? '🌕' : '🌙';
+    }
+
     function scrollToSection(id){
       const el = document.getElementById(id);
       if(!el) return;

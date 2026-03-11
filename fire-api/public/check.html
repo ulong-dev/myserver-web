@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บันทึกการตรวจเช็คถังดับเพลิง</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');
+        
+        body { font-family: 'Sarabun', sans-serif; background-color: #f0f2f5; margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .container { background: white; max-width: 500px; width: 100%; border-radius: 16px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        
+        /* Header & GPS */
+        .header-box { background: #1a73e8; color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
+        .header-box h2 { margin: 0; font-size: 1.4em; }
+        .gps-info { background: #e8f0fe; color: #1967d2; padding: 10px; border-radius: 8px; font-size: 0.85em; margin-top: 10px; font-weight: 600; }
+
+        .section-title { font-weight: 600; color: #5f6368; margin: 20px 0 10px 0; font-size: 0.9em; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #3c4043; font-size: 0.95em; }
+        select, input, textarea { 
+            width: 100%; padding: 12px; border: 1.5px solid #dadce0; border-radius: 8px; 
+            box-sizing: border-box; font-family: 'Sarabun'; font-size: 16px; 
+        }
+
+        /* Camera & Preview */
+        .camera-section { text-align: center; margin-bottom: 20px; padding: 15px; border: 2px dashed #dadce0; border-radius: 12px; background: #fafafa; }
+        .btn-camera { background-color: #5f6368; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-size: 1em; cursor: pointer; margin-bottom: 10px; }
+        #preview-container { display: none; margin-top: 10px; }
+        #preview-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; border: 1px solid #ddd; }
+
+        /* Auto Status Banner */
+        .status-banner {
+            padding: 15px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 1.1em; margin: 20px 0;
+            transition: all 0.3s;
+        }
+        .status-ready { background-color: #e6ffed; color: #28a745; border: 2px solid #28a745; }
+        .status-broken { background-color: #fff5f5; color: #d93025; border: 2px solid #d93025; }
+
+        .btn-submit { 
+            background-color: #1a73e8; color: white; border: none; padding: 16px; width: 100%; 
+            border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 6px rgba(26, 115, 232, 0.3);
+        }
+        .btn-submit:disabled { background-color: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-box">
+        <h2>📝 ตรวจเช็คถังรหัส: <span id="fire-id-title">...</span></h2>
+        <div class="gps-info" id="gps-display">🛰️ กำลังระบุพิกัด GPS...</div>
+    </div>
+
+    <form id="inspectionForm">
+        <div class="section-title">ข้อมูลทั่วไป</div>
+        <div class="input-group">
+            <label>👤 ชื่อผู้ตรวจเช็ค</label>
+            <input type="text" id="inspector" value="Theerawut" readonly style="background-color: #f8f9fa;">
+        </div>
+        <div class="input-group">
+            <label>📍 สถานที่ติดตั้งปัจจุบัน (แก้ไขหากมีการย้ายถัง)</label>
+            <input type="text" id="current-location" placeholder="ระบุสถานที่" required>
+        </div>
+
+        <div class="section-title">หลักฐานการตรวจ</div>
+        <div class="camera-section">
+            <input type="file" id="photoInput" accept="image/*" capture="environment" style="display: none;">
+            <button type="button" class="btn-camera" onclick="document.getElementById('photoInput').click()">📷 เปิดกล้องถ่ายภาพ</button>
+            <div id="preview-container">
+                <img id="preview-img" src="">
+                <p style="color: #28a745; font-size: 0.8em; margin-top: 5px;">✅ รูปภาพพร้อมอัปโหลด</p>
+            </div>
+        </div>
+
+        <div class="section-title">รายการสภาพถัง</div>
+        <div class="input-group">
+            <label>สายฉีดดับเพลิง</label>
+            <select id="hose" class="check-logic"><option value="ปกติ">ปกติ</option><option value="ชำรุด">ชำรุด</option></select>
+        </div>
+        <div class="input-group">
+            <label>คันบังคับ/สลัก</label>
+            <select id="lever" class="check-logic"><option value="ปกติ">ปกติ</option><option value="ชำรุด">ชำรุด</option></select>
+        </div>
+        <div class="input-group">
+            <label>แรงดัน (เข็มแถบเขียว)</label>
+            <select id="pressure" class="check-logic"><option value="ปกติ">ปกติ</option><option value="ผิดปกติ">ผิดปกติ</option></select>
+        </div>
+        <div class="input-group">
+            <label>สภาพตัวถัง (สนิม/รอยบุบ)</label>
+            <select id="body" class="check-logic"><option value="ปกติ">ปกติ</option><option value="ชำรุด">ชำรุด</option></select>
+        </div>
+        <div class="input-group">
+            <label>สิ่งกีดขวาง</label>
+            <select id="obstacle" class="check-logic"><option value="ไม่มี">ไม่มี</option><option value="มีสิ่งกีดขวาง">มีสิ่งกีดขวาง</option></select>
+        </div>
+
+        <div id="status-banner" class="status-banner status-ready">ผลสรุป: พร้อมใช้งาน</div>
+        
+        <div class="input-group">
+            <label>หมายเหตุ</label>
+            <textarea id="remark" rows="2"></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="saveBtn">💾 บันทึกและอัปโหลดข้อมูล</button>
+    </form>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const fireId = urlParams.get('id');
+    let lat = 0, lng = 0;
+
+    // ระบบ GPS
+    function getGPS() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                lat = pos.coords.latitude;
+                lng = pos.coords.longitude;
+                document.getElementById('gps-display').innerText = `📍 พิกัด: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            }, null, { enableHighAccuracy: true });
+        }
+    }
+
+    // พรีวิวรูปภาพ
+    document.getElementById('photoInput').onchange = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            document.getElementById('preview-img').src = URL.createObjectURL(file);
+            document.getElementById('preview-container').style.display = 'block';
+        }
+    };
+
+    // ระบบ Auto-Status Logic
+    function calculateStatus() {
+        const selects = document.querySelectorAll('.check-logic');
+        let isBroken = false;
+        selects.forEach(s => {
+            if (s.value !== 'ปกติ' && s.value !== 'ไม่มี') isBroken = true;
+        });
+        const banner = document.getElementById('status-banner');
+        banner.innerText = isBroken ? "ผลสรุป: ไม่พร้อมใช้งาน (ชำรุด)" : "ผลสรุป: พร้อมใช้งาน";
+        banner.className = isBroken ? "status-banner status-broken" : "status-banner status-ready";
+    }
+    document.querySelectorAll('.check-logic').forEach(el => el.addEventListener('change', calculateStatus));
+
+    // โหลดข้อมูลเริ่มต้น
+    window.onload = async () => {
+        if (!fireId) return alert("ไม่พบ ID");
+        document.getElementById('fire-id-title').innerText = fireId;
+        getGPS();
+        
+        // ดึงชื่อสถานที่เดิมมาแสดง
+        const res = await fetch(`/api/fire/${fireId}`);
+        const result = await res.json();
+        if (result.success) document.getElementById('current-location').value = result.data.location;
+    };
+
+    // ส่งข้อมูล (FormData)
+    document.getElementById('inspectionForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('saveBtn');
+        btn.disabled = true;
+        btn.innerText = "⌛ กำลังบันทึกและอัปโหลดรูป...";
+
+        const formData = new FormData();
+        formData.append('id', fireId);
+        formData.append('location', document.getElementById('current-location').value);
+        formData.append('inspector', document.getElementById('inspector').value);
+        formData.append('hose', document.getElementById('hose').value);
+        formData.append('lever', document.getElementById('lever').value);
+        formData.append('pressure', document.getElementById('pressure').value);
+        formData.append('body', document.getElementById('body').value);
+        formData.append('obstacle', document.getElementById('obstacle').value);
+        formData.append('remark', document.getElementById('remark').value);
+        formData.append('status', document.getElementById('status-banner').innerText.includes("พร้อมใช้งาน") ? "พร้อมใช้งาน" : "ชำรุด");
+        formData.append('latitude', lat);
+        formData.append('longitude', lng);
+        
+        const photo = document.getElementById('photoInput').files[0];
+        if (photo) formData.append('photo', photo);
+
+        try {
+            const res = await fetch('/api/check', { method: 'POST', body: formData });
+            if (res.ok) {
+                alert("✅ บันทึกข้อมูลและรูปภาพสำเร็จ!");
+                window.location.href = 'index.html';
+            }
+        } catch (err) {
+            alert("❌ เกิดข้อผิดพลาด");
+            btn.disabled = false;
+        }
+    };
+</script>
+</body>
+</html>
