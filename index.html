@@ -81,7 +81,7 @@
       font-family: "Kanit", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       color: var(--ink);
       letter-spacing:.15px;
-      transition: background-color 0.4s ease, color 0.4s ease; /* Smooth Theme Transition */
+      transition: background-color 0.4s ease, color 0.4s ease;
 
       /* warm minimal background glow */
       background:
@@ -98,281 +98,136 @@
     }
 
     /* Top Nav */
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      padding: 10px 0 8px;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:600;
-      letter-spacing:.9px;
-      text-transform:uppercase;
-      font-size: 12.5px;
-      color: var(--nav-text);
-      transition: color 0.3s;
-    }
-    .brand .dot{
-      width:10px; height:10px;
-      border-radius:999px;
-      background: var(--accent);
-      box-shadow: var(--ring);
-    }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding: 10px 0 8px; }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:600; letter-spacing:.9px; text-transform:uppercase; font-size: 12.5px; color: var(--nav-text); transition: color 0.3s; }
+    .brand .dot{ width:10px; height:10px; border-radius:999px; background: var(--accent); box-shadow: var(--ring); }
+    .nav{ display:flex; align-items:center; gap:18px; font-size: 13px; color: var(--nav-text); transition: color 0.3s; }
+    .nav a{ padding: 8px 10px; border-radius: 999px; transition: .18s ease; outline: none; }
+    .nav a:hover{ background: var(--go-bg); color: var(--ink); }
+    .nav a:focus-visible{ box-shadow: var(--ring); background: var(--go-bg); }
 
-    .nav{
-      display:flex;
-      align-items:center;
-      gap:18px;
-      font-size: 13px;
-      color: var(--nav-text);
-      transition: color 0.3s;
-    }
-    .nav a{
-      padding: 8px 10px;
-      border-radius: 999px;
-      transition: .18s ease;
-      outline: none;
-    }
-    .nav a:hover{
-      background: var(--go-bg);
-      color: var(--ink);
-    }
-    .nav a:focus-visible{
-      box-shadow: var(--ring);
-      background: var(--go-bg);
-    }
-
-    /* Theme Toggle Button */
-    .theme-toggle {
-      background: transparent;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 6px;
-      margin-left: 8px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s ease;
-      outline: none;
-    }
-    .theme-toggle:hover {
-      background: var(--go-bg);
-    }
-    .theme-toggle:focus-visible {
-      box-shadow: var(--ring);
-    }
+    .theme-toggle { background: transparent; border: none; font-size: 16px; cursor: pointer; padding: 6px; margin-left: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease; outline: none; }
+    .theme-toggle:hover { background: var(--go-bg); }
 
     /* Hero */
-    .hero{
-      text-align:center;
-      padding: 66px 0 20px;
-    }
-    .hero .kicker{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      color: var(--accent);
-      font-weight:600;
-      font-size: 12.5px;
-      letter-spacing:.6px;
-      text-transform: uppercase;
-    }
+    .hero{ text-align:center; padding: 66px 0 20px; }
+    .hero .kicker{ display:inline-flex; align-items:center; gap:10px; color: var(--accent); font-weight:600; font-size: 12.5px; letter-spacing:.6px; text-transform: uppercase; }
+    .hero h1{ margin: 16px auto 12px; font-family: "Cormorant Garamond", serif; font-size: clamp(44px, 5.2vw, 72px); font-weight: 500; letter-spacing: .8px; line-height: 1.05; max-width: 920px; color: var(--h1-text); transition: color 0.3s; }
+    .hero p{ margin: 0 auto; max-width: 720px; color: var(--muted); font-size: 15px; line-height: 1.85; font-weight: 300; }
+    .divider{ width: 86px; height: 2px; background: linear-gradient(90deg, transparent, var(--accent-2), transparent); margin: 26px auto 0; border-radius: 999px; }
 
-    .hero h1{
-      margin: 16px auto 12px;
-      font-family: "Cormorant Garamond", serif;
-      font-size: clamp(44px, 5.2vw, 72px);
-      font-weight: 500;
-      letter-spacing: .8px;
-      line-height: 1.05;
-      max-width: 920px;
-      color: var(--h1-text);
-      transition: color 0.3s;
-    }
-
-    .hero p{
-      margin: 0 auto;
-      max-width: 720px;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.85;
-      font-weight: 300;
-    }
-
-    .divider{
-      width: 86px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent-2), transparent);
-      margin: 26px auto 0;
-      border-radius: 999px;
-    }
-
-    /* Chips (Show All...) */
-    .chips{
-      display:flex;
-      justify-content:center;
-      gap:16px;
-      flex-wrap:wrap;
-      margin: 34px 0 18px;
-      color: var(--nav-text);
-      font-size: 13px;
-    }
-    .chip{
-      padding: 9px 12px;
-      border-radius: 999px;
-      border: 1px solid transparent;
-      transition: .18s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-      cursor:pointer;
-      user-select:none;
-      background: transparent;
-    }
-    .chip.active{
-      color: var(--ink);
-      border-color: var(--line);
-      background: var(--chip-bg-active);
-      box-shadow: var(--chip-shadow);
-    }
-    .chip:hover{
-      border-color: var(--line);
-      background: var(--chip-bg-hover);
-    }
-    .chip:focus-visible{
-      outline: none;
-      box-shadow: var(--ring);
-    }
+    /* Chips */
+    .chips{ display:flex; justify-content:center; gap:16px; flex-wrap:wrap; margin: 34px 0 18px; color: var(--nav-text); font-size: 13px; }
+    .chip{ padding: 9px 12px; border-radius: 999px; border: 1px solid transparent; transition: .18s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; cursor:pointer; user-select:none; background: transparent; }
+    .chip.active{ color: var(--ink); border-color: var(--line); background: var(--chip-bg-active); box-shadow: var(--chip-shadow); }
+    .chip:hover{ border-color: var(--line); background: var(--chip-bg-hover); }
 
     /* Project grid */
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 18px;
-      align-items: stretch;
-      padding: 10px 0 10px;
+    .grid{ display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; align-items: stretch; padding: 10px 0 10px; }
+    .card{ background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow:hidden; position:relative; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color 0.3s ease; min-height: 216px; display:flex; flex-direction:column; cursor:pointer;}
+    .thumb{ height: 120px; background: transparent; border-bottom: 1px solid var(--line); display:flex; align-items:center; justify-content:center; position:relative; }
+    .icon{ font-size: 34px; transform: translateY(2px); filter: saturate(1.05); }
+    .card .body{ padding: 14px 16px 14px; display:flex; flex-direction:column; gap: 6px; flex: 1; }
+    .title{ font-weight: 600; font-size: 15px; line-height: 1.25; margin:0; letter-spacing:.2px; }
+    .desc{ margin:0; color: var(--muted); font-size: 12.9px; line-height: 1.62; }
+    .meta{ margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top: 12px; }
+    .tag{ display:inline-flex; align-items:center; gap:6px; padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--nav-text); font-size: 12px; background: var(--tag-bg); transition: background-color 0.3s, color 0.3s; }
+    .go{ display:inline-flex; align-items:center; gap:8px; font-size: 12px; font-weight: 700; color: var(--accent); padding: 7px 10px; border-radius: 999px; background: var(--go-bg); border: 1px solid var(--go-border); transition: .18s ease, background-color 0.3s, border-color 0.3s; white-space:nowrap; }
+
+    .card:hover{ transform: translateY(-5px); border-color: var(--card-hover-border); box-shadow: var(--card-hover-shadow); }
+    .card:hover .go{ background: var(--go-bg-hover); border-color: var(--go-border-hover); }
+    
+    footer{ text-align:center; color: var(--footer-text); font-size: 12px; padding: 32px 0 10px; transition: color 0.3s; }
+
+    /* =========================================
+       เกมหมากฮอส (Checkers) - Modal Styles
+       ========================================= */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+      z-index: 1000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+
+    .game-container {
+      background-color: #2c3e50;
+      color: white;
+      padding: 30px 20px;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      max-width: 95vw;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+    .modal-overlay.show .game-container { transform: scale(1); }
+
+    .close-btn {
+      position: absolute; top: 15px; right: 20px;
+      background: rgba(255,255,255,0.1); border: none; color: white;
+      font-size: 20px; width: 36px; height: 36px; border-radius: 50%;
+      cursor: pointer; transition: background 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .close-btn:hover { background: rgba(255,255,255,0.3); }
+
+    .game-container h2 { margin: 0 0 10px 0; color: #f1c40f; font-size: 24px; }
+    
+    .game-status {
+      font-size: 1.2rem; margin-bottom: 20px; padding: 10px 20px;
+      border-radius: 8px; background: #34495e; font-weight: bold; text-align: center;
     }
 
-    .card{
-      background: var(--paper);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color 0.3s ease;
-      min-height: 216px;
-      display:flex;
-      flex-direction:column;
+    .ck-board {
+      display: grid;
+      grid-template-columns: repeat(8, 40px);
+      grid-template-rows: repeat(8, 40px);
+      border: 4px solid #3e2723;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      background-color: #d7ccc8;
+    }
+    @media (min-width: 500px) {
+      .ck-board {
+        grid-template-columns: repeat(8, 55px);
+        grid-template-rows: repeat(8, 55px);
+      }
     }
 
-    /* Minimal “thumbnail” */
-    .thumb{
-      height: 120px;
-      background: transparent;
-      border-bottom: 1px solid var(--line);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
+    .ck-cell {
+      width: 100%; height: 100%;
+      display: flex; justify-content: center; align-items: center;
+      box-sizing: border-box;
     }
+    .ck-cell.dark { background-color: #795548; }
+    .ck-cell.light { background-color: #d7ccc8; }
+    .ck-cell.highlight { outline: 3px solid #00E676; outline-offset: -3px; cursor: pointer; }
 
-    .icon{
-      font-size: 34px;
-      transform: translateY(2px);
-      filter: saturate(1.05);
+    .ck-piece {
+      width: 80%; height: 80%; border-radius: 50%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
+      cursor: pointer; display: flex; justify-content: center; align-items: center;
+      font-size: 1.2rem; user-select: none; transition: transform 0.2s;
     }
+    .ck-piece:hover { transform: scale(1.1); }
+    .ck-piece.selected { outline: 3px solid #FFEA00; box-shadow: 0 0 15px #FFEA00; }
 
-    .card .body{
-      padding: 14px 16px 14px;
-      display:flex;
-      flex-direction:column;
-      gap: 6px;
-      flex: 1;
-    }
+    .ck-player1 { background: radial-gradient(circle, #ff5252, #c62828); }
+    .ck-player2 { background: radial-gradient(circle, #448aff, #1565c0); }
+    .ck-piece.king::after { content: '👑'; }
 
-    .title{
-      font-weight: 600;
-      font-size: 15px;
-      line-height: 1.25;
-      margin:0;
-      letter-spacing:.2px;
+    .ck-reset-btn {
+      margin-top: 20px; padding: 10px 20px; font-size: 1.1rem;
+      font-family: 'Kanit', sans-serif; background-color: #e67e22;
+      color: white; border: none; border-radius: 5px; cursor: pointer;
     }
+    .ck-reset-btn:hover { background-color: #d35400; }
 
-    .desc{
-      margin:0;
-      color: var(--muted);
-      font-size: 12.9px;
-      line-height: 1.62;
-    }
-
-    .meta{
-      margin-top:auto;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding-top: 12px;
-    }
-
-    .tag{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      color: var(--nav-text);
-      font-size: 12px;
-      background: var(--tag-bg);
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .go{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent);
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: var(--go-bg);
-      border: 1px solid var(--go-border);
-      transition: .18s ease, background-color 0.3s, border-color 0.3s;
-      white-space:nowrap;
-    }
-
-    .card:hover{
-      transform: translateY(-5px);
-      border-color: var(--card-hover-border);
-      box-shadow: var(--card-hover-shadow);
-    }
-    .card:hover .go{
-      background: var(--go-bg-hover);
-      border-color: var(--go-border-hover);
-    }
-    .card:focus-visible{
-      outline:none;
-      box-shadow: var(--ring);
-    }
-
-    /* Footer */
-    footer{
-      text-align:center;
-      color: var(--footer-text);
-      font-size: 12px;
-      padding: 32px 0 10px;
-      transition: color 0.3s;
-    }
-
-    /* Responsive */
-    @media (max-width: 1100px){
-      .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
-    }
+    /* Responsive Main Page */
+    @media (max-width: 1100px){ .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
     @media (max-width: 540px){
       .topbar{ flex-direction:column; align-items:flex-start; }
       .nav{ gap:10px; flex-wrap:wrap; }
@@ -420,6 +275,7 @@
 
     <section id="projects" style="padding-top:6px;">
       <div class="grid" id="projectGrid">
+        
         <a class="card" href="space-game/index.html" data-group="kids">
           <div class="thumb"><div class="icon">🚀</div></div>
           <div class="body">
@@ -428,6 +284,18 @@
             <div class="meta">
               <span class="tag">👶 Kids</span>
               <span class="go">Open <span aria-hidden="true">→</span></span>
+            </div>
+          </div>
+        </a>
+
+        <a class="card" href="#" onclick="openCheckers(event)" data-group="kids">
+          <div class="thumb"><div class="icon">♟️</div></div>
+          <div class="body">
+            <p class="title">Checkers</p>
+            <p class="desc">เกมกระดานหมากฮอสคลาสสิก เล่นสนุกกันในครอบครัว</p>
+            <div class="meta">
+              <span class="tag">👶 Kids</span>
+              <span class="go">Play <span aria-hidden="true">→</span></span>
             </div>
           </div>
         </a>
@@ -475,13 +343,22 @@
     </footer>
   </div>
 
+  <div id="checkersModal" class="modal-overlay">
+    <div class="game-container">
+      <button class="close-btn" onclick="closeCheckers()">✕</button>
+      <h2>กระดานหมากฮอส</h2>
+      <div id="gameStatus" class="game-status">ตาผู้เล่น: แดง</div>
+      <div id="checkersBoard" class="ck-board"></div>
+      <button class="ck-reset-btn" onclick="initCheckers()">เริ่มเกมใหม่</button>
+    </div>
+  </div>
+
   <script>
-    // --- โหลดไอคอนปุ่ม Theme ทันทีที่โหลดสคริปต์เสร็จ ---
+    // --- โหลดไอคอนปุ่ม Theme ---
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('themeBtn').innerText = document.documentElement.getAttribute('data-theme') === 'dark' ? '🌕' : '🌙';
     });
 
-    // --- ฟังก์ชันสลับ Theme ---
     function toggleTheme() {
       const html = document.documentElement;
       const newTheme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -511,6 +388,163 @@
         card.style.display = show ? "flex" : "none";
       });
     } 
+
+    // =========================================
+    // ระบบเกมหมากฮอส (Checkers Logic)
+    // =========================================
+    const CK_BOARD_SIZE = 8;
+    let ckBoard = [];
+    let ckPlayer = 1; // 1 = Red, 2 = Blue
+    let ckSelected = null;
+    let ckValidMoves = [];
+
+    function openCheckers(e) {
+      e.preventDefault();
+      document.getElementById('checkersModal').classList.add('show');
+      initCheckers();
+    }
+
+    function closeCheckers() {
+      document.getElementById('checkersModal').classList.remove('show');
+    }
+
+    function initCheckers() {
+      ckBoard = Array(CK_BOARD_SIZE).fill(null).map(() => Array(CK_BOARD_SIZE).fill(0));
+      
+      // วางหมากแดง (ด้านบน)
+      for (let r = 0; r < 2; r++) {
+        for (let c = 0; c < CK_BOARD_SIZE; c++) {
+          if ((r + c) % 2 === 1) ckBoard[r][c] = 1;
+        }
+      }
+      
+      // วางหมากน้ำเงิน (ด้านล่าง)
+      for (let r = 6; r < 8; r++) {
+        for (let c = 0; c < CK_BOARD_SIZE; c++) {
+          if ((r + c) % 2 === 1) ckBoard[r][c] = 2;
+        }
+      }
+
+      ckPlayer = 1;
+      ckSelected = null;
+      ckValidMoves = [];
+      updateCkStatus();
+      renderCkBoard();
+    }
+
+    function updateCkStatus() {
+      const statusEl = document.getElementById('gameStatus');
+      statusEl.textContent = `ตาผู้เล่น: ${ckPlayer === 1 ? '🔴 แดง' : '🔵 น้ำเงิน'}`;
+      statusEl.style.color = ckPlayer === 1 ? '#ff5252' : '#448aff';
+    }
+
+    function renderCkBoard() {
+      const boardEl = document.getElementById('checkersBoard');
+      boardEl.innerHTML = '';
+
+      for (let r = 0; r < CK_BOARD_SIZE; r++) {
+        for (let c = 0; c < CK_BOARD_SIZE; c++) {
+          const cell = document.createElement('div');
+          cell.className = `ck-cell ${(r + c) % 2 === 1 ? 'dark' : 'light'}`;
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+
+          const isMove = ckValidMoves.find(m => m.r === r && m.c === c);
+          if (isMove) {
+            cell.classList.add('highlight');
+            cell.onclick = () => executeCkMove(isMove);
+          } else {
+            cell.onclick = () => clearCkSelection();
+          }
+
+          const pieceVal = ckBoard[r][c];
+          if (pieceVal > 0) {
+            const piece = document.createElement('div');
+            let player = (pieceVal === 1 || pieceVal === 3) ? 1 : 2;
+            piece.className = `ck-piece ck-player${player}`;
+            if (pieceVal > 2) piece.classList.add('king');
+            
+            if (ckSelected && ckSelected.r === r && ckSelected.c === c) {
+              piece.classList.add('selected');
+            }
+
+            if (player === ckPlayer) {
+              piece.onclick = (e) => {
+                e.stopPropagation();
+                selectCkPiece(r, c, pieceVal);
+              };
+            }
+            cell.appendChild(piece);
+          }
+          boardEl.appendChild(cell);
+        }
+      }
+    }
+
+    function selectCkPiece(r, c, pieceVal) {
+      ckSelected = { r, c, val: pieceVal };
+      ckValidMoves = getCkValidMoves(r, c, pieceVal);
+      renderCkBoard();
+    }
+
+    function clearCkSelection() {
+      ckSelected = null;
+      ckValidMoves = [];
+      renderCkBoard();
+    }
+
+    function getCkValidMoves(r, c, val) {
+      const moves = [];
+      const isKing = val > 2;
+      const player = (val === 1 || val === 3) ? 1 : 2;
+      const forward = player === 1 ? 1 : -1;
+      
+      const directions = isKing ? [[1, 1], [1, -1], [-1, 1], [-1, -1]] : [[forward, 1], [forward, -1]];
+
+      directions.forEach(dir => {
+        let nr = r + dir[0];
+        let nc = c + dir[1];
+
+        if (isCkInBounds(nr, nc) && ckBoard[nr][nc] === 0) {
+          moves.push({ r: nr, c: nc, isJump: false });
+        }
+
+        let jumpR = r + dir[0] * 2;
+        let jumpC = c + dir[1] * 2;
+        if (isCkInBounds(nr, nc) && isCkInBounds(jumpR, jumpC)) {
+          let midPiece = ckBoard[nr][nc];
+          let midPlayer = (midPiece === 1 || midPiece === 3) ? 1 : (midPiece === 2 || midPiece === 4) ? 2 : 0;
+          
+          if (midPlayer !== 0 && midPlayer !== player && ckBoard[jumpR][jumpC] === 0) {
+            moves.push({ r: jumpR, c: jumpC, isJump: true, jumpR: nr, jumpC: nc });
+          }
+        }
+      });
+      return moves;
+    }
+
+    function isCkInBounds(r, c) {
+      return r >= 0 && r < CK_BOARD_SIZE && c >= 0 && c < CK_BOARD_SIZE;
+    }
+
+    function executeCkMove(move) {
+      ckBoard[move.r][move.c] = ckSelected.val;
+      ckBoard[ckSelected.r][ckSelected.c] = 0;
+
+      if (move.isJump) {
+        ckBoard[move.jumpR][move.jumpC] = 0;
+      }
+
+      if (ckPlayer === 1 && move.r === 7 && ckBoard[move.r][move.c] === 1) {
+        ckBoard[move.r][move.c] = 3; 
+      } else if (ckPlayer === 2 && move.r === 0 && ckBoard[move.r][move.c] === 2) {
+        ckBoard[move.r][move.c] = 4; 
+      }
+
+      ckPlayer = ckPlayer === 1 ? 2 : 1;
+      clearCkSelection();
+      updateCkStatus();
+    }
   </script>
 </body>
 </html>
