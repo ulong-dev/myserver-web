@@ -1,51 +1,236 @@
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ระบบจัดการถังดับเพลิง</title>
+    
+    <style>@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap');</style>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<style>
-    /* 2. กำหนดขนาดแผนที่ */
-    #map { 
-        height: 400px; 
-        width: 100%; 
-        border-radius: 15px; 
-        margin-top: 20px; 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        z-index: 1;
-    }
-    .map-header { margin-top: 30px; font-weight: 600; color: #2c3e50; }
-</style>
+    <style>
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background-color: #f0f2f5; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .container { 
+            max-width: 1100px; 
+            margin: 0 auto; 
+        }
+        
+        /* Header */
+        .header { 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header h1 { margin: 0; color: #1a73e8; font-size: 1.6em; display: flex; align-items: center; gap: 10px; }
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .last-update { font-size: 0.9em; color: #70757a; }
+        
+        .btn-refresh {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Sarabun';
+            font-size: 1em;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(26, 115, 232, 0.2);
+            transition: background 0.2s;
+        }
+        .btn-refresh:hover { background-color: #1557b0; }
 
-<h3 class="map-header">📍 แผนที่ตำแหน่งจุดติดตั้งถังดับเพลิง</h3>
-<div id="map"></div>
+        /* Stats Grid */
+        .dashboard { 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .card { 
+            background: white; 
+            border-radius: 15px; 
+            padding: 25px 20px; 
+            text-align: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+            border-bottom: 5px solid transparent;
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-3px); }
+        .card h3 { margin: 0; font-size: 1.1em; color: #5f6368; font-weight: 600; }
+        .card .number { font-size: 3.5em; font-weight: bold; margin: 10px 0 0 0; }
+        
+        .card.total { border-color: #1a73e8; }
+        .card.ready { border-color: #28a745; }
+        .card.broken { border-color: #dc3545; }
+        
+        .text-blue { color: #1a73e8; }
+        .text-green { color: #28a745; }
+        .text-red { color: #dc3545; }
 
-<script>
-    // 4. โค้ดสร้างแผนที่
-    let map = L.map('map').setView([14.97, 102.08], 15); // พิกัดเริ่มต้น (โคราช)
+        /* Map Section */
+        .map-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .map-section h3 { margin-top: 0; color: #3c4043; margin-bottom: 15px; }
+        #fireMap {
+            width: 100%;
+            height: 500px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            z-index: 1;
+        }
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+        /* Popup Styles */
+        .custom-popup b { color: #202124; font-size: 1.1em; }
+        .custom-popup p { margin: 5px 0; color: #5f6368; font-size: 0.95em; }
+        .custom-popup a { display: inline-block; margin-top: 8px; color: white; background-color: #1a73e8; padding: 5px 10px; border-radius: 5px; text-decoration: none; font-size: 0.9em; text-align: center; }
 
-    async function loadMarkers() {
-        try {
-            // ดึงข้อมูลทั้งหมดจาก API (ต้องปรับ API Dashboard ให้ส่ง List พิกัดมาด้วย)
-            const response = await fetch('/api/dashboard/fire');
-            const result = await response.json();
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>📊 Dashboard ระบบถังดับเพลิง</h1>
+            <div class="header-actions">
+                <span class="last-update" id="lastUpdate">อัปเดตล่าสุด: กำลังโหลด...</span>
+                <button class="btn-refresh" onclick="fetchDashboardData()">🔄 รีเฟรชข้อมูล</button>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="card total">
+                <h3>ทั้งหมด (ถัง)</h3>
+                <div class="number text-blue" id="totalCount">..</div>
+            </div>
+            <div class="card ready">
+                <h3>พร้อมใช้งาน</h3>
+                <div class="number text-green" id="readyCount">..</div>
+            </div>
+            <div class="card broken">
+                <h3>ชำรุด / ไม่พร้อม</h3>
+                <div class="number text-red" id="brokenCount">..</div>
+            </div>
+        </div>
+
+        <div class="map-section">
+            <h3>📍 แผนที่ตำแหน่งจุดติดตั้งถังดับเพลิง (GPS)</h3>
+            <div id="fireMap"></div>
+        </div>
+    </div>
+
+    <script>
+        let fireMap;
+        let mapMarkers = [];
+
+        // 1. สร้างแผนที่เมื่อโหลดหน้าเว็บ
+        function initMap() {
+            // ตั้งค่าจุดเริ่มต้น (กรณีโคราช) ถ้าดึงข้อมูลสำเร็จเดี๋ยวมันจะซูมไปหาหมุดเอง
+            fireMap = L.map('fireMap').setView([14.97, 102.08], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(fireMap);
+
+            fetchDashboardData();
+        }
+
+        // 2. ดึงข้อมูลตัวเลขและพิกัดจาก API
+        async function fetchDashboardData() {
+            const updateLabel = document.getElementById('lastUpdate');
+            updateLabel.innerText = "กำลังอัปเดต...";
             
-            if (result.success && result.data.list) {
-                result.data.list.forEach(item => {
-                    if (item.lat && item.lng) {
-                        const markerColor = item.status === 'พร้อมใช้งาน' ? 'green' : 'red';
-                        // ปักหมุด (ใช้ CircleMarker แบบง่ายๆ)
-                        L.circleMarker([item.lat, item.lng], {
-                            color: markerColor,
-                            fillColor: markerColor,
-                            fillOpacity: 0.8,
-                            radius: 8
-                        }).addTo(map)
-                        .bindPopup(`<b>ถังรหัส: ${item.id}</b><br>สถานที่: ${item.location}<br>สถานะ: ${item.status}`);
-                    }
-                });
+            try {
+                const response = await fetch('/api/dashboard/fire');
+                const result = await response.json();
+
+                if (result.success) {
+                    // --- อัปเดตตัวเลขบัตรสรุป ---
+                    document.getElementById('totalCount').innerText = result.data.total;
+                    document.getElementById('readyCount').innerText = result.data.ready;
+                    document.getElementById('brokenCount').innerText = result.data.broken;
+                    updateLabel.innerText = `อัปเดตล่าสุด: ${result.data.lastUpdate}`;
+
+                    // --- อัปเดตแผนที่ ---
+                    updateMapMarkers(result.data.list);
+                }
+            } catch (error) {
+                console.error("โหลดข้อมูลล้มเหลว:", error);
+                updateLabel.innerText = "❌ การเชื่อมต่อล้มเหลว";
+                updateLabel.style.color = "red";
             }
-        } catch (e) { console.error(e); }
-    }
-</script>
+        }
+
+        // 3. ปักหมุดลงบนแผนที่
+        function updateMapMarkers(fireList) {
+            // ลบหมุดเก่าออกให้หมดก่อน
+            mapMarkers.forEach(marker => fireMap.removeLayer(marker));
+            mapMarkers = [];
+
+            if (!fireList || fireList.length === 0) return;
+
+            let bounds = L.latLngBounds(); // เอาไว้คำนวณระยะซูมให้พอดีกับหมุดทั้งหมด
+
+            fireList.forEach(item => {
+                // เช็คว่ามีพิกัดที่ถูกต้องหรือไม่ (ไม่ใช่ NaN หรือ undefined)
+                if (item.lat && item.lng && !isNaN(item.lat)) {
+                    const isReady = item.status === 'พร้อมใช้งาน';
+                    const markerColor = isReady ? '#28a745' : '#dc3545'; // เขียว หรือ แดง
+
+                    // ใช้ CircleMarker เพื่อง่ายต่อการเปลี่ยนสี
+                    const marker = L.circleMarker([item.lat, item.lng], {
+                        radius: 8,
+                        fillColor: markerColor,
+                        color: '#fff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.9
+                    });
+
+                    // สร้างหน้าต่าง Popup เมื่อคลิกที่หมุด
+                    marker.bindPopup(`
+                        <div class="custom-popup">
+                            <b>🧯 ถังรหัส: ${item.id}</b>
+                            <p>📍 สถานที่: ${item.location || 'ไม่ระบุ'}</p>
+                            <p>🚩 สถานะ: <span style="color:${markerColor}; font-weight:bold;">${item.status}</span></p>
+                            <a href="scan.html?id=${item.id}" target="_blank">🔍 ตรวจสอบประวัติ</a>
+                        </div>
+                    `);
+
+                    marker.addTo(fireMap);
+                    mapMarkers.push(marker);
+                    bounds.extend([item.lat, item.lng]); // ขยายขอบเขตแผนที่ให้ครอบคลุมหมุดนี้
+                }
+            });
+
+            // ถ้ามีหมุดอย่างน้อย 1 อัน ให้แผนที่ซูมไปหาหมุดเหล่านั้นโดยอัตโนมัติ
+            if (mapMarkers.length > 0) {
+                fireMap.fitBounds(bounds, { padding: [40, 40] });
+            }
+        }
+
+        // เริ่มทำงานเมื่อหน้าเว็บโหลดเสร็จ
+        window.onload = initMap;
+
+        // ให้ระบบรีเฟรชตัวเองอัตโนมัติทุกๆ 5 นาที (300,000 มิลลิวินาที)
+        setInterval(fetchDashboardData, 300000);
+
+    </script>
+</body>
+</html>
