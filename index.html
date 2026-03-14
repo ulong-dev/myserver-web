@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>2PFamily Central Hub</title>
 
   <script>
@@ -75,7 +75,7 @@
     }
 
     *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    html,body{ height:100%; -webkit-tap-highlight-color: transparent;}
     body{
       margin:0;
       font-family: "Kanit", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
@@ -139,82 +139,74 @@
     footer{ text-align:center; color: var(--footer-text); font-size: 12px; padding: 32px 0 10px; transition: color 0.3s; }
 
     /* =========================================
-       เกมหมากฮอสสากล (International Draughts) - Modal Styles
+       เกมหมากฮอสสากล (International Draughts) - โหมด FULL SCREEN iPad
        ========================================= */
     .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+      background: #1a252c; /* เปลี่ยนพื้นหลังให้มืดทึบเต็มจอ */
       z-index: 1000; display: flex; align-items: center; justify-content: center;
       opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     }
     .modal-overlay.show { opacity: 1; pointer-events: auto; }
 
     .game-container {
-      background-color: #1a252c;
-      color: white;
-      padding: 25px 20px;
-      border-radius: 20px;
+      width: 100%;
+      height: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       position: relative;
-      max-width: 95vw;
-      max-height: 98vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-      transform: scale(0.95);
-      transition: transform 0.3s ease;
+      padding: 10px;
+      box-sizing: border-box;
+      color: white;
     }
-    .modal-overlay.show .game-container { transform: scale(1); }
 
     .close-btn {
       position: absolute; top: 15px; right: 20px;
       background: rgba(255,255,255,0.1); border: none; color: white;
-      font-size: 20px; width: 36px; height: 36px; border-radius: 50%;
+      font-size: 24px; width: 44px; height: 44px; border-radius: 50%;
       cursor: pointer; transition: background 0.2s;
       display: flex; align-items: center; justify-content: center;
       z-index: 10;
     }
     .close-btn:hover { background: rgba(255,255,255,0.3); }
 
-    .game-container h2 { margin: 0 0 5px 0; color: #f1c40f; font-size: 24px; }
-    .game-container .ck-subtitle { margin-top:0; font-size:13px; color: #bdc3c7; margin-bottom: 15px;}
+    .game-container h2 { margin: 0; color: #f1c40f; font-size: clamp(20px, 4vw, 28px); }
+    .game-container .ck-subtitle { margin-top:0; font-size: clamp(12px, 2vw, 15px); color: #bdc3c7; margin-bottom: 10px;}
     
     /* Dashboard: คะแนนและเวลา */
     .ck-dashboard {
       display: flex; justify-content: space-between; align-items: center;
-      width: 100%; max-width: 500px; margin-bottom: 15px;
-      background: #2c3e50; padding: 10px 15px; border-radius: 10px;
+      width: 100%; max-width: min(90vw, 75vh); margin-bottom: 15px;
+      background: #2c3e50; padding: 10px 15px; border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.5); box-sizing: border-box;
     }
     .ck-p-stats {
       display: flex; flex-direction: column; align-items: center;
-      padding: 8px; border-radius: 8px; width: 100px; transition: 0.3s;
+      padding: 8px 12px; border-radius: 8px; min-width: 100px; transition: 0.3s;
     }
     .ck-p-stats.active { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
     .ck-p2 { color: #eceff1; border-top: 4px solid #eceff1; }
     .ck-p1 { color: #ff5252; border-bottom: 4px solid #ff5252; }
-    .ck-score { font-size: 1.6rem; font-weight: bold; }
-    .ck-time { font-size: 1.2rem; background: #1a252c; padding: 3px 8px; border-radius: 5px; font-family: monospace; letter-spacing: 1px; margin-top: 5px; }
+    .ck-score { font-size: 1.8rem; font-weight: bold; }
+    .ck-time { font-size: 1.3rem; background: #1a252c; padding: 4px 10px; border-radius: 5px; font-family: monospace; letter-spacing: 1px; margin-top: 5px; }
     .ck-time.danger { color: #ff5252; animation: blink 1s infinite; }
     @keyframes blink { 50% { opacity: 0.5; } }
     
-    .ck-status { font-size: 1.1rem; font-weight: bold; text-align: center; flex: 1; padding: 0 10px; }
+    .ck-status { font-size: clamp(1rem, 2.5vw, 1.3rem); font-weight: bold; text-align: center; flex: 1; padding: 0 10px; }
 
-    /* กระดานสากล 10x10 */
+    /* กระดานสากล 10x10 แบบปรับขนาดอัตโนมัติ (Responsive Grid) */
     .ck-board {
       display: grid;
-      grid-template-columns: repeat(10, 32px);
-      grid-template-rows: repeat(10, 32px);
-      border: 5px solid #3e2723;
+      width: 100%;
+      max-width: min(95vw, 65dvh); /* ยึดสัดส่วนจอ ไม่ให้ล้นจอ iPad */
+      aspect-ratio: 1 / 1; /* บังคับให้เป็นสี่เหลี่ยมจัตุรัสเสมอ */
+      grid-template-columns: repeat(10, 1fr);
+      grid-template-rows: repeat(10, 1fr);
+      border: 6px solid #3e2723;
       box-shadow: 0 10px 40px rgba(0,0,0,0.7);
       background-color: #d7ccc8;
-    }
-    @media (min-width: 480px) {
-      .ck-board {
-        grid-template-columns: repeat(10, 42px);
-        grid-template-rows: repeat(10, 42px);
-      }
     }
 
     .ck-cell {
@@ -227,10 +219,10 @@
     .ck-cell.highlight { background-color: rgba(0, 230, 118, 0.4); cursor: pointer; box-shadow: inset 0 0 10px #00E676; }
 
     .ck-piece {
-      width: 75%; height: 75%; border-radius: 50%;
+      width: 78%; height: 78%; border-radius: 50%;
       box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.4);
       cursor: pointer; display: flex; justify-content: center; align-items: center;
-      font-size: 1rem; user-select: none; transition: transform 0.2s, opacity 0.3s; z-index: 2;
+      font-size: clamp(14px, 2.5vmin, 24px); user-select: none; transition: transform 0.2s, opacity 0.3s; z-index: 2;
     }
     .ck-piece:hover { transform: scale(1.1); }
     .ck-piece.selected { outline: 3px solid #FFEA00; box-shadow: 0 0 15px #FFEA00; transform: scale(1.1); }
@@ -240,10 +232,10 @@
     .ck-player2 { background: radial-gradient(circle, #eceff1, #78909c); color: black;}
     .ck-piece.king::after { content: '👑'; }
 
-    .ck-controls { display: flex; gap: 10px; margin-top: 15px; }
+    .ck-controls { display: flex; gap: 15px; margin-top: 20px; }
     .ck-btn {
-      padding: 10px 15px; font-size: 1rem; font-family: 'Kanit'; color: white;
-      border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s;
+      padding: 12px 20px; font-size: clamp(14px, 2vw, 18px); font-family: 'Kanit'; color: white;
+      border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;
     }
     .ck-btn-restart { background-color: #e67e22; }
     .ck-btn-restart:hover { background-color: #d35400; transform: translateY(-2px); }
