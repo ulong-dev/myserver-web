@@ -83,7 +83,6 @@
       letter-spacing:.15px;
       transition: background-color 0.4s ease, color 0.4s ease;
 
-      /* warm minimal background glow */
       background:
         radial-gradient(1200px 520px at 50% 0%, var(--glow-1), transparent 70%),
         radial-gradient(900px 420px at 12% 14%, var(--glow-2), transparent 65%),
@@ -140,27 +139,29 @@
     footer{ text-align:center; color: var(--footer-text); font-size: 12px; padding: 32px 0 10px; transition: color 0.3s; }
 
     /* =========================================
-       เกมหมากฮอส (Checkers) - Modal Styles
+       เกมหมากฮอสสากล (International Draughts) - Modal Styles
        ========================================= */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
       z-index: 1000; display: flex; align-items: center; justify-content: center;
       opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     }
     .modal-overlay.show { opacity: 1; pointer-events: auto; }
 
     .game-container {
-      background-color: #2c3e50;
+      background-color: #1a252c;
       color: white;
-      padding: 30px 20px;
+      padding: 25px 20px;
       border-radius: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
       max-width: 95vw;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      max-height: 98vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
       transform: scale(0.95);
       transition: transform 0.3s ease;
     }
@@ -172,59 +173,82 @@
       font-size: 20px; width: 36px; height: 36px; border-radius: 50%;
       cursor: pointer; transition: background 0.2s;
       display: flex; align-items: center; justify-content: center;
+      z-index: 10;
     }
     .close-btn:hover { background: rgba(255,255,255,0.3); }
 
-    .game-container h2 { margin: 0 0 10px 0; color: #f1c40f; font-size: 24px; }
+    .game-container h2 { margin: 0 0 5px 0; color: #f1c40f; font-size: 24px; }
+    .game-container .ck-subtitle { margin-top:0; font-size:13px; color: #bdc3c7; margin-bottom: 15px;}
     
-    .game-status {
-      font-size: 1.2rem; margin-bottom: 20px; padding: 10px 20px;
-      border-radius: 8px; background: #34495e; font-weight: bold; text-align: center;
+    /* Dashboard: คะแนนและเวลา */
+    .ck-dashboard {
+      display: flex; justify-content: space-between; align-items: center;
+      width: 100%; max-width: 500px; margin-bottom: 15px;
+      background: #2c3e50; padding: 10px 15px; border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5); box-sizing: border-box;
     }
+    .ck-p-stats {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 8px; border-radius: 8px; width: 100px; transition: 0.3s;
+    }
+    .ck-p-stats.active { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+    .ck-p2 { color: #eceff1; border-top: 4px solid #eceff1; }
+    .ck-p1 { color: #ff5252; border-bottom: 4px solid #ff5252; }
+    .ck-score { font-size: 1.6rem; font-weight: bold; }
+    .ck-time { font-size: 1.2rem; background: #1a252c; padding: 3px 8px; border-radius: 5px; font-family: monospace; letter-spacing: 1px; margin-top: 5px; }
+    .ck-time.danger { color: #ff5252; animation: blink 1s infinite; }
+    @keyframes blink { 50% { opacity: 0.5; } }
+    
+    .ck-status { font-size: 1.1rem; font-weight: bold; text-align: center; flex: 1; padding: 0 10px; }
 
+    /* กระดานสากล 10x10 */
     .ck-board {
       display: grid;
-      grid-template-columns: repeat(8, 40px);
-      grid-template-rows: repeat(8, 40px);
-      border: 4px solid #3e2723;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      grid-template-columns: repeat(10, 32px);
+      grid-template-rows: repeat(10, 32px);
+      border: 5px solid #3e2723;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
       background-color: #d7ccc8;
     }
-    @media (min-width: 500px) {
+    @media (min-width: 480px) {
       .ck-board {
-        grid-template-columns: repeat(8, 55px);
-        grid-template-rows: repeat(8, 55px);
+        grid-template-columns: repeat(10, 42px);
+        grid-template-rows: repeat(10, 42px);
       }
     }
 
     .ck-cell {
       width: 100%; height: 100%;
       display: flex; justify-content: center; align-items: center;
-      box-sizing: border-box;
+      box-sizing: border-box; position: relative;
     }
     .ck-cell.dark { background-color: #795548; }
     .ck-cell.light { background-color: #d7ccc8; }
-    .ck-cell.highlight { outline: 3px solid #00E676; outline-offset: -3px; cursor: pointer; }
+    .ck-cell.highlight { background-color: rgba(0, 230, 118, 0.4); cursor: pointer; box-shadow: inset 0 0 10px #00E676; }
 
     .ck-piece {
-      width: 80%; height: 80%; border-radius: 50%;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
+      width: 75%; height: 75%; border-radius: 50%;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.4);
       cursor: pointer; display: flex; justify-content: center; align-items: center;
-      font-size: 1.2rem; user-select: none; transition: transform 0.2s;
+      font-size: 1rem; user-select: none; transition: transform 0.2s, opacity 0.3s; z-index: 2;
     }
     .ck-piece:hover { transform: scale(1.1); }
-    .ck-piece.selected { outline: 3px solid #FFEA00; box-shadow: 0 0 15px #FFEA00; }
+    .ck-piece.selected { outline: 3px solid #FFEA00; box-shadow: 0 0 15px #FFEA00; transform: scale(1.1); }
+    .ck-piece.dead { opacity: 0.3; filter: grayscale(100%); pointer-events: none; }
 
-    .ck-player1 { background: radial-gradient(circle, #ff5252, #c62828); }
-    .ck-player2 { background: radial-gradient(circle, #448aff, #1565c0); }
+    .ck-player1 { background: radial-gradient(circle, #ff5252, #b71c1c); }
+    .ck-player2 { background: radial-gradient(circle, #eceff1, #78909c); color: black;}
     .ck-piece.king::after { content: '👑'; }
 
-    .ck-reset-btn {
-      margin-top: 20px; padding: 10px 20px; font-size: 1.1rem;
-      font-family: 'Kanit', sans-serif; background-color: #e67e22;
-      color: white; border: none; border-radius: 5px; cursor: pointer;
+    .ck-controls { display: flex; gap: 10px; margin-top: 15px; }
+    .ck-btn {
+      padding: 10px 15px; font-size: 1rem; font-family: 'Kanit'; color: white;
+      border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s;
     }
-    .ck-reset-btn:hover { background-color: #d35400; }
+    .ck-btn-restart { background-color: #e67e22; }
+    .ck-btn-restart:hover { background-color: #d35400; transform: translateY(-2px); }
+    .ck-btn-reset { background-color: #7f8c8d; }
+    .ck-btn-reset:hover { background-color: #95a5a6; transform: translateY(-2px); }
 
     /* Responsive Main Page */
     @media (max-width: 1100px){ .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
@@ -289,10 +313,10 @@
         </a>
 
         <a class="card" href="#" onclick="openCheckers(event)" data-group="kids">
-          <div class="thumb"><div class="icon">♟️</div></div>
+          <div class="thumb"><div class="icon">♞</div></div>
           <div class="body">
-            <p class="title">Checkers</p>
-            <p class="desc">เกมกระดานหมากฮอสคลาสสิก เล่นสนุกกันในครอบครัว</p>
+            <p class="title">Checkers (International)</p>
+            <p class="desc">หมากฮอสสากล 100 ช่อง พร้อมระบบจับเวลาและคะแนน</p>
             <div class="meta">
               <span class="tag">👶 Kids</span>
               <span class="go">Play <span aria-hidden="true">→</span></span>
@@ -346,10 +370,31 @@
   <div id="checkersModal" class="modal-overlay">
     <div class="game-container">
       <button class="close-btn" onclick="closeCheckers()">✕</button>
-      <h2>กระดานหมากฮอส</h2>
-      <div id="gameStatus" class="game-status">ตาผู้เล่น: แดง</div>
+      <h2>หมากฮอสสากล</h2>
+      <p class="ck-subtitle">100 ช่อง | กินมากที่สุด | จับเวลาแข่งขัน</p>
+
+      <div class="ck-dashboard">
+        <div class="ck-p-stats ck-p2" id="ck-p2-panel">
+          <div style="font-size:14px; font-weight:bold;">⚪ ขาว</div>
+          <div class="ck-score" id="ck-score-p2">0</div>
+          <div class="ck-time" id="ck-time-p2">10:00</div>
+        </div>
+        
+        <div id="ck-gameStatus" class="ck-status">ตาผู้เล่น: แดง</div>
+
+        <div class="ck-p-stats ck-p1 active" id="ck-p1-panel">
+          <div style="font-size:14px; font-weight:bold;">🔴 แดง</div>
+          <div class="ck-score" id="ck-score-p1">0</div>
+          <div class="ck-time" id="ck-time-p1">10:00</div>
+        </div>
+      </div>
+
       <div id="checkersBoard" class="ck-board"></div>
-      <button class="ck-reset-btn" onclick="initCheckers()">เริ่มเกมใหม่</button>
+      
+      <div class="ck-controls">
+        <button class="ck-btn ck-btn-restart" onclick="initCheckers()">🔄 เริ่มกระดานใหม่</button>
+        <button class="ck-btn ck-btn-reset" onclick="resetCkMatch()">🗑️ ล้างคะแนน</button>
+      </div>
     </div>
   </div>
 
@@ -390,89 +435,281 @@
     } 
 
     // =========================================
-    // ระบบเกมหมากฮอส (Checkers Logic)
+    // ระบบเกมหมากฮอสสากล (International Checkers Logic)
     // =========================================
-    const CK_BOARD_SIZE = 8;
+    const CK_SIZE = 10;
+    const CK_TIME_LIMIT = 600; // 10 นาที
+    
     let ckBoard = [];
-    let ckPlayer = 1; // 1 = Red, 2 = Blue
+    let ckPlayer = 1; 
     let ckSelected = null;
-    let ckValidMoves = [];
+    let ckActivePaths = []; 
+    let ckMultiJumping = false;
+    let ckCapturedThisTurn = []; 
+
+    let ckScoreP1 = 0;
+    let ckScoreP2 = 0;
+    let ckTimeLeftP1 = CK_TIME_LIMIT;
+    let ckTimeLeftP2 = CK_TIME_LIMIT;
+    let ckTimerInterval = null;
+    let ckGameActive = false;
 
     function openCheckers(e) {
       e.preventDefault();
       document.getElementById('checkersModal').classList.add('show');
-      initCheckers();
+      // ถ้าเกมยังไม่เคยเริ่ม หรือจบไปแล้ว ให้เริ่มใหม่
+      if (!ckGameActive && ckTimeLeftP1 === CK_TIME_LIMIT) {
+        initCheckers();
+      } else if (ckGameActive) {
+        // ให้เวลาเดินต่อถ้าย่อจอไป
+        clearInterval(ckTimerInterval);
+        startCkTimer();
+      }
     }
 
     function closeCheckers() {
       document.getElementById('checkersModal').classList.remove('show');
+      clearInterval(ckTimerInterval); // หยุดเวลาชั่วคราวตอนปิด Modal
     }
 
     function initCheckers() {
-      ckBoard = Array(CK_BOARD_SIZE).fill(null).map(() => Array(CK_BOARD_SIZE).fill(0));
+      ckBoard = Array(CK_SIZE).fill(null).map(() => Array(CK_SIZE).fill(0));
       
-      // วางหมากแดง (ด้านบน)
-      for (let r = 0; r < 2; r++) {
-        for (let c = 0; c < CK_BOARD_SIZE; c++) {
-          if ((r + c) % 2 === 1) ckBoard[r][c] = 1;
+      for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < CK_SIZE; c++) {
+          if ((r + c) % 2 === 1) ckBoard[r][c] = 2; // ขาว
         }
       }
-      
-      // วางหมากน้ำเงิน (ด้านล่าง)
-      for (let r = 6; r < 8; r++) {
-        for (let c = 0; c < CK_BOARD_SIZE; c++) {
-          if ((r + c) % 2 === 1) ckBoard[r][c] = 2;
+      for (let r = 6; r < CK_SIZE; r++) {
+        for (let c = 0; c < CK_SIZE; c++) {
+          if ((r + c) % 2 === 1) ckBoard[r][c] = 1; // แดง
         }
       }
 
       ckPlayer = 1;
       ckSelected = null;
-      ckValidMoves = [];
-      updateCkStatus();
+      ckMultiJumping = false;
+      ckCapturedThisTurn = [];
+      ckGameActive = true;
+      
+      ckTimeLeftP1 = CK_TIME_LIMIT;
+      ckTimeLeftP2 = CK_TIME_LIMIT;
+      clearInterval(ckTimerInterval);
+      startCkTimer();
+
+      calcCkValidMoves(); 
+      updateCkUI();
       renderCkBoard();
     }
 
-    function updateCkStatus() {
-      const statusEl = document.getElementById('gameStatus');
-      statusEl.textContent = `ตาผู้เล่น: ${ckPlayer === 1 ? '🔴 แดง' : '🔵 น้ำเงิน'}`;
-      statusEl.style.color = ckPlayer === 1 ? '#ff5252' : '#448aff';
+    function resetCkMatch() {
+      if(confirm("ต้องการล้างคะแนนสะสมทั้งหมดใช่หรือไม่?")) {
+        ckScoreP1 = 0;
+        ckScoreP2 = 0;
+        initCheckers();
+      }
+    }
+
+    function startCkTimer() {
+      ckTimerInterval = setInterval(() => {
+        if (!ckGameActive) return;
+
+        if (ckPlayer === 1) {
+          ckTimeLeftP1--;
+          if (ckTimeLeftP1 <= 0) endCkGame(2, "🔴 แดงเวลาหมด! ขาวชนะ");
+        } else {
+          ckTimeLeftP2--;
+          if (ckTimeLeftP2 <= 0) endCkGame(1, "⚪ ขาวเวลาหมด! แดงชนะ");
+        }
+        updateCkTimerDisplay();
+      }, 1000);
+    }
+
+    function formatCkTime(seconds) {
+      if (seconds <= 0) return "00:00";
+      let m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      let s = (seconds % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function updateCkTimerDisplay() {
+      const t1 = document.getElementById('ck-time-p1');
+      const t2 = document.getElementById('ck-time-p2');
+      t1.textContent = formatCkTime(ckTimeLeftP1);
+      t2.textContent = formatCkTime(ckTimeLeftP2);
+
+      t1.classList.toggle('danger', ckTimeLeftP1 <= 60 && ckTimeLeftP1 > 0);
+      t2.classList.toggle('danger', ckTimeLeftP2 <= 60 && ckTimeLeftP2 > 0);
+    }
+
+    function endCkGame(winnerIndex, msg) {
+      ckGameActive = false;
+      clearInterval(ckTimerInterval);
+      
+      if (winnerIndex === 1) ckScoreP1++;
+      else if (winnerIndex === 2) ckScoreP2++;
+
+      const statusEl = document.getElementById('ck-gameStatus');
+      statusEl.textContent = `🎉 ${msg}`;
+      statusEl.style.color = '#00E676';
+      
+      document.getElementById('ck-score-p1').textContent = ckScoreP1;
+      document.getElementById('ck-score-p2').textContent = ckScoreP2;
+      
+      renderCkBoard(); 
+    }
+
+    // --- Core Game Logic ---
+    function getCkOwner(val) { return (val === 1 || val === 3) ? 1 : (val === 2 || val === 4) ? 2 : 0; }
+    function isCkKing(val) { return val > 2; }
+    function isCkEnemy(v1, v2) { let o1 = getCkOwner(v1), o2 = getCkOwner(v2); return o1 !== 0 && o2 !== 0 && o1 !== o2; }
+    function isCkInBounds(r, c) { return r >= 0 && r < CK_SIZE && c >= 0 && c < CK_SIZE; }
+    function isCkCapturedTemp(r, c, caps) { return caps.some(p => p.r === r && p.c === c); }
+
+    function calcCkValidMoves() {
+      ckActivePaths = [];
+      let maxCaptures = 0;
+
+      for (let r = 0; r < CK_SIZE; r++) {
+        for (let c = 0; c < CK_SIZE; c++) {
+          let val = ckBoard[r][c];
+          if (getCkOwner(val) === ckPlayer) {
+            let paths = findCkCapturePaths(r, c, r, c, val, []);
+            if (paths.length > 0) {
+              paths.forEach(p => {
+                if (p.captures.length > maxCaptures) maxCaptures = p.captures.length;
+                ckActivePaths.push({ startR: r, startC: c, ...p });
+              });
+            }
+          }
+        }
+      }
+
+      if (maxCaptures > 0) {
+        ckActivePaths = ckActivePaths.filter(p => p.captures.length === maxCaptures);
+      } else {
+        for (let r = 0; r < CK_SIZE; r++) {
+          for (let c = 0; c < CK_SIZE; c++) {
+            let val = ckBoard[r][c];
+            if (getCkOwner(val) === ckPlayer) {
+              let steps = findCkNormalMoves(r, c, val);
+              steps.forEach(step => ckActivePaths.push({ startR: r, startC: c, steps: [step], captures: [] }));
+            }
+          }
+        }
+      }
+
+      if (ckActivePaths.length === 0 && ckGameActive) {
+        let winner = ckPlayer === 1 ? 2 : 1;
+        let loserName = ckPlayer === 1 ? 'แดง' : 'ขาว';
+        endCkGame(winner, `${loserName} ไม่มีตาเดิน! ผู้ชนะคือ ${winner === 1 ? 'แดง' : 'ขาว'}`);
+      }
+    }
+
+    function findCkNormalMoves(r, c, val) {
+      let moves = []; let king = isCkKing(val); let player = getCkOwner(val);
+      let dirs = king ? [[1,1],[1,-1],[-1,1],[-1,-1]] : (player === 1 ? [[-1,1],[-1,-1]] : [[1,1],[1,-1]]);
+      for (let dir of dirs) {
+        let step = 1;
+        while (true) {
+          let nr = r + step * dir[0], nc = c + step * dir[1];
+          if (!isCkInBounds(nr, nc) || ckBoard[nr][nc] !== 0) break;
+          moves.push({ r: nr, c: nc });
+          if (!king) break; 
+          step++;
+        }
+      }
+      return moves;
+    }
+
+    function findCkCapturePaths(currR, currC, origR, origC, val, currentCaptures) {
+      let king = isCkKing(val); let paths = []; let dirs = [[1,1],[1,-1],[-1,1],[-1,-1]];
+      let getSim = (r, c) => (r === origR && c === origC) ? 0 : ckBoard[r][c];
+
+      for (let dir of dirs) {
+        if (king) {
+          let step = 1, enemyFound = null;
+          while (true) {
+            let nr = currR + step * dir[0], nc = currC + step * dir[1];
+            if (!isCkInBounds(nr, nc) || isCkCapturedTemp(nr, nc, currentCaptures)) break;
+            let target = getSim(nr, nc);
+            if (target !== 0) {
+              if (isCkEnemy(target, val) && !enemyFound) enemyFound = { r: nr, c: nc };
+              else break; 
+            } else if (enemyFound) {
+              let newCaps = [...currentCaptures, enemyFound];
+              let subPaths = findCkCapturePaths(nr, nc, origR, origC, val, newCaps);
+              if (subPaths.length > 0) subPaths.forEach(sp => paths.push({ steps: [{ r: nr, c: nc }, ...sp.steps], captures: sp.captures }));
+              else paths.push({ steps: [{ r: nr, c: nc }], captures: newCaps });
+            }
+            step++;
+          }
+        } else {
+          let nr = currR + dir[0], nc = currC + dir[1], nrr = currR + 2 * dir[0], ncc = currC + 2 * dir[1];
+          if (isCkInBounds(nr, nc) && isCkInBounds(nrr, ncc)) {
+            if (getSim(nr, nc) !== 0 && isCkEnemy(getSim(nr, nc), val) && !isCkCapturedTemp(nr, nc, currentCaptures) && getSim(nrr, ncc) === 0 && !isCkCapturedTemp(nrr, ncc, currentCaptures)) {
+              let newCaps = [...currentCaptures, { r: nr, c: nc }];
+              let subPaths = findCkCapturePaths(nrr, ncc, origR, origC, val, newCaps);
+              if (subPaths.length > 0) subPaths.forEach(sp => paths.push({ steps: [{ r: nrr, c: ncc }, ...sp.steps], captures: sp.captures }));
+              else paths.push({ steps: [{ r: nrr, c: ncc }], captures: newCaps });
+            }
+          }
+        }
+      }
+      if (paths.length > 0) {
+        let maxLen = Math.max(...paths.map(p => p.captures.length));
+        return paths.filter(p => p.captures.length === maxLen);
+      }
+      return [];
+    }
+
+    function updateCkUI() {
+      if (!ckGameActive) return;
+      const statusEl = document.getElementById('ck-gameStatus');
+      statusEl.textContent = `ตาเดิน: ${ckPlayer === 1 ? '🔴 แดง' : '⚪ ขาว'}`;
+      statusEl.style.color = ckPlayer === 1 ? '#ff5252' : '#eceff1';
+
+      document.getElementById('ck-p1-panel').classList.toggle('active', ckPlayer === 1);
+      document.getElementById('ck-p2-panel').classList.toggle('active', ckPlayer === 2);
+      
+      document.getElementById('ck-score-p1').textContent = ckScoreP1;
+      document.getElementById('ck-score-p2').textContent = ckScoreP2;
+      updateCkTimerDisplay();
     }
 
     function renderCkBoard() {
       const boardEl = document.getElementById('checkersBoard');
       boardEl.innerHTML = '';
+      let highlightCells = [];
+      if (ckSelected && ckGameActive) {
+        ckActivePaths.forEach(p => { if (p.startR === ckSelected.r && p.startC === ckSelected.c) highlightCells.push(p.steps[0]); });
+      }
 
-      for (let r = 0; r < CK_BOARD_SIZE; r++) {
-        for (let c = 0; c < CK_BOARD_SIZE; c++) {
+      for (let r = 0; r < CK_SIZE; r++) {
+        for (let c = 0; c < CK_SIZE; c++) {
           const cell = document.createElement('div');
           cell.className = `ck-cell ${(r + c) % 2 === 1 ? 'dark' : 'light'}`;
-          cell.dataset.row = r;
-          cell.dataset.col = c;
 
-          const isMove = ckValidMoves.find(m => m.r === r && m.c === c);
-          if (isMove) {
+          if (highlightCells.some(hc => hc.r === r && hc.c === c)) {
             cell.classList.add('highlight');
-            cell.onclick = () => executeCkMove(isMove);
+            cell.onclick = () => executeCkMoveStep(r, c);
           } else {
-            cell.onclick = () => clearCkSelection();
+            cell.onclick = () => { if(!ckMultiJumping && ckGameActive) { ckSelected = null; renderCkBoard(); } };
           }
 
           const pieceVal = ckBoard[r][c];
           if (pieceVal > 0) {
             const piece = document.createElement('div');
-            let player = (pieceVal === 1 || pieceVal === 3) ? 1 : 2;
+            let player = getCkOwner(pieceVal);
             piece.className = `ck-piece ck-player${player}`;
-            if (pieceVal > 2) piece.classList.add('king');
-            
-            if (ckSelected && ckSelected.r === r && ckSelected.c === c) {
-              piece.classList.add('selected');
-            }
+            if (isCkKing(pieceVal)) piece.classList.add('king');
+            if (ckSelected && ckSelected.r === r && ckSelected.c === c) piece.classList.add('selected');
+            if (isCkCapturedTemp(r, c, ckCapturedThisTurn)) piece.classList.add('dead');
 
-            if (player === ckPlayer) {
-              piece.onclick = (e) => {
-                e.stopPropagation();
-                selectCkPiece(r, c, pieceVal);
-              };
+            if (player === ckPlayer && !ckMultiJumping && !piece.classList.contains('dead') && ckGameActive) {
+              if (ckActivePaths.some(p => p.startR === r && p.startC === c)) {
+                piece.onclick = (e) => { e.stopPropagation(); ckSelected = { r, c, val: pieceVal }; renderCkBoard(); };
+              }
             }
             cell.appendChild(piece);
           }
@@ -481,69 +718,44 @@
       }
     }
 
-    function selectCkPiece(r, c, pieceVal) {
-      ckSelected = { r, c, val: pieceVal };
-      ckValidMoves = getCkValidMoves(r, c, pieceVal);
-      renderCkBoard();
+    function getCkJumpedPiece(r1, c1, r2, c2) {
+      let dr = Math.sign(r2 - r1), dc = Math.sign(c2 - c1), r = r1 + dr, c = c1 + dc;
+      while (r !== r2 && c !== c2) { if (ckBoard[r][c] !== 0) return { r, c }; r += dr; c += dc; }
+      return null;
     }
 
-    function clearCkSelection() {
-      ckSelected = null;
-      ckValidMoves = [];
-      renderCkBoard();
+    function executeCkMoveStep(destR, destC) {
+      let startR = ckSelected.r, startC = ckSelected.c, val = ckSelected.val;
+      let jumped = getCkJumpedPiece(startR, startC, destR, destC);
+      if (jumped) ckCapturedThisTurn.push(jumped);
+
+      ckBoard[destR][destC] = val; ckBoard[startR][startC] = 0;
+
+      ckActivePaths = ckActivePaths.filter(p => p.startR === startR && p.startC === startC && p.steps[0].r === destR && p.steps[0].c === destC);
+      ckActivePaths.forEach(p => { p.startR = destR; p.startC = destC; p.steps.shift(); });
+
+      ckSelected.r = destR; ckSelected.c = destC;
+
+      if (ckActivePaths.length > 0 && ckActivePaths[0].steps.length > 0) {
+        ckMultiJumping = true; renderCkBoard();
+      } else {
+        finalizeCkTurn(destR, destC, val);
+      }
     }
 
-    function getCkValidMoves(r, c, val) {
-      const moves = [];
-      const isKing = val > 2;
-      const player = (val === 1 || val === 3) ? 1 : 2;
-      const forward = player === 1 ? 1 : -1;
+    function finalizeCkTurn(r, c, val) {
+      if (!isCkKing(val)) {
+        if (ckPlayer === 1 && r === 0) ckBoard[r][c] = 3; 
+        if (ckPlayer === 2 && r === CK_SIZE - 1) ckBoard[r][c] = 4; 
+      }
+      ckCapturedThisTurn.forEach(p => ckBoard[p.r][p.c] = 0);
       
-      const directions = isKing ? [[1, 1], [1, -1], [-1, 1], [-1, -1]] : [[forward, 1], [forward, -1]];
-
-      directions.forEach(dir => {
-        let nr = r + dir[0];
-        let nc = c + dir[1];
-
-        if (isCkInBounds(nr, nc) && ckBoard[nr][nc] === 0) {
-          moves.push({ r: nr, c: nc, isJump: false });
-        }
-
-        let jumpR = r + dir[0] * 2;
-        let jumpC = c + dir[1] * 2;
-        if (isCkInBounds(nr, nc) && isCkInBounds(jumpR, jumpC)) {
-          let midPiece = ckBoard[nr][nc];
-          let midPlayer = (midPiece === 1 || midPiece === 3) ? 1 : (midPiece === 2 || midPiece === 4) ? 2 : 0;
-          
-          if (midPlayer !== 0 && midPlayer !== player && ckBoard[jumpR][jumpC] === 0) {
-            moves.push({ r: jumpR, c: jumpC, isJump: true, jumpR: nr, jumpC: nc });
-          }
-        }
-      });
-      return moves;
-    }
-
-    function isCkInBounds(r, c) {
-      return r >= 0 && r < CK_BOARD_SIZE && c >= 0 && c < CK_BOARD_SIZE;
-    }
-
-    function executeCkMove(move) {
-      ckBoard[move.r][move.c] = ckSelected.val;
-      ckBoard[ckSelected.r][ckSelected.c] = 0;
-
-      if (move.isJump) {
-        ckBoard[move.jumpR][move.jumpC] = 0;
-      }
-
-      if (ckPlayer === 1 && move.r === 7 && ckBoard[move.r][move.c] === 1) {
-        ckBoard[move.r][move.c] = 3; 
-      } else if (ckPlayer === 2 && move.r === 0 && ckBoard[move.r][move.c] === 2) {
-        ckBoard[move.r][move.c] = 4; 
-      }
-
       ckPlayer = ckPlayer === 1 ? 2 : 1;
-      clearCkSelection();
-      updateCkStatus();
+      ckSelected = null; ckMultiJumping = false; ckCapturedThisTurn = [];
+      
+      calcCkValidMoves();
+      updateCkUI();
+      renderCkBoard();
     }
   </script>
 </body>
