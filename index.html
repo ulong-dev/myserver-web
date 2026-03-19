@@ -139,27 +139,20 @@
     footer{ text-align:center; color: var(--footer-text); font-size: 12px; padding: 32px 0 10px; transition: color 0.3s; }
 
     /* =========================================
-       เกมหมากฮอสสากล (International Draughts) - โหมด FULL SCREEN iPad
+       Modal & Shared UI
        ========================================= */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
-      background: #1a252c; /* เปลี่ยนพื้นหลังให้มืดทึบเต็มจอ */
+      background: #1a252c; 
       z-index: 1000; display: flex; align-items: center; justify-content: center;
       opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     }
     .modal-overlay.show { opacity: 1; pointer-events: auto; }
 
     .game-container {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      padding: 10px;
-      box-sizing: border-box;
-      color: white;
+      width: 100%; height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; position: relative;
+      padding: 10px; box-sizing: border-box; color: white;
     }
 
     .close-btn {
@@ -167,80 +160,87 @@
       background: rgba(255,255,255,0.1); border: none; color: white;
       font-size: 24px; width: 44px; height: 44px; border-radius: 50%;
       cursor: pointer; transition: background 0.2s;
-      display: flex; align-items: center; justify-content: center;
-      z-index: 10;
+      display: flex; align-items: center; justify-content: center; z-index: 10;
     }
     .close-btn:hover { background: rgba(255,255,255,0.3); }
 
     .game-container h2 { margin: 0; color: #f1c40f; font-size: clamp(20px, 4vw, 28px); }
-    .game-container .ck-subtitle { margin-top:0; font-size: clamp(12px, 2vw, 15px); color: #bdc3c7; margin-bottom: 10px;}
+    .game-container .gm-subtitle { margin-top:0; font-size: clamp(12px, 2vw, 15px); color: #bdc3c7; margin-bottom: 10px;}
     
-    /* Dashboard: คะแนนและเวลา */
-    .ck-dashboard {
+    /* Dashboard */
+    .gm-dashboard {
       display: flex; justify-content: space-between; align-items: center;
       width: 100%; max-width: min(90vw, 75vh); margin-bottom: 15px;
       background: #2c3e50; padding: 10px 15px; border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.5); box-sizing: border-box;
     }
-    .ck-p-stats {
+    .gm-p-stats {
       display: flex; flex-direction: column; align-items: center;
-      padding: 8px 12px; border-radius: 8px; min-width: 100px; transition: 0.3s;
+      padding: 8px 12px; border-radius: 8px; min-width: 90px; transition: 0.3s;
     }
-    .ck-p-stats.active { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
-    .ck-p2 { color: #eceff1; border-top: 4px solid #eceff1; }
-    .ck-p1 { color: #ff5252; border-bottom: 4px solid #ff5252; }
-    .ck-score { font-size: 1.8rem; font-weight: bold; }
-    .ck-time { font-size: 1.3rem; background: #1a252c; padding: 4px 10px; border-radius: 5px; font-family: monospace; letter-spacing: 1px; margin-top: 5px; }
-    .ck-time.danger { color: #ff5252; animation: blink 1s infinite; }
+    .gm-p-stats.active { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+    .gm-p2 { color: #eceff1; border-top: 4px solid #eceff1; }
+    .gm-p1 { color: #ff5252; border-bottom: 4px solid #ff5252; }
+    .gm-score { font-size: 1.8rem; font-weight: bold; }
+    .gm-time { font-size: 1.3rem; background: #1a252c; padding: 4px 10px; border-radius: 5px; font-family: monospace; letter-spacing: 1px; margin-top: 5px; }
+    .gm-time.danger { color: #ff5252; animation: blink 1s infinite; }
     @keyframes blink { 50% { opacity: 0.5; } }
     
-    .ck-status { font-size: clamp(1rem, 2.5vw, 1.3rem); font-weight: bold; text-align: center; flex: 1; padding: 0 10px; }
+    .gm-status { font-size: clamp(1rem, 2.5vw, 1.3rem); font-weight: bold; text-align: center; flex: 1; padding: 0 10px; }
 
-    /* กระดานสากล 10x10 แบบปรับขนาดอัตโนมัติ (Responsive Grid) */
+    .gm-controls { display: flex; gap: 15px; margin-top: 20px; }
+    .gm-btn {
+      padding: 12px 20px; font-size: clamp(14px, 2vw, 18px); font-family: 'Kanit'; color: white;
+      border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;
+    }
+    .gm-btn-restart { background-color: #e67e22; }
+    .gm-btn-restart:hover { background-color: #d35400; transform: translateY(-2px); }
+    .gm-btn-reset { background-color: #7f8c8d; }
+    .gm-btn-reset:hover { background-color: #95a5a6; transform: translateY(-2px); }
+
+    /* =========================================
+       หมากฮอสสากล (International Draughts)
+       ========================================= */
     .ck-board {
-      display: grid;
-      width: 100%;
-      max-width: min(95vw, 65dvh); /* ยึดสัดส่วนจอ ไม่ให้ล้นจอ iPad */
-      aspect-ratio: 1 / 1; /* บังคับให้เป็นสี่เหลี่ยมจัตุรัสเสมอ */
-      grid-template-columns: repeat(10, 1fr);
-      grid-template-rows: repeat(10, 1fr);
-      border: 6px solid #3e2723;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-      background-color: #d7ccc8;
+      display: grid; width: 100%; max-width: min(95vw, 65dvh); aspect-ratio: 1 / 1; 
+      grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr);
+      border: 6px solid #3e2723; box-shadow: 0 10px 40px rgba(0,0,0,0.7); background-color: #d7ccc8;
     }
-
-    .ck-cell {
-      width: 100%; height: 100%;
-      display: flex; justify-content: center; align-items: center;
-      box-sizing: border-box; position: relative;
-    }
+    .ck-cell { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; box-sizing: border-box; position: relative; }
     .ck-cell.dark { background-color: #795548; }
     .ck-cell.light { background-color: #d7ccc8; }
     .ck-cell.highlight { background-color: rgba(0, 230, 118, 0.4); cursor: pointer; box-shadow: inset 0 0 10px #00E676; }
-
     .ck-piece {
-      width: 78%; height: 78%; border-radius: 50%;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.4);
-      cursor: pointer; display: flex; justify-content: center; align-items: center;
-      font-size: clamp(14px, 2.5vmin, 24px); user-select: none; transition: transform 0.2s, opacity 0.3s; z-index: 2;
+      width: 78%; height: 78%; border-radius: 50%; box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.4);
+      cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: clamp(14px, 2.5vmin, 24px); user-select: none; transition: transform 0.2s, opacity 0.3s; z-index: 2;
     }
     .ck-piece:hover { transform: scale(1.1); }
     .ck-piece.selected { outline: 3px solid #FFEA00; box-shadow: 0 0 15px #FFEA00; transform: scale(1.1); }
     .ck-piece.dead { opacity: 0.3; filter: grayscale(100%); pointer-events: none; }
-
     .ck-player1 { background: radial-gradient(circle, #ff5252, #b71c1c); }
     .ck-player2 { background: radial-gradient(circle, #eceff1, #78909c); color: black;}
     .ck-piece.king::after { content: '👑'; }
 
-    .ck-controls { display: flex; gap: 15px; margin-top: 20px; }
-    .ck-btn {
-      padding: 12px 20px; font-size: clamp(14px, 2vw, 18px); font-family: 'Kanit'; color: white;
-      border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;
+    /* =========================================
+       XO (Tic-Tac-Toe)
+       ========================================= */
+    .xo-board {
+      display: grid; width: 100%; max-width: min(95vw, 55dvh); aspect-ratio: 1 / 1; 
+      grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+      gap: 8px; border: 8px solid #2c3e50; background-color: #2c3e50; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
     }
-    .ck-btn-restart { background-color: #e67e22; }
-    .ck-btn-restart:hover { background-color: #d35400; transform: translateY(-2px); }
-    .ck-btn-reset { background-color: #7f8c8d; }
-    .ck-btn-reset:hover { background-color: #95a5a6; transform: translateY(-2px); }
+    .xo-cell {
+      background-color: #ecf0f1; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;
+      font-size: clamp(40px, 12vmin, 80px); font-weight: bold; cursor: pointer; transition: background-color 0.2s, transform 0.2s; border-radius: 4px;
+    }
+    .xo-cell:active { transform: scale(0.95); }
+    .xo-cell.x { color: #ff5252; }
+    .xo-cell.o { color: #448aff; }
+    .xo-cell.win { background-color: #00E676; color: white; animation: pop 0.4s ease-out; }
+    @keyframes pop { 50% { transform: scale(1.1); } }
+    
+    .xo-p1 { color: #ff5252; border-bottom: 4px solid #ff5252; }
+    .xo-p2 { color: #448aff; border-top: 4px solid #448aff; }
 
     /* Responsive Main Page */
     @media (max-width: 1100px){ .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
@@ -316,6 +316,18 @@
           </div>
         </a>
 
+        <a class="card" href="#" onclick="openXO(event)" data-group="kids">
+          <div class="thumb"><div class="icon">❌⭕</div></div>
+          <div class="body">
+            <p class="title">Tic-Tac-Toe (XO)</p>
+            <p class="desc">เกมดวลเอกซ์โอคลาสสิก แข่งกันเรียง 3 ตัว</p>
+            <div class="meta">
+              <span class="tag">👶 Kids</span>
+              <span class="go">Play <span aria-hidden="true">→</span></span>
+            </div>
+          </div>
+        </a>
+
         <a class="card" href="running-app/index.html" data-group="sport">
           <div class="thumb"><div class="icon">🏃</div></div>
           <div class="body">
@@ -363,29 +375,58 @@
     <div class="game-container">
       <button class="close-btn" onclick="closeCheckers()">✕</button>
       <h2>หมากฮอสสากล</h2>
-      <p class="ck-subtitle">100 ช่อง | กินมากที่สุด | จับเวลาแข่งขัน</p>
+      <p class="gm-subtitle">100 ช่อง | กินมากที่สุด | จับเวลาแข่งขัน</p>
 
-      <div class="ck-dashboard">
-        <div class="ck-p-stats ck-p2" id="ck-p2-panel">
+      <div class="gm-dashboard">
+        <div class="gm-p-stats gm-p2" id="ck-p2-panel">
           <div style="font-size:14px; font-weight:bold;">⚪ ขาว</div>
-          <div class="ck-score" id="ck-score-p2">0</div>
-          <div class="ck-time" id="ck-time-p2">10:00</div>
+          <div class="gm-score" id="ck-score-p2">0</div>
+          <div class="gm-time" id="ck-time-p2">10:00</div>
         </div>
         
-        <div id="ck-gameStatus" class="ck-status">ตาผู้เล่น: แดง</div>
+        <div id="ck-gameStatus" class="gm-status">ตาผู้เล่น: แดง</div>
 
-        <div class="ck-p-stats ck-p1 active" id="ck-p1-panel">
+        <div class="gm-p-stats gm-p1 active" id="ck-p1-panel">
           <div style="font-size:14px; font-weight:bold;">🔴 แดง</div>
-          <div class="ck-score" id="ck-score-p1">0</div>
-          <div class="ck-time" id="ck-time-p1">10:00</div>
+          <div class="gm-score" id="ck-score-p1">0</div>
+          <div class="gm-time" id="ck-time-p1">10:00</div>
         </div>
       </div>
 
       <div id="checkersBoard" class="ck-board"></div>
       
-      <div class="ck-controls">
-        <button class="ck-btn ck-btn-restart" onclick="initCheckers()">🔄 เริ่มกระดานใหม่</button>
-        <button class="ck-btn ck-btn-reset" onclick="resetCkMatch()">🗑️ ล้างคะแนน</button>
+      <div class="gm-controls">
+        <button class="gm-btn gm-btn-restart" onclick="initCheckers()">🔄 เริ่มกระดานใหม่</button>
+        <button class="gm-btn gm-btn-reset" onclick="resetCkMatch()">🗑️ ล้างคะแนน</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="xoModal" class="modal-overlay">
+    <div class="game-container">
+      <button class="close-btn" onclick="closeXO()">✕</button>
+      <h2>Tic-Tac-Toe (XO)</h2>
+      <p class="gm-subtitle">ใครเรียง 3 ตัวได้ก่อน ชนะไปเลย!</p>
+
+      <div class="gm-dashboard">
+        <div class="gm-p-stats xo-p2" id="xo-p2-panel">
+          <div style="font-size:14px; font-weight:bold;">⭕ ฝั่งโอ</div>
+          <div class="gm-score" id="xo-score-p2">0</div>
+        </div>
+        
+        <div id="xo-gameStatus" class="gm-status">ตาผู้เล่น: ❌</div>
+
+        <div class="gm-p-stats xo-p1 active" id="xo-p1-panel">
+          <div style="font-size:14px; font-weight:bold;">❌ ฝั่งเอกซ์</div>
+          <div class="gm-score" id="xo-score-p1">0</div>
+        </div>
+      </div>
+
+      <div id="xoBoard" class="xo-board"></div>
+      
+      <div class="gm-controls">
+        <button class="gm-btn gm-btn-restart" onclick="initXO()">🔄 เริ่มกระดานใหม่</button>
+        <button class="gm-btn gm-btn-reset" onclick="resetXOMatch()">🗑️ ล้างคะแนน</button>
       </div>
     </div>
   </div>
@@ -427,10 +468,147 @@
     } 
 
     // =========================================
+    // ระบบเกม XO (Tic-Tac-Toe Logic)
+    // =========================================
+    let xoBoardState = ["", "", "", "", "", "", "", "", ""];
+    let xoCurrentPlayer = "X";
+    let xoGameActive = false;
+    let xoScoreX = 0;
+    let xoScoreO = 0;
+
+    const xoWinningConditions = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // แนวนอน
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // แนวตั้ง
+      [0, 4, 8], [2, 4, 6]             // แนวทแยง
+    ];
+
+    function openXO(e) {
+      e.preventDefault();
+      document.getElementById('xoModal').classList.add('show');
+      if (!xoGameActive && xoBoardState.every(cell => cell === "")) {
+        initXO();
+      }
+    }
+
+    function closeXO() {
+      document.getElementById('xoModal').classList.remove('show');
+    }
+
+    function initXO() {
+      xoBoardState = ["", "", "", "", "", "", "", "", ""];
+      xoCurrentPlayer = "X";
+      xoGameActive = true;
+      updateXOUI();
+      renderXOBoard();
+    }
+
+    function resetXOMatch() {
+      if(confirm("ต้องการล้างคะแนนสะสมทั้งหมดใช่หรือไม่?")) {
+        xoScoreX = 0;
+        xoScoreO = 0;
+        initXO();
+      }
+    }
+
+    function renderXOBoard() {
+      const boardEl = document.getElementById('xoBoard');
+      boardEl.innerHTML = '';
+
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'xo-cell';
+        cell.dataset.index = i;
+        
+        if (xoBoardState[i] !== "") {
+          cell.textContent = xoBoardState[i];
+          cell.classList.add(xoBoardState[i] === "X" ? "x" : "o");
+        }
+
+        cell.onclick = () => handleXOCellClick(i);
+        boardEl.appendChild(cell);
+      }
+    }
+
+    function handleXOCellClick(index) {
+      if (xoBoardState[index] !== "" || !xoGameActive) return;
+
+      xoBoardState[index] = xoCurrentPlayer;
+      
+      // Update DOM for instant feedback
+      const cells = document.querySelectorAll('.xo-cell');
+      cells[index].textContent = xoCurrentPlayer;
+      cells[index].classList.add(xoCurrentPlayer === "X" ? "x" : "o");
+
+      checkXOWin();
+    }
+
+    function checkXOWin() {
+      let roundWon = false;
+      let winningCells = [];
+
+      for (let i = 0; i < xoWinningConditions.length; i++) {
+        const winCondition = xoWinningConditions[i];
+        let a = xoBoardState[winCondition[0]];
+        let b = xoBoardState[winCondition[1]];
+        let c = xoBoardState[winCondition[2]];
+
+        if (a === '' || b === '' || c === '') continue;
+        if (a === b && b === c) {
+          roundWon = true;
+          winningCells = winCondition;
+          break;
+        }
+      }
+
+      if (roundWon) {
+        xoGameActive = false;
+        const cells = document.querySelectorAll('.xo-cell');
+        winningCells.forEach(index => cells[index].classList.add('win'));
+
+        if (xoCurrentPlayer === "X") xoScoreX++;
+        else xoScoreO++;
+
+        const statusEl = document.getElementById('xo-gameStatus');
+        statusEl.textContent = `🎉 ผู้ชนะคือ: ${xoCurrentPlayer}`;
+        statusEl.style.color = '#00E676';
+        
+        document.getElementById('xo-score-p1').textContent = xoScoreX;
+        document.getElementById('xo-score-p2').textContent = xoScoreO;
+        return;
+      }
+
+      let roundDraw = !xoBoardState.includes("");
+      if (roundDraw) {
+        xoGameActive = false;
+        const statusEl = document.getElementById('xo-gameStatus');
+        statusEl.textContent = `🤝 เสมอกัน!`;
+        statusEl.style.color = '#f1c40f';
+        return;
+      }
+
+      xoCurrentPlayer = xoCurrentPlayer === "X" ? "O" : "X";
+      updateXOUI();
+    }
+
+    function updateXOUI() {
+      if (!xoGameActive) return;
+      const statusEl = document.getElementById('xo-gameStatus');
+      statusEl.textContent = `ตาผู้เล่น: ${xoCurrentPlayer === "X" ? "❌" : "⭕"}`;
+      statusEl.style.color = xoCurrentPlayer === "X" ? '#ff5252' : '#448aff';
+
+      document.getElementById('xo-p1-panel').classList.toggle('active', xoCurrentPlayer === "X");
+      document.getElementById('xo-p2-panel').classList.toggle('active', xoCurrentPlayer === "O");
+      
+      document.getElementById('xo-score-p1').textContent = xoScoreX;
+      document.getElementById('xo-score-p2').textContent = xoScoreO;
+    }
+
+
+    // =========================================
     // ระบบเกมหมากฮอสสากล (International Checkers Logic)
     // =========================================
     const CK_SIZE = 10;
-    const CK_TIME_LIMIT = 600; // 10 นาที
+    const CK_TIME_LIMIT = 600; 
     
     let ckBoard = [];
     let ckPlayer = 1; 
@@ -449,11 +627,9 @@
     function openCheckers(e) {
       e.preventDefault();
       document.getElementById('checkersModal').classList.add('show');
-      // ถ้าเกมยังไม่เคยเริ่ม หรือจบไปแล้ว ให้เริ่มใหม่
       if (!ckGameActive && ckTimeLeftP1 === CK_TIME_LIMIT) {
         initCheckers();
       } else if (ckGameActive) {
-        // ให้เวลาเดินต่อถ้าย่อจอไป
         clearInterval(ckTimerInterval);
         startCkTimer();
       }
@@ -461,51 +637,36 @@
 
     function closeCheckers() {
       document.getElementById('checkersModal').classList.remove('show');
-      clearInterval(ckTimerInterval); // หยุดเวลาชั่วคราวตอนปิด Modal
+      clearInterval(ckTimerInterval); 
     }
 
     function initCheckers() {
       ckBoard = Array(CK_SIZE).fill(null).map(() => Array(CK_SIZE).fill(0));
-      
       for (let r = 0; r < 4; r++) {
         for (let c = 0; c < CK_SIZE; c++) {
-          if ((r + c) % 2 === 1) ckBoard[r][c] = 2; // ขาว
+          if ((r + c) % 2 === 1) ckBoard[r][c] = 2; 
         }
       }
       for (let r = 6; r < CK_SIZE; r++) {
         for (let c = 0; c < CK_SIZE; c++) {
-          if ((r + c) % 2 === 1) ckBoard[r][c] = 1; // แดง
+          if ((r + c) % 2 === 1) ckBoard[r][c] = 1; 
         }
       }
-
-      ckPlayer = 1;
-      ckSelected = null;
-      ckMultiJumping = false;
-      ckCapturedThisTurn = [];
-      ckGameActive = true;
-      
-      ckTimeLeftP1 = CK_TIME_LIMIT;
-      ckTimeLeftP2 = CK_TIME_LIMIT;
-      clearInterval(ckTimerInterval);
-      startCkTimer();
-
-      calcCkValidMoves(); 
-      updateCkUI();
-      renderCkBoard();
+      ckPlayer = 1; ckSelected = null; ckMultiJumping = false; ckCapturedThisTurn = []; ckGameActive = true;
+      ckTimeLeftP1 = CK_TIME_LIMIT; ckTimeLeftP2 = CK_TIME_LIMIT;
+      clearInterval(ckTimerInterval); startCkTimer();
+      calcCkValidMoves(); updateCkUI(); renderCkBoard();
     }
 
     function resetCkMatch() {
       if(confirm("ต้องการล้างคะแนนสะสมทั้งหมดใช่หรือไม่?")) {
-        ckScoreP1 = 0;
-        ckScoreP2 = 0;
-        initCheckers();
+        ckScoreP1 = 0; ckScoreP2 = 0; initCheckers();
       }
     }
 
     function startCkTimer() {
       ckTimerInterval = setInterval(() => {
         if (!ckGameActive) return;
-
         if (ckPlayer === 1) {
           ckTimeLeftP1--;
           if (ckTimeLeftP1 <= 0) endCkGame(2, "🔴 แดงเวลาหมด! ขาวชนะ");
@@ -529,29 +690,19 @@
       const t2 = document.getElementById('ck-time-p2');
       t1.textContent = formatCkTime(ckTimeLeftP1);
       t2.textContent = formatCkTime(ckTimeLeftP2);
-
       t1.classList.toggle('danger', ckTimeLeftP1 <= 60 && ckTimeLeftP1 > 0);
       t2.classList.toggle('danger', ckTimeLeftP2 <= 60 && ckTimeLeftP2 > 0);
     }
 
     function endCkGame(winnerIndex, msg) {
-      ckGameActive = false;
-      clearInterval(ckTimerInterval);
-      
-      if (winnerIndex === 1) ckScoreP1++;
-      else if (winnerIndex === 2) ckScoreP2++;
-
+      ckGameActive = false; clearInterval(ckTimerInterval);
+      if (winnerIndex === 1) ckScoreP1++; else if (winnerIndex === 2) ckScoreP2++;
       const statusEl = document.getElementById('ck-gameStatus');
-      statusEl.textContent = `🎉 ${msg}`;
-      statusEl.style.color = '#00E676';
-      
-      document.getElementById('ck-score-p1').textContent = ckScoreP1;
-      document.getElementById('ck-score-p2').textContent = ckScoreP2;
-      
+      statusEl.textContent = `🎉 ${msg}`; statusEl.style.color = '#00E676';
+      document.getElementById('ck-score-p1').textContent = ckScoreP1; document.getElementById('ck-score-p2').textContent = ckScoreP2;
       renderCkBoard(); 
     }
 
-    // --- Core Game Logic ---
     function getCkOwner(val) { return (val === 1 || val === 3) ? 1 : (val === 2 || val === 4) ? 2 : 0; }
     function isCkKing(val) { return val > 2; }
     function isCkEnemy(v1, v2) { let o1 = getCkOwner(v1), o2 = getCkOwner(v2); return o1 !== 0 && o2 !== 0 && o1 !== o2; }
@@ -559,9 +710,7 @@
     function isCkCapturedTemp(r, c, caps) { return caps.some(p => p.r === r && p.c === c); }
 
     function calcCkValidMoves() {
-      ckActivePaths = [];
-      let maxCaptures = 0;
-
+      ckActivePaths = []; let maxCaptures = 0;
       for (let r = 0; r < CK_SIZE; r++) {
         for (let c = 0; c < CK_SIZE; c++) {
           let val = ckBoard[r][c];
@@ -576,10 +725,8 @@
           }
         }
       }
-
-      if (maxCaptures > 0) {
-        ckActivePaths = ckActivePaths.filter(p => p.captures.length === maxCaptures);
-      } else {
+      if (maxCaptures > 0) { ckActivePaths = ckActivePaths.filter(p => p.captures.length === maxCaptures); } 
+      else {
         for (let r = 0; r < CK_SIZE; r++) {
           for (let c = 0; c < CK_SIZE; c++) {
             let val = ckBoard[r][c];
@@ -590,7 +737,6 @@
           }
         }
       }
-
       if (ckActivePaths.length === 0 && ckGameActive) {
         let winner = ckPlayer === 1 ? 2 : 1;
         let loserName = ckPlayer === 1 ? 'แดง' : 'ขาว';
@@ -617,7 +763,6 @@
     function findCkCapturePaths(currR, currC, origR, origC, val, currentCaptures) {
       let king = isCkKing(val); let paths = []; let dirs = [[1,1],[1,-1],[-1,1],[-1,-1]];
       let getSim = (r, c) => (r === origR && c === origC) ? 0 : ckBoard[r][c];
-
       for (let dir of dirs) {
         if (king) {
           let step = 1, enemyFound = null;
@@ -660,48 +805,30 @@
       const statusEl = document.getElementById('ck-gameStatus');
       statusEl.textContent = `ตาเดิน: ${ckPlayer === 1 ? '🔴 แดง' : '⚪ ขาว'}`;
       statusEl.style.color = ckPlayer === 1 ? '#ff5252' : '#eceff1';
-
       document.getElementById('ck-p1-panel').classList.toggle('active', ckPlayer === 1);
       document.getElementById('ck-p2-panel').classList.toggle('active', ckPlayer === 2);
-      
       document.getElementById('ck-score-p1').textContent = ckScoreP1;
       document.getElementById('ck-score-p2').textContent = ckScoreP2;
       updateCkTimerDisplay();
     }
 
     function renderCkBoard() {
-      const boardEl = document.getElementById('checkersBoard');
-      boardEl.innerHTML = '';
-      let highlightCells = [];
-      if (ckSelected && ckGameActive) {
-        ckActivePaths.forEach(p => { if (p.startR === ckSelected.r && p.startC === ckSelected.c) highlightCells.push(p.steps[0]); });
-      }
-
+      const boardEl = document.getElementById('checkersBoard'); boardEl.innerHTML = ''; let highlightCells = [];
+      if (ckSelected && ckGameActive) { ckActivePaths.forEach(p => { if (p.startR === ckSelected.r && p.startC === ckSelected.c) highlightCells.push(p.steps[0]); }); }
       for (let r = 0; r < CK_SIZE; r++) {
         for (let c = 0; c < CK_SIZE; c++) {
-          const cell = document.createElement('div');
-          cell.className = `ck-cell ${(r + c) % 2 === 1 ? 'dark' : 'light'}`;
-
-          if (highlightCells.some(hc => hc.r === r && hc.c === c)) {
-            cell.classList.add('highlight');
-            cell.onclick = () => executeCkMoveStep(r, c);
-          } else {
-            cell.onclick = () => { if(!ckMultiJumping && ckGameActive) { ckSelected = null; renderCkBoard(); } };
-          }
-
+          const cell = document.createElement('div'); cell.className = `ck-cell ${(r + c) % 2 === 1 ? 'dark' : 'light'}`;
+          if (highlightCells.some(hc => hc.r === r && hc.c === c)) { cell.classList.add('highlight'); cell.onclick = () => executeCkMoveStep(r, c); } 
+          else { cell.onclick = () => { if(!ckMultiJumping && ckGameActive) { ckSelected = null; renderCkBoard(); } }; }
           const pieceVal = ckBoard[r][c];
           if (pieceVal > 0) {
-            const piece = document.createElement('div');
-            let player = getCkOwner(pieceVal);
+            const piece = document.createElement('div'); let player = getCkOwner(pieceVal);
             piece.className = `ck-piece ck-player${player}`;
             if (isCkKing(pieceVal)) piece.classList.add('king');
             if (ckSelected && ckSelected.r === r && ckSelected.c === c) piece.classList.add('selected');
             if (isCkCapturedTemp(r, c, ckCapturedThisTurn)) piece.classList.add('dead');
-
             if (player === ckPlayer && !ckMultiJumping && !piece.classList.contains('dead') && ckGameActive) {
-              if (ckActivePaths.some(p => p.startR === r && p.startC === c)) {
-                piece.onclick = (e) => { e.stopPropagation(); ckSelected = { r, c, val: pieceVal }; renderCkBoard(); };
-              }
+              if (ckActivePaths.some(p => p.startR === r && p.startC === c)) { piece.onclick = (e) => { e.stopPropagation(); ckSelected = { r, c, val: pieceVal }; renderCkBoard(); }; }
             }
             cell.appendChild(piece);
           }
@@ -720,19 +847,12 @@
       let startR = ckSelected.r, startC = ckSelected.c, val = ckSelected.val;
       let jumped = getCkJumpedPiece(startR, startC, destR, destC);
       if (jumped) ckCapturedThisTurn.push(jumped);
-
       ckBoard[destR][destC] = val; ckBoard[startR][startC] = 0;
-
       ckActivePaths = ckActivePaths.filter(p => p.startR === startR && p.startC === startC && p.steps[0].r === destR && p.steps[0].c === destC);
       ckActivePaths.forEach(p => { p.startR = destR; p.startC = destC; p.steps.shift(); });
-
       ckSelected.r = destR; ckSelected.c = destC;
-
-      if (ckActivePaths.length > 0 && ckActivePaths[0].steps.length > 0) {
-        ckMultiJumping = true; renderCkBoard();
-      } else {
-        finalizeCkTurn(destR, destC, val);
-      }
+      if (ckActivePaths.length > 0 && ckActivePaths[0].steps.length > 0) { ckMultiJumping = true; renderCkBoard(); } 
+      else { finalizeCkTurn(destR, destC, val); }
     }
 
     function finalizeCkTurn(r, c, val) {
@@ -741,13 +861,9 @@
         if (ckPlayer === 2 && r === CK_SIZE - 1) ckBoard[r][c] = 4; 
       }
       ckCapturedThisTurn.forEach(p => ckBoard[p.r][p.c] = 0);
-      
       ckPlayer = ckPlayer === 1 ? 2 : 1;
       ckSelected = null; ckMultiJumping = false; ckCapturedThisTurn = [];
-      
-      calcCkValidMoves();
-      updateCkUI();
-      renderCkBoard();
+      calcCkValidMoves(); updateCkUI(); renderCkBoard();
     }
   </script>
 </body>
