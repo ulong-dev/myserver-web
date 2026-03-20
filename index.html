@@ -90,11 +90,7 @@
     }
 
     a{ color:inherit; text-decoration:none; }
-    .container{
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px 22px 30px;
-    }
+    .container{ max-width: 1200px; margin: 0 auto; padding: 24px 22px 30px; }
 
     /* Top Nav */
     .topbar{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding: 10px 0 8px; }
@@ -104,7 +100,6 @@
     .nav a{ padding: 8px 10px; border-radius: 999px; transition: .18s ease; outline: none; }
     .nav a:hover{ background: var(--go-bg); color: var(--ink); }
     .nav a:focus-visible{ box-shadow: var(--ring); background: var(--go-bg); }
-
     .theme-toggle { background: transparent; border: none; font-size: 16px; cursor: pointer; padding: 6px; margin-left: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease; outline: none; }
     .theme-toggle:hover { background: var(--go-bg); }
 
@@ -132,7 +127,6 @@
     .meta{ margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top: 12px; }
     .tag{ display:inline-flex; align-items:center; gap:6px; padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--nav-text); font-size: 12px; background: var(--tag-bg); transition: background-color 0.3s, color 0.3s; }
     .go{ display:inline-flex; align-items:center; gap:8px; font-size: 12px; font-weight: 700; color: var(--accent); padding: 7px 10px; border-radius: 999px; background: var(--go-bg); border: 1px solid var(--go-border); transition: .18s ease, background-color 0.3s, border-color 0.3s; white-space:nowrap; }
-
     .card:hover{ transform: translateY(-5px); border-color: var(--card-hover-border); box-shadow: var(--card-hover-shadow); }
     .card:hover .go{ background: var(--go-bg-hover); border-color: var(--go-border-hover); }
     
@@ -154,7 +148,6 @@
       align-items: center; justify-content: center; position: relative;
       padding: 10px; box-sizing: border-box; color: white;
     }
-
     .close-btn {
       position: absolute; top: 15px; right: 20px;
       background: rgba(255,255,255,0.1); border: none; color: white;
@@ -167,7 +160,6 @@
     .game-container h2 { margin: 0; color: #f1c40f; font-size: clamp(20px, 4vw, 28px); }
     .game-container .gm-subtitle { margin-top:0; font-size: clamp(12px, 2vw, 15px); color: #bdc3c7; margin-bottom: 10px;}
     
-    /* Dashboard */
     .gm-dashboard {
       display: flex; justify-content: space-between; align-items: center;
       width: 100%; max-width: min(90vw, 75vh); margin-bottom: 15px;
@@ -179,24 +171,43 @@
       padding: 8px 12px; border-radius: 8px; min-width: 90px; transition: 0.3s;
     }
     .gm-p-stats.active { background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
-    .gm-p2 { color: #eceff1; border-top: 4px solid #eceff1; }
-    .gm-p1 { color: #ff5252; border-bottom: 4px solid #ff5252; }
     .gm-score { font-size: 1.8rem; font-weight: bold; }
     .gm-time { font-size: 1.3rem; background: #1a252c; padding: 4px 10px; border-radius: 5px; font-family: monospace; letter-spacing: 1px; margin-top: 5px; }
-    .gm-time.danger { color: #ff5252; animation: blink 1s infinite; }
-    @keyframes blink { 50% { opacity: 0.5; } }
-    
     .gm-status { font-size: clamp(1rem, 2.5vw, 1.3rem); font-weight: bold; text-align: center; flex: 1; padding: 0 10px; }
-
     .gm-controls { display: flex; gap: 15px; margin-top: 20px; }
-    .gm-btn {
-      padding: 12px 20px; font-size: clamp(14px, 2vw, 18px); font-family: 'Kanit'; color: white;
-      border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;
-    }
+    .gm-btn { padding: 12px 20px; font-size: clamp(14px, 2vw, 18px); font-family: 'Kanit'; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
     .gm-btn-restart { background-color: #e67e22; }
     .gm-btn-restart:hover { background-color: #d35400; transform: translateY(-2px); }
     .gm-btn-reset { background-color: #7f8c8d; }
     .gm-btn-reset:hover { background-color: #95a5a6; transform: translateY(-2px); }
+
+    /* =========================================
+       Snake Game (Nokia Style)
+       ========================================= */
+    #snakeCanvas {
+      background-color: #9ebb24; /* จอเขียวโนเกีย */
+      border: 8px solid #2c3e50;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: min(95vw, 55dvh);
+      aspect-ratio: 1 / 1;
+      touch-action: none; /* ป้องกันไม่ให้จอสไลด์ตอนลากนิ้ว */
+    }
+    
+    /* D-Pad สำหรับ iPad/มือถือ */
+    .d-pad {
+      display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 15px;
+    }
+    .d-pad-row { display: flex; gap: 40px; }
+    .d-pad button {
+      width: 55px; height: 55px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3);
+      color: white; font-size: 22px; cursor: pointer; transition: 0.1s;
+      display: flex; align-items: center; justify-content: center;
+      user-select: none; -webkit-user-select: none;
+    }
+    .d-pad button:active { background: rgba(255,255,255,0.4); transform: scale(0.9); }
 
     /* =========================================
        หมากฮอสสากล (International Draughts)
@@ -238,9 +249,6 @@
     .xo-cell.o { color: #448aff; }
     .xo-cell.win { background-color: #00E676; color: white; animation: pop 0.4s ease-out; }
     @keyframes pop { 50% { transform: scale(1.1); } }
-    
-    .xo-p1 { color: #ff5252; border-bottom: 4px solid #ff5252; }
-    .xo-p2 { color: #448aff; border-top: 4px solid #448aff; }
 
     /* Responsive Main Page */
     @media (max-width: 1100px){ .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
@@ -267,7 +275,6 @@
         <a href="#" onclick="scrollToSection('projects'); return false;">Projects</a>
         <a href="library/index.html">Library</a>
         <a href="#" onclick="scrollToSection('contact'); return false;">Contact</a>
-        
         <button onclick="toggleTheme()" class="theme-toggle" aria-label="Toggle Night Mode" id="themeBtn">🌙</button>
       </nav>
     </div>
@@ -275,9 +282,7 @@
     <section class="hero" id="home">
       <div class="kicker">AW2P Home Server</div>
       <h1>Simple hub for family projects.</h1>
-      <p>
-        ศูนย์รวมโปรเจกต์ของครอบครัว
-      </p>
+      <p>ศูนย์รวมโปรเจกต์ของครอบครัว</p>
       <div class="divider"></div>
     </section>
 
@@ -300,6 +305,18 @@
             <div class="meta">
               <span class="tag">👶 Kids</span>
               <span class="go">Open <span aria-hidden="true">→</span></span>
+            </div>
+          </div>
+        </a>
+
+        <a class="card" href="#" onclick="openSnake(event)" data-group="kids">
+          <div class="thumb"><div class="icon">🐍</div></div>
+          <div class="body">
+            <p class="title">Retro Snake (Nokia)</p>
+            <p class="desc">เกมเจ้างูจอมหิวคลาสสิก ปัดจอหรือกดลูกศรเพื่อเล่น</p>
+            <div class="meta">
+              <span class="tag">👶 Kids</span>
+              <span class="go">Play <span aria-hidden="true">→</span></span>
             </div>
           </div>
         </a>
@@ -371,6 +388,36 @@
     </footer>
   </div>
 
+  <div id="snakeModal" class="modal-overlay">
+    <div class="game-container">
+      <button class="close-btn" onclick="closeSnake()">✕</button>
+      <h2>Retro Snake</h2>
+      <p class="gm-subtitle">เกมงูสุดคลาสสิก (ปัดหน้าจอ หรือ กดปุ่มเพื่อเลี้ยว)</p>
+
+      <div class="gm-dashboard" style="max-width: 300px; justify-content: center; margin-bottom: 10px;">
+        <div class="gm-p-stats active" style="width: 100%; border-bottom: 4px solid #00E676;">
+          <div style="font-size:14px; font-weight:bold;">🍎 คะแนน (Score)</div>
+          <div class="gm-score" id="snake-score">0</div>
+        </div>
+      </div>
+
+      <canvas id="snakeCanvas" width="300" height="300"></canvas>
+      
+      <div class="d-pad">
+        <button onclick="changeSnakeDirection(0, -1)">▲</button>
+        <div class="d-pad-row">
+          <button onclick="changeSnakeDirection(-1, 0)">◀</button>
+          <button onclick="changeSnakeDirection(1, 0)">▶</button>
+        </div>
+        <button onclick="changeSnakeDirection(0, 1)">▼</button>
+      </div>
+
+      <div class="gm-controls" style="margin-top: 5px;">
+        <button class="gm-btn gm-btn-restart" onclick="initSnake()">🔄 เริ่มเกมใหม่</button>
+      </div>
+    </div>
+  </div>
+
   <div id="checkersModal" class="modal-overlay">
     <div class="game-container">
       <button class="close-btn" onclick="closeCheckers()">✕</button>
@@ -383,9 +430,7 @@
           <div class="gm-score" id="ck-score-p2">0</div>
           <div class="gm-time" id="ck-time-p2">10:00</div>
         </div>
-        
         <div id="ck-gameStatus" class="gm-status">ตาผู้เล่น: แดง</div>
-
         <div class="gm-p-stats gm-p1 active" id="ck-p1-panel">
           <div style="font-size:14px; font-weight:bold;">🔴 แดง</div>
           <div class="gm-score" id="ck-score-p1">0</div>
@@ -409,14 +454,12 @@
       <p class="gm-subtitle">ใครเรียง 3 ตัวได้ก่อน ชนะไปเลย!</p>
 
       <div class="gm-dashboard">
-        <div class="gm-p-stats xo-p2" id="xo-p2-panel">
+        <div class="gm-p-stats" id="xo-p2-panel" style="color: #448aff; border-top: 4px solid #448aff;">
           <div style="font-size:14px; font-weight:bold;">⭕ ฝั่งโอ</div>
           <div class="gm-score" id="xo-score-p2">0</div>
         </div>
-        
         <div id="xo-gameStatus" class="gm-status">ตาผู้เล่น: ❌</div>
-
-        <div class="gm-p-stats xo-p1 active" id="xo-p1-panel">
+        <div class="gm-p-stats active" id="xo-p1-panel" style="color: #ff5252; border-bottom: 4px solid #ff5252;">
           <div style="font-size:14px; font-weight:bold;">❌ ฝั่งเอกซ์</div>
           <div class="gm-score" id="xo-score-p1">0</div>
         </div>
@@ -432,7 +475,7 @@
   </div>
 
   <script>
-    // --- โหลดไอคอนปุ่ม Theme ---
+    // --- Shared Functions ---
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('themeBtn').innerText = document.documentElement.getAttribute('data-theme') === 'dark' ? '🌕' : '🌙';
     });
@@ -468,6 +511,170 @@
     } 
 
     // =========================================
+    // ระบบเกมงู (Retro Snake Logic)
+    // =========================================
+    let snakeCanvas, snakeCtx;
+    let snakeGridSize = 15;
+    let snake = [];
+    let snakeFood = {x: 0, y: 0};
+    let snakeDx = 1;
+    let snakeDy = 0;
+    let snakeScore = 0;
+    let snakeGameLoop;
+    let isSnakeAlive = false;
+
+    function openSnake(e) {
+      e.preventDefault();
+      document.getElementById('snakeModal').classList.add('show');
+      if (!isSnakeAlive) initSnake();
+    }
+
+    function closeSnake() {
+      document.getElementById('snakeModal').classList.remove('show');
+      clearInterval(snakeGameLoop);
+      isSnakeAlive = false;
+    }
+
+    function initSnake() {
+      snakeCanvas = document.getElementById('snakeCanvas');
+      snakeCtx = snakeCanvas.getContext('2d');
+      
+      snake = [ {x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10} ];
+      snakeDx = 1;
+      snakeDy = 0;
+      snakeScore = 0;
+      isSnakeAlive = true;
+      
+      const scoreEl = document.getElementById('snake-score');
+      scoreEl.textContent = snakeScore;
+      scoreEl.style.color = 'white';
+      
+      placeSnakeFood();
+      
+      clearInterval(snakeGameLoop);
+      snakeGameLoop = setInterval(updateSnake, 130); // ความเร็วของงู
+    }
+
+    function placeSnakeFood() {
+      let maxX = snakeCanvas.width / snakeGridSize;
+      let maxY = snakeCanvas.height / snakeGridSize;
+      snakeFood.x = Math.floor(Math.random() * maxX);
+      snakeFood.y = Math.floor(Math.random() * maxY);
+      
+      for (let part of snake) {
+         if (part.x === snakeFood.x && part.y === snakeFood.y) return placeSnakeFood();
+      }
+    }
+
+    function changeSnakeDirection(dx, dy) {
+      if (!isSnakeAlive) return;
+      // ป้องกันการเลี้ยวกลับหลังหัน (งูกินตัวเอง)
+      if (dx === 1 && snakeDx === -1) return;
+      if (dx === -1 && snakeDx === 1) return;
+      if (dy === 1 && snakeDy === -1) return;
+      if (dy === -1 && snakeDy === 1) return;
+      snakeDx = dx;
+      snakeDy = dy;
+    }
+
+    function updateSnake() {
+      let head = { x: snake[0].x + snakeDx, y: snake[0].y + snakeDy };
+      snake.unshift(head);
+
+      // กินแอปเปิ้ล
+      if (head.x === snakeFood.x && head.y === snakeFood.y) {
+        snakeScore += 10;
+        document.getElementById('snake-score').textContent = snakeScore;
+        placeSnakeFood();
+      } else {
+        snake.pop(); 
+      }
+
+      // เช็คชนกำแพง
+      let maxX = snakeCanvas.width / snakeGridSize;
+      let maxY = snakeCanvas.height / snakeGridSize;
+      
+      if (head.x < 0 || head.x >= maxX || head.y < 0 || head.y >= maxY) {
+        return gameOverSnake();
+      }
+      
+      // เช็คชนตัวเอง
+      for (let i = 1; i < snake.length; i++) {
+        if (head.x === snake[i].x && head.y === snake[i].y) {
+          return gameOverSnake();
+        }
+      }
+      drawSnake();
+    }
+
+    function drawSnake() {
+      // พื้นหลังจอเขียว
+      snakeCtx.fillStyle = '#9ebb24'; 
+      snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+
+      // วาดแอปเปิ้ล
+      snakeCtx.fillStyle = '#ff5252';
+      snakeCtx.beginPath();
+      snakeCtx.arc((snakeFood.x * snakeGridSize) + (snakeGridSize/2), (snakeFood.y * snakeGridSize) + (snakeGridSize/2), snakeGridSize/2.2, 0, Math.PI*2);
+      snakeCtx.fill();
+
+      // วาดตัวงู
+      snakeCtx.fillStyle = '#21311b'; // สีเขียวดำสไตล์ Pixel
+      for (let i = 0; i < snake.length; i++) {
+         snakeCtx.fillRect(snake[i].x * snakeGridSize, snake[i].y * snakeGridSize, snakeGridSize-1, snakeGridSize-1);
+      }
+    }
+
+    function gameOverSnake() {
+      clearInterval(snakeGameLoop);
+      isSnakeAlive = false;
+      const scoreEl = document.getElementById('snake-score');
+      scoreEl.textContent = `Game Over! (${snakeScore})`;
+      scoreEl.style.color = '#ff5252';
+    }
+    
+    // Swipe Controls สำหรับ iPad
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const sCanvas = document.getElementById('snakeCanvas');
+    
+    sCanvas.addEventListener('touchstart', e => {
+       touchStartX = e.changedTouches[0].screenX;
+       touchStartY = e.changedTouches[0].screenY;
+    }, {passive: true});
+    
+    sCanvas.addEventListener('touchend', e => {
+       if(!isSnakeAlive) return;
+       let touchEndX = e.changedTouches[0].screenX;
+       let touchEndY = e.changedTouches[0].screenY;
+       handleSwipe(touchStartX, touchStartY, touchEndX, touchEndY);
+    }, {passive: true});
+    
+    function handleSwipe(startX, startY, endX, endY) {
+       let dx = endX - startX;
+       let dy = endY - startY;
+       // คำนวณว่าปัดไปทางไหนมากกว่ากัน (แนวนอน หรือ แนวตั้ง)
+       if(Math.abs(dx) > Math.abs(dy)) {
+          if(dx > 30) changeSnakeDirection(1, 0); // ขวา
+          else if(dx < -30) changeSnakeDirection(-1, 0); // ซ้าย
+       } else {
+          if(dy > 30) changeSnakeDirection(0, 1); // ลง
+          else if(dy < -30) changeSnakeDirection(0, -1); // ขึ้น
+       }
+    }
+    
+    // คีย์บอร์ดคอมพิวเตอร์เผื่อเล่นบน PC
+    document.addEventListener('keydown', (e) => {
+       if(!isSnakeAlive) return;
+       switch(e.key) {
+         case 'ArrowUp': case 'w': changeSnakeDirection(0, -1); break;
+         case 'ArrowDown': case 's': changeSnakeDirection(0, 1); break;
+         case 'ArrowLeft': case 'a': changeSnakeDirection(-1, 0); break;
+         case 'ArrowRight': case 'd': changeSnakeDirection(1, 0); break;
+       }
+    });
+
+    // =========================================
     // ระบบเกม XO (Tic-Tac-Toe Logic)
     // =========================================
     let xoBoardState = ["", "", "", "", "", "", "", "", ""];
@@ -475,55 +682,36 @@
     let xoGameActive = false;
     let xoScoreX = 0;
     let xoScoreO = 0;
-
-    const xoWinningConditions = [
-      [0, 1, 2], [3, 4, 5], [6, 7, 8], // แนวนอน
-      [0, 3, 6], [1, 4, 7], [2, 5, 8], // แนวตั้ง
-      [0, 4, 8], [2, 4, 6]             // แนวทแยง
-    ];
+    const xoWinningConditions = [ [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6] ];
 
     function openXO(e) {
       e.preventDefault();
       document.getElementById('xoModal').classList.add('show');
-      if (!xoGameActive && xoBoardState.every(cell => cell === "")) {
-        initXO();
-      }
+      if (!xoGameActive && xoBoardState.every(cell => cell === "")) initXO();
     }
 
-    function closeXO() {
-      document.getElementById('xoModal').classList.remove('show');
-    }
+    function closeXO() { document.getElementById('xoModal').classList.remove('show'); }
 
     function initXO() {
       xoBoardState = ["", "", "", "", "", "", "", "", ""];
-      xoCurrentPlayer = "X";
-      xoGameActive = true;
-      updateXOUI();
-      renderXOBoard();
+      xoCurrentPlayer = "X"; xoGameActive = true;
+      updateXOUI(); renderXOBoard();
     }
 
     function resetXOMatch() {
       if(confirm("ต้องการล้างคะแนนสะสมทั้งหมดใช่หรือไม่?")) {
-        xoScoreX = 0;
-        xoScoreO = 0;
-        initXO();
+        xoScoreX = 0; xoScoreO = 0; initXO();
       }
     }
 
     function renderXOBoard() {
-      const boardEl = document.getElementById('xoBoard');
-      boardEl.innerHTML = '';
-
+      const boardEl = document.getElementById('xoBoard'); boardEl.innerHTML = '';
       for (let i = 0; i < 9; i++) {
-        const cell = document.createElement('div');
-        cell.className = 'xo-cell';
-        cell.dataset.index = i;
-        
+        const cell = document.createElement('div'); cell.className = 'xo-cell'; cell.dataset.index = i;
         if (xoBoardState[i] !== "") {
           cell.textContent = xoBoardState[i];
           cell.classList.add(xoBoardState[i] === "X" ? "x" : "o");
         }
-
         cell.onclick = () => handleXOCellClick(i);
         boardEl.appendChild(cell);
       }
@@ -531,61 +719,38 @@
 
     function handleXOCellClick(index) {
       if (xoBoardState[index] !== "" || !xoGameActive) return;
-
       xoBoardState[index] = xoCurrentPlayer;
-      
-      // Update DOM for instant feedback
       const cells = document.querySelectorAll('.xo-cell');
       cells[index].textContent = xoCurrentPlayer;
       cells[index].classList.add(xoCurrentPlayer === "X" ? "x" : "o");
-
       checkXOWin();
     }
 
     function checkXOWin() {
-      let roundWon = false;
-      let winningCells = [];
-
+      let roundWon = false; let winningCells = [];
       for (let i = 0; i < xoWinningConditions.length; i++) {
         const winCondition = xoWinningConditions[i];
-        let a = xoBoardState[winCondition[0]];
-        let b = xoBoardState[winCondition[1]];
-        let c = xoBoardState[winCondition[2]];
-
+        let a = xoBoardState[winCondition[0]], b = xoBoardState[winCondition[1]], c = xoBoardState[winCondition[2]];
         if (a === '' || b === '' || c === '') continue;
-        if (a === b && b === c) {
-          roundWon = true;
-          winningCells = winCondition;
-          break;
-        }
+        if (a === b && b === c) { roundWon = true; winningCells = winCondition; break; }
       }
-
       if (roundWon) {
         xoGameActive = false;
         const cells = document.querySelectorAll('.xo-cell');
         winningCells.forEach(index => cells[index].classList.add('win'));
-
-        if (xoCurrentPlayer === "X") xoScoreX++;
-        else xoScoreO++;
-
+        if (xoCurrentPlayer === "X") xoScoreX++; else xoScoreO++;
         const statusEl = document.getElementById('xo-gameStatus');
-        statusEl.textContent = `🎉 ผู้ชนะคือ: ${xoCurrentPlayer}`;
-        statusEl.style.color = '#00E676';
-        
-        document.getElementById('xo-score-p1').textContent = xoScoreX;
-        document.getElementById('xo-score-p2').textContent = xoScoreO;
+        statusEl.textContent = `🎉 ผู้ชนะคือ: ${xoCurrentPlayer}`; statusEl.style.color = '#00E676';
+        document.getElementById('xo-score-p1').textContent = xoScoreX; document.getElementById('xo-score-p2').textContent = xoScoreO;
         return;
       }
-
       let roundDraw = !xoBoardState.includes("");
       if (roundDraw) {
         xoGameActive = false;
         const statusEl = document.getElementById('xo-gameStatus');
-        statusEl.textContent = `🤝 เสมอกัน!`;
-        statusEl.style.color = '#f1c40f';
+        statusEl.textContent = `🤝 เสมอกัน!`; statusEl.style.color = '#f1c40f';
         return;
       }
-
       xoCurrentPlayer = xoCurrentPlayer === "X" ? "O" : "X";
       updateXOUI();
     }
@@ -595,85 +760,44 @@
       const statusEl = document.getElementById('xo-gameStatus');
       statusEl.textContent = `ตาผู้เล่น: ${xoCurrentPlayer === "X" ? "❌" : "⭕"}`;
       statusEl.style.color = xoCurrentPlayer === "X" ? '#ff5252' : '#448aff';
-
       document.getElementById('xo-p1-panel').classList.toggle('active', xoCurrentPlayer === "X");
       document.getElementById('xo-p2-panel').classList.toggle('active', xoCurrentPlayer === "O");
-      
       document.getElementById('xo-score-p1').textContent = xoScoreX;
       document.getElementById('xo-score-p2').textContent = xoScoreO;
     }
-
 
     // =========================================
     // ระบบเกมหมากฮอสสากล (International Checkers Logic)
     // =========================================
     const CK_SIZE = 10;
     const CK_TIME_LIMIT = 600; 
-    
-    let ckBoard = [];
-    let ckPlayer = 1; 
-    let ckSelected = null;
-    let ckActivePaths = []; 
-    let ckMultiJumping = false;
-    let ckCapturedThisTurn = []; 
-
-    let ckScoreP1 = 0;
-    let ckScoreP2 = 0;
-    let ckTimeLeftP1 = CK_TIME_LIMIT;
-    let ckTimeLeftP2 = CK_TIME_LIMIT;
-    let ckTimerInterval = null;
-    let ckGameActive = false;
+    let ckBoard = []; let ckPlayer = 1; let ckSelected = null; let ckActivePaths = []; let ckMultiJumping = false; let ckCapturedThisTurn = []; 
+    let ckScoreP1 = 0; let ckScoreP2 = 0; let ckTimeLeftP1 = CK_TIME_LIMIT; let ckTimeLeftP2 = CK_TIME_LIMIT; let ckTimerInterval = null; let ckGameActive = false;
 
     function openCheckers(e) {
-      e.preventDefault();
-      document.getElementById('checkersModal').classList.add('show');
-      if (!ckGameActive && ckTimeLeftP1 === CK_TIME_LIMIT) {
-        initCheckers();
-      } else if (ckGameActive) {
-        clearInterval(ckTimerInterval);
-        startCkTimer();
-      }
+      e.preventDefault(); document.getElementById('checkersModal').classList.add('show');
+      if (!ckGameActive && ckTimeLeftP1 === CK_TIME_LIMIT) { initCheckers(); } 
+      else if (ckGameActive) { clearInterval(ckTimerInterval); startCkTimer(); }
     }
-
-    function closeCheckers() {
-      document.getElementById('checkersModal').classList.remove('show');
-      clearInterval(ckTimerInterval); 
-    }
+    function closeCheckers() { document.getElementById('checkersModal').classList.remove('show'); clearInterval(ckTimerInterval); }
 
     function initCheckers() {
       ckBoard = Array(CK_SIZE).fill(null).map(() => Array(CK_SIZE).fill(0));
-      for (let r = 0; r < 4; r++) {
-        for (let c = 0; c < CK_SIZE; c++) {
-          if ((r + c) % 2 === 1) ckBoard[r][c] = 2; 
-        }
-      }
-      for (let r = 6; r < CK_SIZE; r++) {
-        for (let c = 0; c < CK_SIZE; c++) {
-          if ((r + c) % 2 === 1) ckBoard[r][c] = 1; 
-        }
-      }
+      for (let r = 0; r < 4; r++) { for (let c = 0; c < CK_SIZE; c++) { if ((r + c) % 2 === 1) ckBoard[r][c] = 2; } }
+      for (let r = 6; r < CK_SIZE; r++) { for (let c = 0; c < CK_SIZE; c++) { if ((r + c) % 2 === 1) ckBoard[r][c] = 1; } }
       ckPlayer = 1; ckSelected = null; ckMultiJumping = false; ckCapturedThisTurn = []; ckGameActive = true;
       ckTimeLeftP1 = CK_TIME_LIMIT; ckTimeLeftP2 = CK_TIME_LIMIT;
       clearInterval(ckTimerInterval); startCkTimer();
       calcCkValidMoves(); updateCkUI(); renderCkBoard();
     }
 
-    function resetCkMatch() {
-      if(confirm("ต้องการล้างคะแนนสะสมทั้งหมดใช่หรือไม่?")) {
-        ckScoreP1 = 0; ckScoreP2 = 0; initCheckers();
-      }
-    }
+    function resetCkMatch() { if(confirm("ต้องการล้างคะแนนสะสมทั้งหมดใช่หรือไม่?")) { ckScoreP1 = 0; ckScoreP2 = 0; initCheckers(); } }
 
     function startCkTimer() {
       ckTimerInterval = setInterval(() => {
         if (!ckGameActive) return;
-        if (ckPlayer === 1) {
-          ckTimeLeftP1--;
-          if (ckTimeLeftP1 <= 0) endCkGame(2, "🔴 แดงเวลาหมด! ขาวชนะ");
-        } else {
-          ckTimeLeftP2--;
-          if (ckTimeLeftP2 <= 0) endCkGame(1, "⚪ ขาวเวลาหมด! แดงชนะ");
-        }
+        if (ckPlayer === 1) { ckTimeLeftP1--; if (ckTimeLeftP1 <= 0) endCkGame(2, "🔴 แดงเวลาหมด! ขาวชนะ"); } 
+        else { ckTimeLeftP2--; if (ckTimeLeftP2 <= 0) endCkGame(1, "⚪ ขาวเวลาหมด! แดงชนะ"); }
         updateCkTimerDisplay();
       }, 1000);
     }
@@ -686,12 +810,9 @@
     }
 
     function updateCkTimerDisplay() {
-      const t1 = document.getElementById('ck-time-p1');
-      const t2 = document.getElementById('ck-time-p2');
-      t1.textContent = formatCkTime(ckTimeLeftP1);
-      t2.textContent = formatCkTime(ckTimeLeftP2);
-      t1.classList.toggle('danger', ckTimeLeftP1 <= 60 && ckTimeLeftP1 > 0);
-      t2.classList.toggle('danger', ckTimeLeftP2 <= 60 && ckTimeLeftP2 > 0);
+      const t1 = document.getElementById('ck-time-p1'), t2 = document.getElementById('ck-time-p2');
+      t1.textContent = formatCkTime(ckTimeLeftP1); t2.textContent = formatCkTime(ckTimeLeftP2);
+      t1.classList.toggle('danger', ckTimeLeftP1 <= 60 && ckTimeLeftP1 > 0); t2.classList.toggle('danger', ckTimeLeftP2 <= 60 && ckTimeLeftP2 > 0);
     }
 
     function endCkGame(winnerIndex, msg) {
@@ -717,10 +838,7 @@
           if (getCkOwner(val) === ckPlayer) {
             let paths = findCkCapturePaths(r, c, r, c, val, []);
             if (paths.length > 0) {
-              paths.forEach(p => {
-                if (p.captures.length > maxCaptures) maxCaptures = p.captures.length;
-                ckActivePaths.push({ startR: r, startC: c, ...p });
-              });
+              paths.forEach(p => { if (p.captures.length > maxCaptures) maxCaptures = p.captures.length; ckActivePaths.push({ startR: r, startC: c, ...p }); });
             }
           }
         }
@@ -738,8 +856,7 @@
         }
       }
       if (ckActivePaths.length === 0 && ckGameActive) {
-        let winner = ckPlayer === 1 ? 2 : 1;
-        let loserName = ckPlayer === 1 ? 'แดง' : 'ขาว';
+        let winner = ckPlayer === 1 ? 2 : 1; let loserName = ckPlayer === 1 ? 'แดง' : 'ขาว';
         endCkGame(winner, `${loserName} ไม่มีตาเดิน! ผู้ชนะคือ ${winner === 1 ? 'แดง' : 'ขาว'}`);
       }
     }
@@ -752,9 +869,7 @@
         while (true) {
           let nr = r + step * dir[0], nc = c + step * dir[1];
           if (!isCkInBounds(nr, nc) || ckBoard[nr][nc] !== 0) break;
-          moves.push({ r: nr, c: nc });
-          if (!king) break; 
-          step++;
+          moves.push({ r: nr, c: nc }); if (!king) break; step++;
         }
       }
       return moves;
@@ -771,8 +886,7 @@
             if (!isCkInBounds(nr, nc) || isCkCapturedTemp(nr, nc, currentCaptures)) break;
             let target = getSim(nr, nc);
             if (target !== 0) {
-              if (isCkEnemy(target, val) && !enemyFound) enemyFound = { r: nr, c: nc };
-              else break; 
+              if (isCkEnemy(target, val) && !enemyFound) enemyFound = { r: nr, c: nc }; else break; 
             } else if (enemyFound) {
               let newCaps = [...currentCaptures, enemyFound];
               let subPaths = findCkCapturePaths(nr, nc, origR, origC, val, newCaps);
@@ -793,10 +907,7 @@
           }
         }
       }
-      if (paths.length > 0) {
-        let maxLen = Math.max(...paths.map(p => p.captures.length));
-        return paths.filter(p => p.captures.length === maxLen);
-      }
+      if (paths.length > 0) { let maxLen = Math.max(...paths.map(p => p.captures.length)); return paths.filter(p => p.captures.length === maxLen); }
       return [];
     }
 
