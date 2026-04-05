@@ -16,28 +16,87 @@
 
   <style>
     :root {
-      /* ==== Light/Dark Variables ==== */
-      --bg: #fbfaf7; --paper: #ffffff; --ink: #2a2018; --muted: #7b6b5f; --line: #ede6dd; --accent: #8b5e34; --accent-2:#c2a27f;
-      --shadow: 0 14px 34px rgba(32,24,16,.07); --radius: 18px; --ring: 0 0 0 5px rgba(139,94,52,.12);
-      --glow-1: rgba(194,162,127,.10); --glow-2: rgba(139,94,52,.06); --nav-text: #8a7a6f; --h1-text: #3a2a1e;
-      --chip-bg-hover: rgba(255,255,255,.70); --chip-bg-active: #fff; --chip-shadow: 0 10px 26px rgba(32,24,16,.06);
-      --tag-bg: rgba(251,250,247,.65); --go-bg: rgba(139,94,52,.08); --go-border: rgba(139,94,52,.18);
-      --go-bg-hover: rgba(139,94,52,.12); --go-border-hover: rgba(139,94,52,.30); --card-hover-border: rgba(139,94,52,.26);
-      --card-hover-shadow: 0 20px 46px rgba(32,24,16,.11); --footer-text: #a0968b;
+      /* ==== Light Mode Variables ==== */
+      --bg: #fdfcf9;          /* สีพื้นกระดาษถนอมสายตา */
+      --paper: #ffffff;       
+      --ink: #2a2018;         
+      --muted: #7b6b5f;       
+      --line: #ede6dd;        
+      --accent: #8b5e34;      
+      --accent-2:#c2a27f;     
+      --shadow: 0 14px 34px rgba(32,24,16,.07);
+      --radius: 18px;
+      --ring: 0 0 0 5px rgba(139,94,52,.12);
+      
+      /* ==== Bujo Dot Grid (Light) ==== */
+      --dot-color: #d8d3c9;   /* สีของจุด */
+      --dot-space: 24px;      /* ระยะห่างระหว่างจุด */
+      --dot-size: 1.5px;      /* ขนาดของจุด */
+
+      --nav-text: #8a7a6f;
+      --h1-text: #3a2a1e;
+      --chip-bg-hover: rgba(255,255,255,.70);
+      --chip-bg-active: #fff;
+      --chip-shadow: 0 10px 26px rgba(32,24,16,.06);
+      --tag-bg: rgba(251,250,247,.65);
+      --go-bg: rgba(139,94,52,.08);
+      --go-border: rgba(139,94,52,.18);
+      --go-bg-hover: rgba(139,94,52,.12);
+      --go-border-hover: rgba(139,94,52,.30);
+      --card-hover-border: rgba(139,94,52,.26);
+      --card-hover-shadow: 0 20px 46px rgba(32,24,16,.11);
+      --footer-text: #a0968b;
     }
+
     [data-theme="dark"] {
-      --bg: #1c1815; --paper: #28231f; --ink: #eae0d5; --muted: #9e8f82; --line: #3b322c; --accent: #dca776; --accent-2: #8a6a4d;
-      --shadow: 0 14px 34px rgba(0,0,0,.25); --ring: 0 0 0 5px rgba(220,167,118,.15);
-      --glow-1: rgba(220,167,118,.05); --glow-2: rgba(220,167,118,.03); --nav-text: #a39589; --h1-text: #f9f6f0;
-      --chip-bg-hover: rgba(255,255,255,.05); --chip-bg-active: #38302b; --chip-shadow: 0 10px 26px rgba(0,0,0,.3);
-      --tag-bg: rgba(0,0,0,.15); --go-bg: rgba(220,167,118,.1); --go-border: rgba(220,167,118,.2);
-      --go-bg-hover: rgba(220,167,118,.15); --go-border-hover: rgba(220,167,118,.35); --card-hover-border: rgba(220,167,118,.4);
-      --card-hover-shadow: 0 20px 46px rgba(0,0,0,.4); --footer-text: #786c62;
+      /* ==== Dark Mode Variables ==== */
+      --bg: #1a1714;
+      --paper: #28231f;
+      --ink: #eae0d5;
+      --muted: #9e8f82;
+      --line: #3b322c;
+      --accent: #dca776;
+      --accent-2: #8a6a4d;
+      --shadow: 0 14px 34px rgba(0,0,0,.25);
+      --ring: 0 0 0 5px rgba(220,167,118,.15);
+      
+      /* ==== Bujo Dot Grid (Dark) ==== */
+      --dot-color: #3b342e;   /* สีของจุดในโหมดมืด */
+      --dot-space: 24px;
+      --dot-size: 1.5px;
+
+      --nav-text: #a39589;
+      --h1-text: #f9f6f0;
+      --chip-bg-hover: rgba(255,255,255,.05);
+      --chip-bg-active: #38302b;
+      --chip-shadow: 0 10px 26px rgba(0,0,0,.3);
+      --tag-bg: rgba(0,0,0,.15);
+      --go-bg: rgba(220,167,118,.1);
+      --go-border: rgba(220,167,118,.2);
+      --go-bg-hover: rgba(220,167,118,.15);
+      --go-border-hover: rgba(220,167,118,.35);
+      --card-hover-border: rgba(220,167,118,.4);
+      --card-hover-shadow: 0 20px 46px rgba(0,0,0,.4);
+      --footer-text: #786c62;
     }
 
     *{ box-sizing:border-box; }
     html,body{ height:100%; -webkit-tap-highlight-color: transparent;}
-    body{ margin:0; font-family: "Kanit", sans-serif; color: var(--ink); letter-spacing:.15px; transition: 0.4s ease; background: radial-gradient(1200px 520px at 50% 0%, var(--glow-1), transparent 70%), radial-gradient(900px 420px at 12% 14%, var(--glow-2), transparent 65%), var(--bg); }
+    
+    body{ 
+      margin:0; 
+      font-family: "Kanit", sans-serif; 
+      color: var(--ink); 
+      letter-spacing:.15px; 
+      transition: background-color 0.4s ease, color 0.4s ease; 
+      
+      /* สร้างลายกระดาษ Bullet Journal */
+      background-color: var(--bg);
+      background-image: radial-gradient(var(--dot-color) var(--dot-size), transparent var(--dot-size));
+      background-size: var(--dot-space) var(--dot-space);
+      background-position: calc(var(--dot-space) / 2) calc(var(--dot-space) / 2);
+    }
+    
     a{ color:inherit; text-decoration:none; }
     .container{ max-width: 1200px; margin: 0 auto; padding: 24px 22px 30px; }
 
@@ -48,21 +107,22 @@
     .nav{ display:flex; align-items:center; gap:18px; font-size: 13px; color: var(--nav-text); }
     .nav a{ padding: 8px 10px; border-radius: 999px; transition: .18s ease; outline: none; }
     .nav a:hover{ background: var(--go-bg); color: var(--ink); }
-    .theme-toggle { background: transparent; border: none; font-size: 16px; cursor: pointer; padding: 6px; margin-left: 8px; border-radius: 50%; }
+    .theme-toggle { background: var(--paper); border: 1px solid var(--line); font-size: 16px; cursor: pointer; padding: 6px; margin-left: 8px; border-radius: 50%; box-shadow: var(--shadow); transition: 0.2s ease;}
+    .theme-toggle:hover { background: var(--go-bg); }
     
     .hero{ text-align:center; padding: 66px 0 20px; }
-    .hero .kicker{ display:inline-flex; align-items:center; gap:10px; color: var(--accent); font-weight:600; font-size: 12.5px; letter-spacing:.6px; text-transform: uppercase; }
+    .hero .kicker{ display:inline-flex; align-items:center; gap:10px; color: var(--accent); font-weight:600; font-size: 12.5px; letter-spacing:.6px; text-transform: uppercase; background: var(--paper); padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); }
     .hero h1{ margin: 16px auto 12px; font-family: "Cormorant Garamond", serif; font-size: clamp(44px, 5.2vw, 72px); font-weight: 500; color: var(--h1-text); }
     .hero p{ margin: 0 auto; max-width: 720px; color: var(--muted); font-size: 15px; line-height: 1.85; font-weight: 300; }
     .divider{ width: 86px; height: 2px; background: linear-gradient(90deg, transparent, var(--accent-2), transparent); margin: 26px auto 0; border-radius: 999px; }
 
     .chips{ display:flex; justify-content:center; gap:16px; flex-wrap:wrap; margin: 34px 0 18px; font-size: 13px; }
-    .chip{ padding: 9px 12px; border-radius: 999px; border: 1px solid transparent; transition: .18s ease; cursor:pointer; color: var(--nav-text); }
-    .chip.active{ color: var(--ink); border-color: var(--line); background: var(--chip-bg-active); box-shadow: var(--chip-shadow); }
+    .chip{ padding: 9px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); transition: .18s ease; cursor:pointer; color: var(--nav-text); }
+    .chip.active{ color: var(--ink); border-color: var(--accent); background: var(--chip-bg-active); box-shadow: var(--chip-shadow); font-weight: 500;}
 
     .grid{ display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; padding: 10px 0; }
     .card{ background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow:hidden; position:relative; transition: .18s ease; min-height: 216px; display:flex; flex-direction:column; cursor:pointer;}
-    .thumb{ height: 120px; display:flex; align-items:center; justify-content:center; border-bottom: 1px solid var(--line); font-size: 34px; }
+    .thumb{ height: 120px; display:flex; align-items:center; justify-content:center; border-bottom: 1px solid var(--line); font-size: 34px; background: rgba(0,0,0,0.01); }
     .card .body{ padding: 14px 16px; display:flex; flex-direction:column; gap: 6px; flex: 1; }
     .title{ font-weight: 600; font-size: 15px; margin:0; }
     .desc{ margin:0; color: var(--muted); font-size: 12.9px; line-height: 1.62; }
@@ -71,7 +131,7 @@
     .go{ padding: 7px 10px; border-radius: 999px; background: var(--go-bg); border: 1px solid var(--go-border); font-size: 12px; font-weight: 700; color: var(--accent); }
     .card:hover{ transform: translateY(-5px); border-color: var(--card-hover-border); box-shadow: var(--card-hover-shadow); }
 
-    footer{ text-align:center; color: var(--footer-text); font-size: 12px; padding: 32px 0 10px; }
+    footer{ text-align:center; color: var(--footer-text); font-size: 12px; padding: 32px 0 10px; font-family: monospace;}
 
     /* Modal & Game Shared Styles */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: #1a252c; z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s ease; }
@@ -113,9 +173,8 @@
     .ch-piece { cursor: pointer; transition: transform 0.1s; position: relative; z-index: 2; line-height: 1; }
     .ch-piece:active { transform: scale(1.1); }
     .ch-piece.selected { background: rgba(255, 234, 0, 0.5); border-radius: 4px; box-shadow: 0 0 10px #FFEA00; }
-    
-    .ch-w { color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 0 2px #000; } /* ขาว */
-    .ch-b { color: #222; text-shadow: 0 1px 1px rgba(255,255,255,0.3); } /* ดำ */
+    .ch-w { color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 0 2px #000; } 
+    .ch-b { color: #222; text-shadow: 0 1px 1px rgba(255,255,255,0.3); } 
 
     /* Retro Tank Game */
     #tankCanvas { background-color: #111; border: 8px solid #555; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); width: 100%; max-width: min(95vw, 55dvh); aspect-ratio: 1 / 1; image-rendering: pixelated; }
@@ -438,7 +497,6 @@
           const cell = document.createElement('div');
           cell.className = `ch-cell ${(r+c)%2 === 0 ? 'light' : 'dark'}`;
           
-          // ไฮไลต์ช่องที่เดินได้
           let isMove = chValidMoves.find(m => m.r === r && m.c === c);
           if(isMove) {
             cell.classList.add('highlight');
@@ -456,7 +514,6 @@
             
             if(chSelected && chSelected.r === r && chSelected.c === c) piece.classList.add('selected');
             
-            // คลิกเลือกตัวหมากฝั่งตัวเอง
             if(getPieceColor(p) === chTurn) {
               piece.onclick = (e) => {
                 e.stopPropagation();
@@ -486,7 +543,6 @@
       chBoard[dR][dC] = p;
       chBoard[chSelected.r][chSelected.c] = '';
       
-      // สลับตาเดิน
       chTurn = chTurn === 'w' ? 'b' : 'w';
       chSelected = null;
       chValidMoves = [];
