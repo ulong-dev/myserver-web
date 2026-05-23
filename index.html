@@ -17,7 +17,7 @@
   <style>
     :root {
       /* ==== Light Mode Variables ==== */
-      --bg: #fdfcf9;          /* สีพื้นกระดาษถนอมสายตา */
+      --bg: #fdfcf9;          
       --paper: #ffffff;       
       --ink: #2a2018;         
       --muted: #7b6b5f;       
@@ -29,9 +29,9 @@
       --ring: 0 0 0 5px rgba(139,94,52,.12);
       
       /* ==== Bujo Dot Grid (Light) ==== */
-      --dot-color: #d8d3c9;   /* สีของจุด */
-      --dot-space: 24px;      /* ระยะห่างระหว่างจุด */
-      --dot-size: 1.5px;      /* ขนาดของจุด */
+      --dot-color: #d8d3c9;   
+      --dot-space: 24px;      
+      --dot-size: 1.5px;      
 
       --nav-text: #8a7a6f;
       --h1-text: #3a2a1e;
@@ -61,7 +61,7 @@
       --ring: 0 0 0 5px rgba(220,167,118,.15);
       
       /* ==== Bujo Dot Grid (Dark) ==== */
-      --dot-color: #3b342e;   /* สีของจุดในโหมดมืด */
+      --dot-color: #3b342e;   
       --dot-space: 24px;
       --dot-size: 1.5px;
 
@@ -90,7 +90,6 @@
       letter-spacing:.15px; 
       transition: background-color 0.4s ease, color 0.4s ease; 
       
-      /* สร้างลายกระดาษ Bullet Journal */
       background-color: var(--bg);
       background-image: radial-gradient(var(--dot-color) var(--dot-size), transparent var(--dot-size));
       background-size: var(--dot-space) var(--dot-space);
@@ -137,7 +136,8 @@
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: #1a252c; z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s ease; }
     .modal-overlay.show { opacity: 1; pointer-events: auto; }
     .game-container { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 10px; color: white; }
-    .close-btn { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; font-size: 24px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; z-index: 10; }
+    .close-btn { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; font-size: 24px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; z-index: 10; transition: background 0.2s;}
+    .close-btn:hover { background: rgba(255,255,255,0.3); }
     .game-container h2 { margin: 0; color: #f1c40f; font-size: clamp(20px, 4vw, 28px); }
     .gm-subtitle { margin-top:0; font-size: clamp(12px, 2vw, 15px); color: #bdc3c7; margin-bottom: 10px;}
     .gm-dashboard { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: min(90vw, 75vh); margin-bottom: 15px; background: #2c3e50; padding: 10px 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
@@ -153,41 +153,17 @@
     /* =========================================
        เกมหมากรุกสากล (International Chess)
        ========================================= */
-    .ch-board { 
-      display: grid; width: 100%; max-width: min(95vw, 65dvh); aspect-ratio: 1 / 1; 
-      grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); 
-      border: 6px solid #2f3640; box-shadow: 0 10px 40px rgba(0,0,0,0.7); 
-    }
-    .ch-cell { 
-      width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; 
-      font-size: clamp(24px, 6vmin, 50px); user-select: none;
-    }
-    .ch-cell.light { background-color: #eeeed2; } 
-    .ch-cell.dark { background-color: #769656; } 
-    .ch-cell.highlight::after { 
-      content: ''; position: absolute; width: 30%; height: 30%; background: rgba(0,0,0,0.15); border-radius: 50%; 
-    }
-    .ch-cell.highlight.capture::after {
-      width: 80%; height: 80%; background: transparent; border: 5px solid rgba(0,0,0,0.15); border-radius: 50%;
-    }
+    .ch-board { display: grid; width: 100%; max-width: min(95vw, 65dvh); aspect-ratio: 1 / 1; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); border: 6px solid #2f3640; box-shadow: 0 10px 40px rgba(0,0,0,0.7); }
+    .ch-cell { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; font-size: clamp(24px, 6vmin, 50px); user-select: none; }
+    .ch-cell.light { background-color: #eeeed2; } .ch-cell.dark { background-color: #769656; } 
+    .ch-cell.highlight::after { content: ''; position: absolute; width: 30%; height: 30%; background: rgba(0,0,0,0.15); border-radius: 50%; }
+    .ch-cell.highlight.capture::after { width: 80%; height: 80%; background: transparent; border: 5px solid rgba(0,0,0,0.15); border-radius: 50%; }
     .ch-piece { cursor: pointer; transition: transform 0.1s; position: relative; z-index: 2; line-height: 1; }
     .ch-piece:active { transform: scale(1.1); }
     .ch-piece.selected { background: rgba(255, 234, 0, 0.5); border-radius: 4px; box-shadow: 0 0 10px #FFEA00; }
-    .ch-w { color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 0 2px #000; } 
-    .ch-b { color: #222; text-shadow: 0 1px 1px rgba(255,255,255,0.3); } 
+    .ch-w { color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 0 2px #000; } .ch-b { color: #222; text-shadow: 0 1px 1px rgba(255,255,255,0.3); } 
 
-    /* Retro Tank Game */
-    #tankCanvas { background-color: #111; border: 8px solid #555; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); width: 100%; max-width: min(95vw, 55dvh); aspect-ratio: 1 / 1; image-rendering: pixelated; }
-    .tank-ui { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: min(95vw, 55dvh); margin-top: 15px; padding: 0 10px; }
-    .t-dpad { display: grid; grid-template-columns: 50px 50px 50px; grid-template-rows: 50px 50px 50px; gap: 5px; }
-    .t-btn { background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3); border-radius: 8px; color: white; font-size: 24px; display: flex; align-items: center; justify-content: center; user-select: none; }
-    .t-btn:active, .t-btn.pressed { background: rgba(255,255,255,0.4); transform: scale(0.95); }
-    .t-up { grid-column: 2; grid-row: 1; } .t-left { grid-column: 1; grid-row: 2; } .t-right { grid-column: 3; grid-row: 2; } .t-down { grid-column: 2; grid-row: 3; }
-    .t-fire-wrap { display: flex; align-items: center; justify-content: center; height: 160px; }
-    .t-fire { width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle, #ff5252, #b71c1c); border: 4px solid #fff; color: white; font-weight: bold; font-size: 20px; box-shadow: 0 5px 15px rgba(255,82,82,0.5); user-select: none; }
-    .t-fire:active, .t-fire.pressed { transform: scale(0.9); box-shadow: 0 2px 5px rgba(255,82,82,0.5); }
-
-    /* Other Games Preserved */
+    /* Checkers */
     .ck-board { display: grid; width: 100%; max-width: min(95vw, 65dvh); aspect-ratio: 1 / 1; grid-template-columns: repeat(10, 1fr); grid-template-rows: repeat(10, 1fr); border: 6px solid #3e2723; background-color: #d7ccc8; }
     .ck-cell { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; }
     .ck-cell.dark { background-color: #795548; } .ck-cell.highlight { background-color: rgba(0, 230, 118, 0.4); cursor: pointer; }
@@ -195,17 +171,16 @@
     .ck-piece.selected { outline: 3px solid #FFEA00; } .ck-piece.dead { opacity: 0.3; pointer-events: none; }
     .ck-player1 { background: radial-gradient(circle, #ff5252, #b71c1c); } .ck-player2 { background: radial-gradient(circle, #eceff1, #78909c); color: black;} .ck-piece.king::after { content: '👑'; }
 
+    /* XO */
     .xo-board { display: grid; width: 100%; max-width: min(95vw, 55dvh); aspect-ratio: 1/1; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 8px; border: 8px solid #2c3e50; background-color: #2c3e50; border-radius: 12px; }
     .xo-cell { background-color: #ecf0f1; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: clamp(40px, 12vmin, 80px); font-weight: bold; cursor: pointer; border-radius: 4px; }
     .xo-cell.x { color: #ff5252; } .xo-cell.o { color: #448aff; } .xo-cell.win { background-color: #00E676; color: white; }
 
-    #snakeCanvas { background-color: #9ebb24; border: 8px solid #2c3e50; border-radius: 8px; width: 100%; max-width: min(95vw, 55dvh); aspect-ratio: 1/1; touch-action: none; }
-    .d-pad { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 15px; }
-    .d-pad-row { display: flex; gap: 40px; }
-    .d-pad button { width: 55px; height: 55px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); color: white; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    /* Ebook iframe Container */
+    .ebook-wrapper { width: 100%; height: 80vh; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
     @media (max-width: 1100px){ .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    @media (max-width: 540px){ .topbar{ flex-direction:column; align-items:flex-start; } .nav{ gap:10px; flex-wrap:wrap; } .hero{ padding-top: 44px; } .grid{ grid-template-columns: 1fr; } }
+    @media (max-width: 540px){ .topbar{ flex-direction:column; align-items:flex-start; } .nav{ gap:10px; flex-wrap:wrap; } .hero{ padding-top: 44px; } .grid{ grid-template-columns: 1fr; } .ebook-wrapper { height: 70vh; } }
   </style>
 </head>
 
@@ -247,27 +222,19 @@
           </div>
         </a>
 
+        <a class="card" href="#" onclick="openEbook(event)" data-group="lab">
+          <div class="thumb">📖</div>
+          <div class="body">
+            <p class="title">Interactive Ebook</p><p class="desc">คลังหนังสืออ่านเพลินๆ สำหรับครอบครัว</p>
+            <div class="meta"><span class="tag">🧠 Lab</span><span class="go">Read →</span></div>
+          </div>
+        </a>
+
         <a class="card" href="#" onclick="openChess(event)" data-group="kids">
           <div class="thumb">♚</div>
           <div class="body">
-            <p class="title">International Chess</p><p class="desc">เกมหมากรุกสากล กติกาสากล กระดาน 8x8</p>
+            <p class="title">International Chess</p><p class="desc">เกมหมากรุกสากล กติกาสากล</p>
             <div class="meta"><span class="tag">🧠 Kids</span><span class="go">Play →</span></div>
-          </div>
-        </a>
-
-        <a class="card" href="#" onclick="openTank(event)" data-group="kids">
-          <div class="thumb">🪖</div>
-          <div class="body">
-            <p class="title">Retro Tank (ยุค 90)</p><p class="desc">เกมรถถังคลาสสิก ปกป้องฐานทัพให้ได้!</p>
-            <div class="meta"><span class="tag">👶 Kids</span><span class="go">Play →</span></div>
-          </div>
-        </a>
-
-        <a class="card" href="#" onclick="openSnake(event)" data-group="kids">
-          <div class="thumb">🐍</div>
-          <div class="body">
-            <p class="title">Retro Snake (Nokia)</p><p class="desc">เกมเจ้างูจอมหิวคลาสสิก</p>
-            <div class="meta"><span class="tag">👶 Kids</span><span class="go">Play →</span></div>
           </div>
         </a>
 
@@ -316,54 +283,28 @@
     <footer id="contact">Powered by Caddy & Cloudflare • 2026</footer>
   </div>
 
+  <div id="ebookModal" class="modal-overlay">
+    <div class="game-container" style="max-width: 1000px; padding: 20px;">
+      <button class="close-btn" onclick="closeEbook()">✕</button>
+      <h2 style="margin-bottom: 15px;">Family Ebook</h2>
+      <div class="ebook-wrapper">
+        <iframe src='https://online.pubhtml5.com/lzld/bvus/' seamless='seamless' scrolling='no' frameborder='0' allowtransparency='true' allowfullscreen='true' style='width:100%; height:100%;'></iframe>
+      </div>
+    </div>
+  </div>
+
   <div id="chessModal" class="modal-overlay">
     <div class="game-container">
       <button class="close-btn" onclick="closeChess()">✕</button>
       <h2>International Chess</h2>
       <p class="gm-subtitle">เกมหมากรุกสากล (แตะที่ตัวหมากเพื่อดูช่องเดิน)</p>
-
       <div class="gm-dashboard" style="max-width: 400px; padding: 10px;">
-        <div class="gm-p-stats" id="ch-p2-panel" style="color: #fff; border-top: 4px solid #555;">
-          <div style="font-size:14px; font-weight:bold;">⬛ สีดำ (Black)</div>
-        </div>
-        
+        <div class="gm-p-stats" id="ch-p2-panel" style="color: #fff; border-top: 4px solid #555;"><div style="font-size:14px; font-weight:bold;">⬛ สีดำ (Black)</div></div>
         <div id="ch-gameStatus" class="gm-status">ตาผู้เล่น: ⬜ ขาว</div>
-
-        <div class="gm-p-stats active" id="ch-p1-panel" style="color: #f1c40f; border-bottom: 4px solid #f1c40f;">
-          <div style="font-size:14px; font-weight:bold;">⬜ สีขาว (White)</div>
-        </div>
+        <div class="gm-p-stats active" id="ch-p1-panel" style="color: #f1c40f; border-bottom: 4px solid #f1c40f;"><div style="font-size:14px; font-weight:bold;">⬜ สีขาว (White)</div></div>
       </div>
-
       <div id="chessBoard" class="ch-board"></div>
-      
-      <div class="gm-controls">
-        <button class="gm-btn gm-btn-restart" onclick="initChess()">🔄 ตั้งกระดานใหม่</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="tankModal" class="modal-overlay">
-    <div class="game-container">
-      <button class="close-btn" onclick="closeTank()">✕</button>
-      <h2>Battle Tank 90s</h2>
-      <div class="gm-dashboard" style="max-width: 350px; justify-content: center; margin-bottom: 10px;"><div class="gm-p-stats active" style="width: 100%; border-bottom: 4px solid #f1c40f;"><div style="font-size:14px; font-weight:bold;">🏆 คะแนน (Score)</div><div class="gm-score" id="tank-score">0</div></div></div>
-      <canvas id="tankCanvas" width="390" height="390"></canvas>
-      <div class="tank-ui">
-        <div class="t-dpad"><div class="t-btn t-up" id="btn-t-up">▲</div><div class="t-btn t-left" id="btn-t-left">◀</div><div class="t-btn t-right" id="btn-t-right">▶</div><div class="t-btn t-down" id="btn-t-down">▼</div></div>
-        <div class="t-fire-wrap"><button class="t-fire" id="btn-t-fire">FIRE</button></div>
-      </div>
-      <div class="gm-controls" style="margin-top: 10px;"><button class="gm-btn gm-btn-restart" onclick="initTank()">🔄 เริ่มเกมใหม่</button></div>
-    </div>
-  </div>
-
-  <div id="snakeModal" class="modal-overlay">
-    <div class="game-container">
-      <button class="close-btn" onclick="closeSnake()">✕</button>
-      <h2>Retro Snake</h2>
-      <div class="gm-dashboard" style="max-width:300px; justify-content:center; margin-bottom:10px;"><div class="gm-p-stats active" style="width:100%; border-bottom:4px solid #00E676;"><div style="font-size:14px; font-weight:bold;">🍎 คะแนน</div><div class="gm-score" id="snake-score">0</div></div></div>
-      <canvas id="snakeCanvas" width="300" height="300"></canvas>
-      <div class="d-pad"><button onclick="changeSnakeDirection(0,-1)">▲</button><div class="d-pad-row"><button onclick="changeSnakeDirection(-1,0)">◀</button><button onclick="changeSnakeDirection(1,0)">▶</button></div><button onclick="changeSnakeDirection(0,1)">▼</button></div>
-      <div class="gm-controls"><button class="gm-btn gm-btn-restart" onclick="initSnake()">🔄 เริ่มเกมใหม่</button></div>
+      <div class="gm-controls"><button class="gm-btn gm-btn-restart" onclick="initChess()">🔄 ตั้งกระดานใหม่</button></div>
     </div>
   </div>
 
@@ -395,205 +336,75 @@
     function applyFilter(filter){ document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.dataset.filter === filter)); document.querySelectorAll("#projectGrid .card").forEach(card => card.style.display = (filter === "all" || card.dataset.group === filter) ? "flex" : "none"); } 
 
     // =========================================
+    // ระบบเปิด-ปิด Ebook Modal
+    // =========================================
+    function openEbook(e) {
+      e.preventDefault();
+      document.getElementById('ebookModal').classList.add('show');
+    }
+
+    function closeEbook() {
+      document.getElementById('ebookModal').classList.remove('show');
+    }
+
+    // =========================================
     // เกมหมากรุกสากล (International Chess)
     // =========================================
-    let chBoard = [];
-    let chTurn = 'w'; 
-    let chSelected = null;
-    let chValidMoves = [];
-    
-    // ไอคอนหมากรุก (ตัวพิมพ์เล็ก = ดำ, ตัวพิมพ์ใหญ่ = ขาว)
+    let chBoard = []; let chTurn = 'w'; let chSelected = null; let chValidMoves = [];
     const chIcons = { 'r':'♜', 'n':'♞', 'b':'♝', 'q':'♛', 'k':'♚', 'p':'♟', 'R':'♜', 'N':'♞', 'B':'♝', 'Q':'♛', 'K':'♚', 'P':'♟' };
-
     function openChess(e) { e.preventDefault(); document.getElementById('chessModal').classList.add('show'); if(chBoard.length===0) initChess(); }
     function closeChess() { document.getElementById('chessModal').classList.remove('show'); }
-
-    function initChess() {
-      // เซ็ตกระดานเริ่มต้น (อิงตามหลักสากล)
-      chBoard = [
-        ['r','n','b','q','k','b','n','r'],
-        ['p','p','p','p','p','p','p','p'],
-        ['','','','','','','',''],
-        ['','','','','','','',''],
-        ['','','','','','','',''],
-        ['','','','','','','',''],
-        ['P','P','P','P','P','P','P','P'],
-        ['R','N','B','Q','K','B','N','R']
-      ];
-      chTurn = 'w';
-      chSelected = null;
-      chValidMoves = [];
-      updateChessUI();
-      renderChessBoard();
-    }
-
-    function getPieceColor(p) {
-      if(!p || p==='') return null;
-      return p === p.toUpperCase() ? 'w' : 'b';
-    }
-
+    function initChess() { chBoard = [['r','n','b','q','k','b','n','r'],['p','p','p','p','p','p','p','p'],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['','','','','','','',''],['P','P','P','P','P','P','P','P'],['R','N','B','Q','K','B','N','R']]; chTurn = 'w'; chSelected = null; chValidMoves = []; updateChessUI(); renderChessBoard(); }
+    function getPieceColor(p) { if(!p || p==='') return null; return p === p.toUpperCase() ? 'w' : 'b'; }
     function calcChessMoves(r, c) {
-      let p = chBoard[r][c];
-      let color = getPieceColor(p);
-      let moves = [];
-      let type = p.toLowerCase();
-      let dirs = [];
-      let steps = 7;
-
+      let p = chBoard[r][c]; let color = getPieceColor(p); let moves = []; let type = p.toLowerCase(); let dirs = []; let steps = 7;
       if(type === 'p') {
-         let dir = color === 'w' ? -1 : 1;
-         let startRow = color === 'w' ? 6 : 1;
-         // เดินหน้า 1 ช่อง
+         let dir = color === 'w' ? -1 : 1; let startRow = color === 'w' ? 6 : 1;
          if(r+dir >= 0 && r+dir < 8 && chBoard[r+dir][c] === '') {
             moves.push({r: r+dir, c: c});
-            // เดินหน้า 2 ช่อง (ครั้งแรก)
-            if(r === startRow && chBoard[r+2*dir][c] === '') {
-               moves.push({r: r+2*dir, c: c});
-            }
+            if(r === startRow && chBoard[r+2*dir][c] === '') moves.push({r: r+2*dir, c: c});
          }
-         // กินแนวทแยง
          if(r+dir >= 0 && r+dir < 8) {
             if(c>0 && chBoard[r+dir][c-1] !== '' && getPieceColor(chBoard[r+dir][c-1]) !== color) moves.push({r: r+dir, c: c-1, capture:true});
             if(c<7 && chBoard[r+dir][c+1] !== '' && getPieceColor(chBoard[r+dir][c+1]) !== color) moves.push({r: r+dir, c: c+1, capture:true});
-         }
-         return moves;
+         } return moves;
       }
-      
-      if(type === 'n') { // ม้า
-         dirs = [[-2,-1],[-2,1],[2,-1],[2,1],[-1,-2],[-1,2],[1,-2],[1,2]];
-         dirs.forEach(d => {
-            let nr=r+d[0], nc=c+d[1];
-            if(nr>=0 && nr<8 && nc>=0 && nc<8) {
-               if(getPieceColor(chBoard[nr][nc]) !== color) moves.push({r:nr, c:nc, capture: chBoard[nr][nc] !== ''});
-            }
-         });
-         return moves;
-      }
-
+      if(type === 'n') { dirs = [[-2,-1],[-2,1],[2,-1],[2,1],[-1,-2],[-1,2],[1,-2],[1,2]]; dirs.forEach(d => { let nr=r+d[0], nc=c+d[1]; if(nr>=0 && nr<8 && nc>=0 && nc<8) { if(getPieceColor(chBoard[nr][nc]) !== color) moves.push({r:nr, c:nc, capture: chBoard[nr][nc] !== ''}); } }); return moves; }
       if(type === 'k') { dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]; steps = 1; }
-      if(type === 'r') { dirs = [[-1,0],[1,0],[0,-1],[0,1]]; } // เรือ
-      if(type === 'b') { dirs = [[-1,-1],[-1,1],[1,-1],[1,1]]; } // บิชอป
-      if(type === 'q') { dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]; } // ควีน
-
-      dirs.forEach(d => {
-         for(let i=1; i<=steps; i++) {
-            let nr=r+d[0]*i, nc=c+d[1]*i;
-            if(nr<0 || nr>7 || nc<0 || nc>7) break;
-            let targetColor = getPieceColor(chBoard[nr][nc]);
-            if(!targetColor) { moves.push({r:nr, c:nc}); }
-            else if(targetColor !== color) { moves.push({r:nr, c:nc, capture: true}); break; }
-            else { break; } // ชนพวกเดียวกัน
-         }
-      });
-      return moves;
+      if(type === 'r') { dirs = [[-1,0],[1,0],[0,-1],[0,1]]; } 
+      if(type === 'b') { dirs = [[-1,-1],[-1,1],[1,-1],[1,1]]; } 
+      if(type === 'q') { dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]; } 
+      dirs.forEach(d => { for(let i=1; i<=steps; i++) { let nr=r+d[0]*i, nc=c+d[1]*i; if(nr<0 || nr>7 || nc<0 || nc>7) break; let targetColor = getPieceColor(chBoard[nr][nc]); if(!targetColor) { moves.push({r:nr, c:nc}); } else if(targetColor !== color) { moves.push({r:nr, c:nc, capture: true}); break; } else { break; } } }); return moves;
     }
-
     function renderChessBoard() {
-      const boardEl = document.getElementById('chessBoard');
-      boardEl.innerHTML = '';
-
+      const boardEl = document.getElementById('chessBoard'); boardEl.innerHTML = '';
       for(let r=0; r<8; r++) {
         for(let c=0; c<8; c++) {
-          const cell = document.createElement('div');
-          cell.className = `ch-cell ${(r+c)%2 === 0 ? 'light' : 'dark'}`;
-          
+          const cell = document.createElement('div'); cell.className = `ch-cell ${(r+c)%2 === 0 ? 'light' : 'dark'}`;
           let isMove = chValidMoves.find(m => m.r === r && m.c === c);
-          if(isMove) {
-            cell.classList.add('highlight');
-            if(isMove.capture) cell.classList.add('capture');
-            cell.onclick = () => moveChessPiece(r, c);
-          } else {
-            cell.onclick = () => { chSelected = null; chValidMoves = []; renderChessBoard(); };
-          }
-
+          if(isMove) { cell.classList.add('highlight'); if(isMove.capture) cell.classList.add('capture'); cell.onclick = () => moveChessPiece(r, c); } 
+          else { cell.onclick = () => { chSelected = null; chValidMoves = []; renderChessBoard(); }; }
           const p = chBoard[r][c];
           if(p !== '') {
-            const piece = document.createElement('div');
-            piece.className = `ch-piece ${getPieceColor(p) === 'w' ? 'ch-w' : 'ch-b'}`;
-            piece.innerText = chIcons[p];
-            
+            const piece = document.createElement('div'); piece.className = `ch-piece ${getPieceColor(p) === 'w' ? 'ch-w' : 'ch-b'}`; piece.innerText = chIcons[p];
             if(chSelected && chSelected.r === r && chSelected.c === c) piece.classList.add('selected');
-            
-            if(getPieceColor(p) === chTurn) {
-              piece.onclick = (e) => {
-                e.stopPropagation();
-                chSelected = {r, c, p};
-                chValidMoves = calcChessMoves(r, c);
-                renderChessBoard();
-              };
-            }
+            if(getPieceColor(p) === chTurn) { piece.onclick = (e) => { e.stopPropagation(); chSelected = {r, c, p}; chValidMoves = calcChessMoves(r, c); renderChessBoard(); }; }
             cell.appendChild(piece);
-          }
-          boardEl.appendChild(cell);
+          } boardEl.appendChild(cell);
         }
       }
     }
-
     function moveChessPiece(dR, dC) {
-      if(!chSelected) return;
-      let p = chSelected.p;
-      
-      // โปรโมตเบี้ย (Pawn Promotion)
-      if(p.toLowerCase() === 'p') {
-        if((p === 'P' && dR === 0) || (p === 'p' && dR === 7)) {
-          p = getPieceColor(p) === 'w' ? 'Q' : 'q'; 
-        }
-      }
-
-      chBoard[dR][dC] = p;
-      chBoard[chSelected.r][chSelected.c] = '';
-      
-      chTurn = chTurn === 'w' ? 'b' : 'w';
-      chSelected = null;
-      chValidMoves = [];
-      
-      updateChessUI();
-      renderChessBoard();
+      if(!chSelected) return; let p = chSelected.p;
+      if(p.toLowerCase() === 'p') { if((p === 'P' && dR === 0) || (p === 'p' && dR === 7)) { p = getPieceColor(p) === 'w' ? 'Q' : 'q'; } }
+      chBoard[dR][dC] = p; chBoard[chSelected.r][chSelected.c] = '';
+      chTurn = chTurn === 'w' ? 'b' : 'w'; chSelected = null; chValidMoves = []; updateChessUI(); renderChessBoard();
     }
-
-    function updateChessUI() {
-      const statusEl = document.getElementById('ch-gameStatus');
-      statusEl.textContent = `ตาผู้เล่น: ${chTurn === 'w' ? '⬜ ขาว' : '⬛ ดำ'}`;
-      document.getElementById('ch-p1-panel').classList.toggle('active', chTurn === 'w');
-      document.getElementById('ch-p2-panel').classList.toggle('active', chTurn === 'b');
-    }
+    function updateChessUI() { const statusEl = document.getElementById('ch-gameStatus'); statusEl.textContent = `ตาผู้เล่น: ${chTurn === 'w' ? '⬜ ขาว' : '⬛ ดำ'}`; document.getElementById('ch-p1-panel').classList.toggle('active', chTurn === 'w'); document.getElementById('ch-p2-panel').classList.toggle('active', chTurn === 'b'); }
 
     // =========================================
-    // เกมรถถังยุค 90 (Battle Tank)
+    // โค้ดเกมหมากฮอสสากล (Checkers) และ XO
     // =========================================
-    let tkCanvas, tkCtx; const TS = 30; let tkGameLoop, tkActive = false, tkScore = 0;
-    let tkMapMaster = [[0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,1,0,1,1,0,1,1,0,1,1,0],[0,1,1,0,1,1,0,1,1,0,1,1,0],[0,1,1,0,1,1,2,1,1,0,1,1,0],[0,1,1,0,1,1,0,1,1,0,1,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,1,0,2,0,0,0,2,0,1,1,0],[0,1,1,0,2,1,1,1,2,0,1,1,0],[0,0,0,0,0,0,0,0,0,0,0,0,0],[0,1,1,0,1,1,1,1,1,0,1,1,0],[0,1,1,0,1,1,0,1,1,0,1,1,0],[0,0,0,0,1,9,9,9,1,0,0,0,0],[0,0,0,0,1,9,9,9,1,0,0,0,0]];
-    let tkMap = []; let tkPlayer = { x: 4*TS, y: 12*TS, w: 26, h: 26, speed: 3, dir: 'up', moving: false, cd: 0 }; let tkBullets = []; let tkEnemies = []; let tkEnemySpawnTimer = 0;
-
-    function openTank(e) { e.preventDefault(); document.getElementById('tankModal').classList.add('show'); if(!tkActive) initTank(); }
-    function closeTank() { document.getElementById('tankModal').classList.remove('show'); clearInterval(tkGameLoop); tkActive = false; }
-    function initTank() { tkCanvas = document.getElementById('tankCanvas'); tkCtx = tkCanvas.getContext('2d'); tkMap = tkMapMaster.map(row => [...row]); tkPlayer = { x: 4*TS + 2, y: 12*TS + 2, w: 26, h: 26, speed: 4, dir: 'up', moving: false, cd: 0 }; tkBullets = []; tkEnemies = []; tkScore = 0; tkActive = true; document.getElementById('tank-score').textContent = tkScore; document.getElementById('tank-score').style.color = '#fff'; clearInterval(tkGameLoop); tkGameLoop = setInterval(updateTankGame, 30); }
-    function spawnEnemy() { if(tkEnemies.length >= 4) return; let spawnPoints = [{x:2, y:2}, {x:6*TS+2, y:2}, {x:12*TS-28, y:2}]; let pt = spawnPoints[Math.floor(Math.random() * spawnPoints.length)]; tkEnemies.push({ x: pt.x, y: pt.y, w: 26, h: 26, speed: 2, dir: 'down', cd: 30, turnTimer: 0 }); }
-    function fireBullet(isPlayer, entity) { if(entity.cd > 0) return; let bx = entity.x + entity.w/2 - 3; let by = entity.y + entity.h/2 - 3; let bSpeed = isPlayer ? 8 : 6; tkBullets.push({ x: bx, y: by, w: 6, h: 6, dir: entity.dir, isPlayer: isPlayer, speed: bSpeed }); entity.cd = isPlayer ? 15 : 40; }
-    function rectIntersect(r1, r2) { return !(r2.x > r1.x + r1.w || r2.x + r2.w < r1.x || r2.y > r1.y + r1.h || r2.y + r2.h < r1.y); }
-    function checkMapCollision(rect) { if(rect.x < 0 || rect.y < 0 || rect.x + rect.w > 390 || rect.y + rect.h > 390) return true; let startCol = Math.floor(rect.x / TS); let endCol = Math.floor((rect.x + rect.w - 1) / TS); let startRow = Math.floor(rect.y / TS); let endRow = Math.floor((rect.y + rect.h - 1) / TS); for(let r = startRow; r <= endRow; r++) { for(let c = startCol; c <= endCol; c++) { if(r>=0 && r<13 && c>=0 && c<13 && tkMap[r][c] !== 0) return { hit: true, r: r, c: c, type: tkMap[r][c] }; } } return false; }
-    function updateTankGame() { if(!tkActive) return; if(tkPlayer.cd > 0) tkPlayer.cd--; if(tkPlayer.moving) { let nextX = tkPlayer.x, nextY = tkPlayer.y; if(tkPlayer.dir === 'up') nextY -= tkPlayer.speed; if(tkPlayer.dir === 'down') nextY += tkPlayer.speed; if(tkPlayer.dir === 'left') nextX -= tkPlayer.speed; if(tkPlayer.dir === 'right') nextX += tkPlayer.speed; if(!checkMapCollision({x: nextX, y: nextY, w: tkPlayer.w, h: tkPlayer.h})) { tkPlayer.x = nextX; tkPlayer.y = nextY; } } tkEnemySpawnTimer++; if(tkEnemySpawnTimer > 100) { spawnEnemy(); tkEnemySpawnTimer = 0; } tkEnemies.forEach(e => { if(e.cd > 0) e.cd--; e.turnTimer++; if(e.turnTimer > 30 + Math.random()*50) { let dirs = ['up','down','left','right']; e.dir = dirs[Math.floor(Math.random()*4)]; e.turnTimer = 0; } let nx = e.x, ny = e.y; if(e.dir === 'up') ny -= e.speed; if(e.dir === 'down') ny += e.speed; if(e.dir === 'left') nx -= e.speed; if(e.dir === 'right') nx += e.speed; if(!checkMapCollision({x: nx, y: ny, w: e.w, h: e.h})) { e.x = nx; e.y = ny; } else { e.turnTimer = 100; } if(Math.random() < 0.05) fireBullet(false, e); }); for(let i = tkBullets.length - 1; i >= 0; i--) { let b = tkBullets[i]; if(b.dir === 'up') b.y -= b.speed; if(b.dir === 'down') b.y += b.speed; if(b.dir === 'left') b.x -= b.speed; if(b.dir === 'right') b.x += b.speed; let mapHit = checkMapCollision(b); let bulletRemoved = false; if(mapHit) { if(mapHit.type === 1) tkMap[mapHit.r][mapHit.c] = 0; if(mapHit.type === 9) gameOverTank(); tkBullets.splice(i, 1); continue; } if(b.isPlayer) { for(let j = tkEnemies.length - 1; j >= 0; j--) { if(rectIntersect(b, tkEnemies[j])) { tkEnemies.splice(j, 1); tkBullets.splice(i, 1); tkScore += 100; document.getElementById('tank-score').textContent = tkScore; bulletRemoved = true; break; } } } else { if(rectIntersect(b, tkPlayer)) { gameOverTank(); bulletRemoved = true; } } if(!bulletRemoved && (b.x<0 || b.y<0 || b.x>390 || b.y>390)) tkBullets.splice(i, 1); } drawTankGame(); }
-    function drawTank(entity, colorMain, colorBarrel) { tkCtx.fillStyle = colorMain; tkCtx.fillRect(entity.x, entity.y, entity.w, entity.h); tkCtx.fillStyle = colorBarrel; let bx=entity.x, by=entity.y, bw=entity.w, bh=entity.h; if(entity.dir === 'up') { bx+=10; bw=6; bh=14; by-=6; } if(entity.dir === 'down') { bx+=10; bw=6; bh=14; by+=18; } if(entity.dir === 'left') { by+=10; bh=6; bw=14; bx-=6; } if(entity.dir === 'right') { by+=10; bh=6; bw=14; bx+=18; } tkCtx.fillRect(bx, by, bw, bh); }
-    function drawTankGame() { tkCtx.fillStyle = '#000'; tkCtx.fillRect(0, 0, 390, 390); for(let r=0; r<13; r++){ for(let c=0; c<13; c++){ let t = tkMap[r][c]; if(t === 1) { tkCtx.fillStyle = '#c0392b'; tkCtx.fillRect(c*TS+1, r*TS+1, TS-2, TS-2); } if(t === 2) { tkCtx.fillStyle = '#7f8c8d'; tkCtx.fillRect(c*TS+1, r*TS+1, TS-2, TS-2); } if(t === 9) { tkCtx.fillStyle = '#27ae60'; tkCtx.fillRect(c*TS, r*TS, TS, TS); } } } drawTank(tkPlayer, '#f1c40f', '#e67e22'); tkEnemies.forEach(e => drawTank(e, '#e74c3c', '#c0392b')); tkCtx.fillStyle = '#ecf0f1'; tkBullets.forEach(b => tkCtx.fillRect(b.x, b.y, b.w, b.h)); }
-    function gameOverTank() { tkActive = false; document.getElementById('tank-score').textContent = `GAME OVER (${tkScore})`; document.getElementById('tank-score').style.color = '#ff5252'; }
-    function setupBtn(id, dir) { const btn = document.getElementById(id); const startMove = (e) => { e.preventDefault(); if(!tkActive) return; tkPlayer.dir = dir; tkPlayer.moving = true; btn.classList.add('pressed'); }; const stopMove = (e) => { e.preventDefault(); tkPlayer.moving = false; btn.classList.remove('pressed'); }; btn.addEventListener('mousedown', startMove); btn.addEventListener('touchstart', startMove, {passive:false}); btn.addEventListener('mouseup', stopMove); btn.addEventListener('touchend', stopMove); btn.addEventListener('mouseleave', stopMove); }
-    setupBtn('btn-t-up', 'up'); setupBtn('btn-t-down', 'down'); setupBtn('btn-t-left', 'left'); setupBtn('btn-t-right', 'right'); const fireBtn = document.getElementById('btn-t-fire'); const doFire = (e) => { e.preventDefault(); if(tkActive) fireBullet(true, tkPlayer); fireBtn.classList.add('pressed'); setTimeout(()=>fireBtn.classList.remove('pressed'), 100); }; fireBtn.addEventListener('mousedown', doFire); fireBtn.addEventListener('touchstart', doFire, {passive:false});
-
-    // =========================================
-    // โค้ดเกมงู (Retro Snake), หมากฮอสสากล (Checkers), XO
-    // =========================================
-    let sCv, sCtx, sGrid=15, snk=[], sFood={x:0,y:0}, sDx=1, sDy=0, sSc=0, sLoop, sAlive=false;
-    function openSnake(e){ e.preventDefault(); document.getElementById('snakeModal').classList.add('show'); if(!sAlive) initSnake(); }
-    function closeSnake(){ document.getElementById('snakeModal').classList.remove('show'); clearInterval(sLoop); sAlive=false; }
-    function initSnake(){ sCv=document.getElementById('snakeCanvas'); sCtx=sCv.getContext('2d'); snk=[{x:10,y:10},{x:9,y:10},{x:8,y:10}]; sDx=1; sDy=0; sSc=0; sAlive=true; document.getElementById('snake-score').textContent=sSc; placeFood(); clearInterval(sLoop); sLoop=setInterval(updSnk,130); }
-    function placeFood(){ let mX=sCv.width/sGrid, mY=sCv.height/sGrid; sFood.x=Math.floor(Math.random()*mX); sFood.y=Math.floor(Math.random()*mY); for(let p of snk) if(p.x===sFood.x&&p.y===sFood.y) return placeFood(); }
-    function changeSnakeDirection(dx,dy){ if(!sAlive || (dx===1&&sDx===-1) || (dx===-1&&sDx===1) || (dy===1&&sDy===-1) || (dy===-1&&sDy===1)) return; sDx=dx; sDy=dy; }
-    function updSnk(){ let hd={x:snk[0].x+sDx, y:snk[0].y+sDy}; snk.unshift(hd); if(hd.x===sFood.x&&hd.y===sFood.y){ sSc+=10; document.getElementById('snake-score').textContent=sSc; placeFood(); } else snk.pop(); let mX=sCv.width/sGrid, mY=sCv.height/sGrid; if(hd.x<0||hd.x>=mX||hd.y<0||hd.y>=mY) return goSnk(); for(let i=1;i<snk.length;i++) if(hd.x===snk[i].x&&hd.y===snk[i].y) return goSnk(); drwSnk(); }
-    function drwSnk(){ sCtx.fillStyle='#9ebb24'; sCtx.fillRect(0,0,sCv.width,sCv.height); sCtx.fillStyle='#ff5252'; sCtx.beginPath(); sCtx.arc(sFood.x*sGrid+sGrid/2,sFood.y*sGrid+sGrid/2,sGrid/2.2,0,Math.PI*2); sCtx.fill(); sCtx.fillStyle='#21311b'; for(let p of snk) sCtx.fillRect(p.x*sGrid,p.y*sGrid,sGrid-1,sGrid-1); }
-    function goSnk(){ clearInterval(sLoop); sAlive=false; document.getElementById('snake-score').textContent=`Game Over! (${sSc})`; }
-    let tsX=0, tsY=0; document.getElementById('snakeCanvas').addEventListener('touchstart',e=>{tsX=e.changedTouches[0].screenX; tsY=e.changedTouches[0].screenY;},{passive:true});
-    document.getElementById('snakeCanvas').addEventListener('touchend',e=>{if(!sAlive)return; let dx=e.changedTouches[0].screenX-tsX, dy=e.changedTouches[0].screenY-tsY; if(Math.abs(dx)>Math.abs(dy)){if(dx>30)changeSnakeDirection(1,0); else if(dx<-30)changeSnakeDirection(-1,0);}else{if(dy>30)changeSnakeDirection(0,1); else if(dy<-30)changeSnakeDirection(0,-1);}},{passive:true});
-
     const CK_SIZE=10, CK_TIME=600; let ckBd=[], ckPl=1, ckSel=null, ckPaths=[], ckMulti=false, ckCap=[]; let ckSc1=0, ckSc2=0, ckT1=CK_TIME, ckT2=CK_TIME, ckInt=null, ckActive=false;
     function openCheckers(e){ e.preventDefault(); document.getElementById('checkersModal').classList.add('show'); if(!ckActive&&ckT1===CK_TIME) initCheckers(); else if(ckActive){clearInterval(ckInt); startCkTimer();} }
     function closeCheckers(){ document.getElementById('checkersModal').classList.remove('show'); clearInterval(ckInt); }
