@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Guitar Learning — 84 Days Training Player</title>
+  <style>
+    :root{
+      --bg:#f3f5fb;
+      --card:#ffffff;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --line:#e2e8f0;
+      --soft:#f8fafc;
+      --primary:#2563eb;
+      --primary2:#1e40af;
+      --green:#16a34a;
+      --orange:#ea580c;
+      --red:#dc2626;
+      --yellow:#facc15;
+      --dark:#0b1220;
+      --shadow:0 18px 45px rgba(15,23,42,.10);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.12), transparent 34%),
+        radial-gradient(circle at top right, rgba(234,88,12,.10), transparent 28%),
+        var(--bg);
+      color:var(--ink);
+      line-height:1.55;
+    }
+    .app{max-width:1240px;margin:0 auto;padding:18px}
+    .homeBtn{
+      display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;padding:10px 14px;border-radius:999px;
+      background:rgba(255,255,255,.92);border:1px solid rgba(226,232,240,.9);box-shadow:0 10px 28px rgba(15,23,42,.08);
+      color:#1e40af;text-decoration:none;font-weight:900;
+    }
+    .homeBtn:hover{background:#eff6ff}
+    .hero{
+      background:linear-gradient(135deg,#07111f,#162b67 55%,#7c2d12);
+      color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow);overflow:hidden;position:relative;
+    }
+    .hero:after{content:"";position:absolute;right:-70px;top:-70px;width:190px;height:190px;border-radius:999px;background:rgba(255,255,255,.08)}
+    .hero h1{margin:0;font-size:clamp(24px,5vw,42px);line-height:1.12;letter-spacing:-.02em}
+    .hero p{margin:8px 0 0;color:#dbeafe;max-width:920px}
+    .topbar{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin:16px 0}
+    @media(max-width:900px){.topbar{grid-template-columns:1fr 1fr}}
+    @media(max-width:520px){.topbar{grid-template-columns:1fr}}
+    .control,.card{background:rgba(255,255,255,.92);border:1px solid rgba(226,232,240,.85);box-shadow:var(--shadow);border-radius:var(--radius)}
+    .control{padding:12px}
+    .control label{display:block;font-size:13px;color:var(--muted);font-weight:700;margin-bottom:6px}
+    select,input,textarea,button{font:inherit;border-radius:14px;border:1px solid var(--line);padding:10px 12px;background:#fff;color:var(--ink);width:100%}
+    button{border:0;background:var(--primary);color:#fff;font-weight:800;cursor:pointer;transition:.15s transform,.15s opacity,.15s background}
+    button:active{transform:scale(.98)}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    .secondary{background:#111827}.ghost{background:#eef2ff;color:#1e3a8a}.danger{background:#fee2e2;color:#991b1b}.greenBtn{background:#16a34a}.orangeBtn{background:#ea580c}
+    .layout{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(340px,.78fr);gap:16px}
+    @media(max-width:980px){.layout{grid-template-columns:1fr}}
+    .card{padding:18px;margin-bottom:16px}
+    h2,h3{margin:0 0 10px;line-height:1.25}.small{font-size:13px;color:var(--muted)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.between{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .badge{display:inline-flex;align-items:center;gap:6px;background:#dbeafe;color:#1e40af;border-radius:999px;padding:6px 10px;font-size:13px;font-weight:800;white-space:nowrap}
+    .badge.green{background:#dcfce7;color:#166534}.badge.orange{background:#ffedd5;color:#9a3412}.badge.red{background:#fee2e2;color:#991b1b}.badge.dark{background:#e5e7eb;color:#111827}.badge.yellow{background:#fef9c3;color:#854d0e}
+    .videoStage{background:#080f1d;border-radius:26px;overflow:hidden;color:#f8fafc;box-shadow:0 22px 60px rgba(15,23,42,.25);border:1px solid rgba(255,255,255,.10)}
+    .stageTop{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.10);display:flex;justify-content:space-between;gap:14px;align-items:flex-start;background:linear-gradient(135deg,rgba(37,99,235,.25),rgba(234,88,12,.14))}
+    .stageTitle{font-size:clamp(18px,3vw,29px);font-weight:900;line-height:1.2}.stageSub{color:#cbd5e1;font-size:14px;margin-top:4px}
+    .timerBox{text-align:right;min-width:140px}.timer{font-variant-numeric:tabular-nums;font-size:clamp(26px,5vw,44px);font-weight:950;line-height:1}.timerLabel{font-size:12px;color:#cbd5e1;margin-top:5px}
+    .stageBody{padding:18px;display:grid;grid-template-columns:1fr;gap:14px}
+    .cueCard{border-radius:22px;padding:18px;background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.10)}
+    .cueLabel{font-size:13px;color:#bfdbfe;font-weight:900;text-transform:uppercase;letter-spacing:.04em}.cueText{font-size:clamp(20px,3vw,34px);font-weight:950;line-height:1.25;margin-top:6px}.cueHint{font-size:15px;color:#e2e8f0;margin-top:8px}
+    .progressTrack{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}.progressFill{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#facc15,#ea580c);transition:width .25s linear}
+    .stageActions{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px}
+    @media(max-width:650px){.stageActions{grid-template-columns:1fr 1fr}.stageActions button:last-child{grid-column:1/-1}}
+    .beatRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.beatDot{width:18px;height:18px;border-radius:999px;background:#334155;box-shadow:0 0 0 0 rgba(250,204,21,.5)}.beatDot.active{background:#facc15;box-shadow:0 0 0 10px rgba(250,204,21,0);animation:pulse .28s ease-out}@keyframes pulse{from{box-shadow:0 0 0 0 rgba(250,204,21,.7)}to{box-shadow:0 0 0 14px rgba(250,204,21,0)}}
+    .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}@media(max-width:650px){.timeline{grid-template-columns:1fr 1fr}}
+    .tl{padding:10px;border-radius:16px;background:#f8fafc;border:1px solid var(--line)}.tl.active{background:#eff6ff;border-color:#93c5fd}.tl strong{display:block}.tl small{color:var(--muted)}
+    .tabBox{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0b1220;color:#e5e7eb;border-radius:18px;padding:14px;overflow-x:auto;white-space:pre;line-height:1.65;font-size:14px;border:1px solid rgba(255,255,255,.08)}
+    .fretboard{background:#3b2417;border-radius:18px;padding:12px 10px 10px;border:1px solid #8b5a2b;overflow-x:auto}.fretGrid{display:grid;grid-template-columns:56px repeat(12,54px);grid-template-rows:repeat(6,40px);min-width:704px}.stringName{display:flex;align-items:center;justify-content:center;color:#f8fafc;font-weight:900}.fretCell{position:relative;border-left:2px solid rgba(245,222,179,.55);border-bottom:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center}.fretCell:before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:rgba(255,255,255,.32)}.dot{position:relative;z-index:2;width:30px;height:30px;border-radius:999px;background:#bfdbfe;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font-weight:950;font-size:11px;border:2px solid rgba(255,255,255,.85)}.dot.root{background:#fecaca;color:#991b1b}.dot.dim{opacity:.35}.fretNo{font-size:11px;color:#f8fafc;text-align:center;margin:5px 0 0 56px;display:grid;grid-template-columns:repeat(12,54px);min-width:648px}.fretNo span{display:block}
+    .infoGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}@media(max-width:750px){.infoGrid{grid-template-columns:1fr}}
+    .infoBox{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:12px}.infoBox strong{display:block;margin-bottom:4px}
+    .exercise{border-left:5px solid var(--primary);background:#f8fafc;border-radius:16px;padding:12px;margin-bottom:10px}.exercise.orange{border-left-color:var(--orange)}.exercise.green{border-left-color:var(--green)}.exercise.red{border-left-color:var(--red)}
+    .checklist{display:grid;gap:9px}.checkItem{display:flex;gap:10px;align-items:flex-start;padding:10px;background:#fafafa;border:1px solid var(--line);border-radius:14px}.checkItem input{width:auto;transform:scale(1.18);margin-top:5px}.localProgress{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden}.localFill{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#2563eb);transition:width .2s}
+    .links{display:grid;gap:8px}.links a{text-decoration:none;background:#eff6ff;color:#1d4ed8;border-radius:14px;padding:10px 12px;font-weight:800;display:block}.links a:hover{text-decoration:underline}
+    textarea{min-height:120px;resize:vertical}.miniGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:520px){.miniGrid{grid-template-columns:1fr}}
+    details{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:12px}summary{font-weight:900;cursor:pointer}.completeBanner{display:none;background:#dcfce7;border:1px solid #86efac;color:#166534;border-radius:16px;padding:12px;font-weight:900;margin-top:10px}.notice{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:16px;padding:12px}.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#e5e7eb;border-radius:8px;padding:1px 6px;color:#111827}
+  </style>
+</head>
+<body>
+<div class="app">
+  <a class="homeBtn" href="../index.html">&larr; Home</a>
+
+  <section class="hero">
+    <h1>🎸 Guitar Learning — 12 Weeks / 84 Days Training Player</h1>
+    <p>หน้าเดียวจบสำหรับฝึกตามแบบวิดีโอจำลอง: มีเสียงพูดนำฝึก, metronome, TAB, fretboard, checklist และ note รายวัน</p>
+  </section>
+
+  <section class="topbar">
+    <div class="control"><label>Week</label><select id="weekSelect"></select></div>
+    <div class="control"><label>Day</label><select id="daySelect"></select></div>
+    <div class="control"><label>Mode</label><select id="modeSelect"><option value="demo">Demo 3 นาที</option><option value="full">Full 30 นาที</option></select></div>
+    <div class="control"><label>BPM วันนี้</label><input id="bpmInput" type="number" min="40" max="220" step="1" /></div>
+  </section>
+
+  <main class="layout">
+    <div>
+      <section class="videoStage">
+        <div class="stageTop">
+          <div>
+            <div class="stageTitle" id="stageTitle">Week 1 / Day 1</div>
+            <div class="stageSub" id="stageSub">A Minor P1 — จำฟอร์ม + root note</div>
+            <div class="row" style="margin-top:10px">
+              <span class="badge" id="scaleBadge">A Minor</span>
+              <span class="badge orange" id="positionBadge">Position 1</span>
+              <span class="badge green" id="bpmBadge">80 bpm</span>
+            </div>
+          </div>
+          <div class="timerBox">
+            <div class="timer" id="timerText">03:00</div>
+            <div class="timerLabel" id="timerLabel">เวลาคงเหลือ</div>
+          </div>
+        </div>
+        <div class="stageBody">
+          <div class="cueCard">
+            <div class="cueLabel" id="cueLabel">READY</div>
+            <div class="cueText" id="cueText">กด Start เพื่อเริ่มฝึกตามเสียงนำ</div>
+            <div class="cueHint" id="cueHint">ระบบจะพูด cue แต่ละช่วง และ metronome จะเริ่มหลังคุณกดปุ่ม</div>
+          </div>
+          <div class="progressTrack"><div class="progressFill" id="playerProgress"></div></div>
+          <div class="beatRow">
+            <span class="beatDot" id="beatDot"></span>
+            <span id="metroText">Metronome: พร้อม</span>
+          </div>
+          <div class="stageActions">
+            <button id="startBtn" onclick="startPlayer()">▶ Start</button>
+            <button id="pauseBtn" class="orangeBtn" onclick="pausePlayer()" disabled>⏸ Pause</button>
+            <button id="resumeBtn" class="greenBtn" onclick="resumePlayer()" disabled>⏵ Resume</button>
+            <button id="stopBtn" class="danger" onclick="stopPlayer()" disabled>⏹ Stop</button>
+            <button class="ghost" onclick="speakCurrentCue()">🔊 พูดซ้ำ</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="between">
+          <h2 id="dayTitle">Week 1 / Day 1</h2>
+          <span class="badge orange" id="completeStatus">ยังไม่ครบ</span>
+        </div>
+        <p id="goalText" style="margin-bottom:8px"></p>
+        <div class="notice" id="formulaNotice"></div>
+      </section>
+
+      <section class="card">
+        <h3>Timeline การฝึก</h3>
+        <div class="timeline" id="timelineBox"></div>
+      </section>
+
+      <section class="card">
+        <h3>Scale Information</h3>
+        <div class="infoGrid">
+          <div class="infoBox"><strong>Notes</strong><span id="notesText"></span></div>
+          <div class="infoBox"><strong>Degrees</strong><span id="degreesText"></span></div>
+          <div class="infoBox"><strong>Sound</strong><span id="soundText"></span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="between"><h3>TAB / Position วันนี้</h3><span class="badge dark">อ่านจาก E ใหญ่ขึ้นไป e เล็ก</span></div>
+        <div class="tabBox" id="tabBox"></div>
+      </section>
+
+      <section class="card">
+        <h3>Fretboard Visual</h3>
+        <p class="small">จุดสีแดง = root note | จุดสีฟ้า = โน้ตใน scale | แสดงช่วง fret 0-11 ตาม position ที่ฝึกวันนี้</p>
+        <div class="fretboard"><div class="fretGrid" id="fretGrid"></div><div class="fretNo" id="fretNo"></div></div>
+      </section>
+
+      <section class="card">
+        <h3>ตัวอย่างแบบฝึกวันนี้</h3>
+        <div id="exerciseBox"></div>
+      </section>
+    </div>
+
+    <aside>
+      <section class="card">
+        <h3>Audio Settings</h3>
+        <div class="miniGrid">
+          <label class="small">เสียงพูด
+            <select id="voiceSelect"></select>
+          </label>
+          <label class="small">ความเร็วเสียงพูด
+            <input id="speechRate" type="number" min="0.6" max="1.4" step="0.1" value="0.95" />
+          </label>
+          <label class="small">เปิดเสียงพูด
+            <select id="voiceOn"><option value="1">เปิด</option><option value="0">ปิด</option></select>
+          </label>
+          <label class="small">เปิด Metronome
+            <select id="metroOn"><option value="1">เปิด</option><option value="0">ปิด</option></select>
+          </label>
+        </div>
+        <button class="secondary" onclick="testVoice()" style="margin-top:10px">ทดสอบเสียง</button>
+        <p class="small">หมายเหตุ: browser จะยอมให้เล่นเสียงหลังจากกดปุ่ม Start/Test เท่านั้น</p>
+      </section>
+
+      <section class="card">
+        <div class="between"><h3>Checklist การฝึก</h3><span id="checkPercent" class="badge dark">0%</span></div>
+        <div class="localProgress"><div class="localFill" id="localFill"></div></div>
+        <div class="checklist" id="checklistBox" style="margin-top:12px"></div>
+        <div class="completeBanner" id="completeBanner">✅ วันนี้ฝึกครบแล้ว</div>
+        <div class="miniGrid" style="margin-top:10px">
+          <button onclick="markAll()">ติ๊กครบ</button>
+          <button onclick="clearToday()" class="danger">ล้างวันนี้</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>บันทึกหลังฝึก</h3>
+        <textarea id="noteBox" placeholder="ตัวอย่าง: วันนี้ quarter notes ที่ 80 bpm สะอาด / ขาลงยังหลุด / root note สาย G fret 2 จำได้แล้ว"></textarea>
+        <button onclick="saveNote()" style="margin-top:10px">บันทึก Note</button>
+        <p class="small" id="saveStatus"></p>
+      </section>
+
+      <section class="card">
+        <h3>ลิงก์ฝึก</h3>
+        <div class="links" id="linkBox"></div>
+      </section>
+
+      <section class="card">
+        <h3>Quick Actions</h3>
+        <div class="miniGrid">
+          <button class="ghost" onclick="goToday()">ไปวันที่ตามแผน</button>
+          <button class="ghost" onclick="copyTodaySummary()">คัดลอกโปรแกรมวันนี้</button>
+        </div>
+        <p class="small" id="copyStatus"></p>
+      </section>
+
+      <section class="card">
+        <details>
+          <summary>หลักฝึกที่ใช้ทั้ง 84 วัน</summary>
+          <p><strong>Quarter notes:</strong> 1 จังหวะ = 1 โน้ต</p>
+          <p><strong>Eighth notes:</strong> 1 จังหวะ = 2 โน้ต</p>
+          <p><strong>Root note:</strong> จุดกลับบ้านของ scale ใช้จบ phrase ให้เสียงนิ่ง</p>
+          <p><strong>Rock/Metal:</strong> ไม่ต้องไล่ scale ตรง ๆ ตลอด ให้เล่นสั้น มีพัก ใช้ rhythm และจบที่ root</p>
+        </details>
+      </section>
+    </aside>
+  </main>
+</div>
+
+<script>
+const CONFIG = {
+  startDate: "2026-07-06",
+  totalWeeks: 12,
+  daysPerWeek: 7,
+  baseBpm: 80,
+  bpmStepPerWeek: 4
+};
+
+const NOTES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const FORMULAS = {
+  Major: { intervals:[0,2,4,5,7,9,11], degrees:["1","2","3","4","5","6","7"], sound:"สว่าง เปิด โปร่ง เหมาะกับ melodic lead และ solo ที่ต้องการความสดใส" },
+  Minor: { intervals:[0,2,3,5,7,9,10], degrees:["1","2","b3","4","5","6","b7"], sound:"หม่น หนัก มี b3 และ b7 แต่ยังมี 6 เหมาะกับ rock/metal riff" }
+};
+const STRINGS = [
+  {label:"e", open:"E"},{label:"B", open:"B"},{label:"G", open:"G"},{label:"D", open:"D"},{label:"A", open:"A"},{label:"E", open:"E"}
+];
+const PLAY_ORDER = ["E","A","D","G","B","e"];
+const WINDOWS = {1:[0,3],2:[2,5],3:[4,7],4:[6,9],5:[8,11]};
+const CHECK_ITEMS = [
+  "Warm up 5 นาทีครบ",
+  "เล่น TAB ขาขึ้นครบ",
+  "เล่น TAB ขาลงครบ",
+  "Quarter notes ที่ BPM วันนี้ เสียงสะอาด",
+  "Eighth notes ที่ BPM วันนี้ ไม่หลุดจังหวะ",
+  "พูดชื่อ root note ในใจทุกครั้งที่เจอ",
+  "สร้าง lick/riff สั้น 1-2 ห้อง",
+  "จบ phrase ที่ root note ได้"
+];
+
+const SEGMENTS = [
+  {id:"warm", label:"Warm up", full:300, demo:30},
+  {id:"main", label:"Main scale drill", full:900, demo:90},
+  {id:"review", label:"Review / Connecting", full:300, demo:30},
+  {id:"apply", label:"Application", full:300, demo:30}
+];
+
+let PLAN = buildPlan();
+let voices = [];
+let player = {running:false, paused:false, elapsed:0, lastTick:0, tickTimer:null, currentSegment:"ready", spoken:{}};
+let audioCtx = null;
+let metroTimer = null;
+let beatCount = 0;
+
+const $ = id => document.getElementById(id);
+
+init();
+
+function init(){
+  for(let w=1; w<=CONFIG.totalWeeks; w++) $("weekSelect").appendChild(new Option("Week " + w, w));
+  for(let d=1; d<=CONFIG.daysPerWeek; d++) $("daySelect").appendChild(new Option("Day " + d, d));
+  ["weekSelect","daySelect","modeSelect","bpmInput","voiceOn","metroOn"].forEach(id => $(id).addEventListener("change", () => { if(id === "bpmInput") saveBpm(); render(); }));
+  $("speechRate").addEventListener("change", saveAudioSettings);
+  $("voiceSelect").addEventListener("change", saveAudioSettings);
+  $("voiceOn").addEventListener("change", saveAudioSettings);
+  $("metroOn").addEventListener("change", saveAudioSettings);
+  loadAudioSettings();
+  loadVoices();
+  if("speechSynthesis" in window){ window.speechSynthesis.onvoiceschanged = loadVoices; }
+  goTo(1,1);
+}
+
+function buildPlan(){
+  return [
+    makeWeek(1,"A","Minor",[1,2],"ปูพื้นฐาน ใกล้เสียงคอร์ดเปิดที่เล่นได้อยู่แล้ว ฝึกให้แม่นก่อน"),
+    makeWeek(2,"A","Minor",[3,4,5],"ขยาย A Minor ไปคอกลางและคอบน เริ่มเชื่อมตำแหน่ง"),
+    makeWeek(3,"A","Major",[1,2,3,4,5],"เทียบอารมณ์ A Major กับ A Minor ให้ชัด"),
+    makeWeek(4,"C","Major",[1,2,3,4,5],"ฝึก C Major ซึ่งเป็นคีย์พื้นฐานสำคัญ"),
+    makeWeek(5,"C","Minor",[1,2,3,4,5],"ฝึก minor sound ใน C เพื่อให้มือไม่ติดแค่คีย์ A"),
+    makeWeek(6,"E","Minor",[1,2,3],"E Minor เป็นคีย์สำคัญของ Rock/Metal เพราะสัมพันธ์กับสาย E ต่ำ"),
+    makeWeek(7,"E","Minor",[4,5],"เก็บ E Minor คอบนและฝึก riff จากสาย E ต่ำ"),
+    makeWeek(8,"E","Major",[1,2,3,4,5],"ฝึก E Major เพื่อเพิ่มสีเสียง melodic rock"),
+    makeMixedWeek(9,"D","D Minor + D Major","ฝึกเปรียบเทียบ Major/Minor ในคีย์ D"),
+    makeMixedWeek(10,"B","B Minor + B Major","ฝึกคีย์ B ที่ใช้บ่อยใน Rock/Metal และ riff คอบน"),
+    makeConnectionWeek(),
+    makeApplicationWeek()
+  ];
+}
+
+function makeWeek(week, root, type, positions, goal){
+  const templates = [
+    ["learn","จำฟอร์ม + root note"],
+    ["alternate","alternate picking"],
+    ["sequence","sequence 3 notes"],
+    ["connect","เชื่อมตำแหน่ง"],
+    ["riff","สร้าง riff / lick"],
+    ["review","review แบบไม่หยุดมือ"],
+    ["apply","เล่นกับ backing track"]
+  ];
+  const days = templates.map((t,i) => {
+    let p = [positions[Math.min(i, positions.length-1)]];
+    if(i >= 3) p = positions.slice(0, Math.min(positions.length, Math.max(2, i-1)));
+    if(i >= 5) p = positions.slice();
+    return {root,type,positions:p,mode:t[0],focus:`${root} ${type} P${p.join("-")} — ${t[1]}`,goal};
+  });
+  return {week,title:`${root} ${type}`,days};
+}
+
+function makeMixedWeek(week, root, title, goal){
+  return {week,title,days:[
+    {root,type:"Minor",positions:[1,2],mode:"learn",focus:`${root} Minor P1-P2 — จำฟอร์ม`,goal},
+    {root,type:"Minor",positions:[3,4,5],mode:"alternate",focus:`${root} Minor P3-P5 — alternate picking`,goal},
+    {root,type:"Minor",positions:[1,2,3,4,5],mode:"connect",focus:`${root} Minor P1-P5 — connect`,goal},
+    {root,type:"Major",positions:[1,2],mode:"learn",focus:`${root} Major P1-P2 — จำฟอร์ม`,goal},
+    {root,type:"Major",positions:[3,4,5],mode:"sequence",focus:`${root} Major P3-P5 — sequence`,goal},
+    {root,type:"Major",positions:[1,2,3,4,5],mode:"connect",focus:`${root} Major P1-P5 — connect`,goal},
+    {root,type:"Minor",altType:"Major",positions:[1,2,3,4,5],mode:"compare",focus:`${root} Minor/Major Compare — apply`,goal}
+  ]};
+}
+
+function makeConnectionWeek(){
+  const keys = ["A","B","C","D","E"];
+  const days = keys.map(k => ({root:k,type:"Minor",altType:"Major",positions:[1,2,3,4,5],mode:"connect",focus:`${k} Major/Minor — เชื่อม 5 positions`,goal:"ฝึกเลื่อนตำแหน่งจาก position 1 ไป 5 โดยไม่หยุดมือ"}));
+  days.push({root:"A",type:"Minor",positions:[1,3,5],mode:"riff",focus:"A Minor Random Position Challenge",goal:"ฝึกกระโดด position และยังรู้ root note"});
+  days.push({root:"E",type:"Minor",positions:[1,2,3,4,5],mode:"test",focus:"E Minor Mock Test — เล่นไม่หยุด 5 นาที",goal:"ทดสอบความต่อเนื่องและจังหวะ"});
+  return {week:11,title:"Connecting Positions",days};
+}
+
+function makeApplicationWeek(){
+  const keys = ["A","B","C","D","E"];
+  const days = keys.map(k => ({root:k,type:"Minor",altType:"Major",positions:[1,2,3,4,5],mode:"apply",focus:`${k} Major/Minor — แต่ง solo สั้น`,goal:"ใช้ scale จริงกับ backing track และแต่ง phrase สั้น"}));
+  days.push({root:"A",type:"Minor",positions:[1,2,3,4,5],mode:"riff",focus:"Rock/Metal Solo Test — A Minor",goal:"สร้าง solo 8 ห้องจาก A Minor"});
+  days.push({root:"E",type:"Minor",positions:[1,2,3,4,5],mode:"test",focus:"Final Review — E Minor",goal:"ทบทวนทั้งหมดและประเมินความแม่นยำ"});
+  return {week:12,title:"Application / Solo",days};
+}
+
+function render(){
+  stopPlayer(false);
+  const {weekNo,dayNo,day,bpm} = current();
+  $("stageTitle").textContent = `Week ${weekNo} / Day ${dayNo}`;
+  $("stageSub").textContent = day.focus;
+  $("dayTitle").textContent = `Week ${weekNo} / Day ${dayNo}`;
+  $("goalText").textContent = "เป้าหมาย: " + day.goal;
+  $("scaleBadge").textContent = day.altType ? `${day.root} ${day.type} + ${day.altType}` : `${day.root} ${day.type}`;
+  $("positionBadge").textContent = "Position " + day.positions.join(", ");
+  $("bpmBadge").textContent = bpm + " bpm";
+  $("bpmInput").value = bpm;
+  $("timerText").textContent = fmt(totalDuration());
+  $("playerProgress").style.width = "0%";
+  setCue("READY","กด Start เพื่อเริ่มฝึกตามเสียงนำ", "ระบบจะพูด cue แต่ละช่วง และ metronome จะเริ่มหลังคุณกดปุ่ม");
+  renderScaleInfo(day);
+  renderTimeline(null);
+  renderTab(day);
+  renderFretboard(day);
+  renderExercises(day,bpm);
+  renderChecklist();
+  renderLinks(day,bpm);
+  loadNote();
+  updateChecklistProgress();
+}
+
+function current(){
+  const weekNo = Number($("weekSelect").value || 1);
+  const dayNo = Number($("daySelect").value || 1);
+  const day = PLAN[weekNo-1].days[dayNo-1];
+  const saved = localStorage.getItem(keyFor(weekNo, dayNo, "bpm"));
+  const bpm = Number(saved || defaultBpm(weekNo));
+  return {weekNo,dayNo,day,bpm};
+}
+
+function renderScaleInfo(day){
+  const info = scaleInfo(day.root, day.type);
+  $("notesText").textContent = info.notes.join(" - ");
+  $("degreesText").textContent = FORMULAS[day.type].degrees.join(" - ");
+  $("soundText").textContent = FORMULAS[day.type].sound;
+  $("formulaNotice").textContent = day.type === "Minor" || day.altType
+    ? "หมายเหตุ: Minor ในโปรแกรมนี้ใช้สูตร 1-2-b3-4-5-6-b7 ซึ่งเป็นโทน Minor Rock / Dorian flavor เหมาะกับ Rock/Metal"
+    : "Major scale ใช้สูตร 1-2-3-4-5-6-7 ให้เสียงสว่างกว่า Minor";
+}
+
+function renderTimeline(activeId){
+  const box = $("timelineBox"); box.innerHTML = "";
+  const mode = $("modeSelect").value;
+  SEGMENTS.forEach(s => {
+    const div = document.createElement("div");
+    div.className = "tl" + (activeId === s.id ? " active" : "");
+    div.innerHTML = `<strong>${s.label}</strong><small>${fmt(s[mode])}</small>`;
+    box.appendChild(div);
+  });
+}
+
+function renderTab(day){
+  let out = `=== ${day.root} ${day.type} ===\nNotes: ${scaleInfo(day.root, day.type).notes.join(" - ")}\n\n`;
+  day.positions.forEach(p => {
+    out += `Position ${p} — fret ${WINDOWS[p][0]}-${WINDOWS[p][1]}\n`;
+    out += generateTab(day.root, day.type, p) + "\n";
+  });
+  if(day.altType){
+    out += `\n=== ${day.root} ${day.altType} เปรียบเทียบ ===\nNotes: ${scaleInfo(day.root, day.altType).notes.join(" - ")}\n\n`;
+    day.positions.slice(0, Math.min(2, day.positions.length)).forEach(p => {
+      out += `Position ${p} — fret ${WINDOWS[p][0]}-${WINDOWS[p][1]}\n`;
+      out += generateTab(day.root, day.altType, p) + "\n";
+    });
+  }
+  out += `\nRoot note: ${rootLocations(day).join(" / ")}`;
+  out += `\nFinger guide: fret 0=สายเปล่า, fret 1=นิ้ว 1, fret 2=นิ้ว 2/3, fret 3=นิ้ว 3/4 ตามตำแหน่งมือ`;
+  $("tabBox").textContent = out;
+}
+
+function generateTab(root,type,pos){
+  const [start,end] = WINDOWS[pos];
+  const set = new Set(scaleInfo(root,type).notes);
+  return STRINGS.map(str => {
+    let frets=[];
+    for(let f=start; f<=end; f++) if(set.has(noteAt(str.open,f))) frets.push(String(f).padStart(2,"0"));
+    return `${str.label}|--${frets.length ? frets.join("--") : "----"}--|`;
+  }).join("\n");
+}
+
+function renderFretboard(day){
+  const grid = $("fretGrid"); grid.innerHTML = "";
+  const no = $("fretNo"); no.innerHTML = "";
+  const set = new Set(scaleInfo(day.root, day.type).notes);
+  const allowedFrets = new Set();
+  day.positions.forEach(p => { for(let f=WINDOWS[p][0]; f<=WINDOWS[p][1]; f++) allowedFrets.add(f); });
+  STRINGS.forEach(str => {
+    const name = document.createElement("div"); name.className = "stringName"; name.textContent = str.label; grid.appendChild(name);
+    for(let f=0; f<=11; f++){
+      const cell = document.createElement("div"); cell.className="fretCell";
+      const n = noteAt(str.open,f);
+      if(set.has(n)){
+        const dot = document.createElement("div");
+        dot.className = "dot" + (n === day.root ? " root" : "") + (!allowedFrets.has(f) ? " dim" : "");
+        dot.textContent = n;
+        cell.appendChild(dot);
+      }
+      grid.appendChild(cell);
+    }
+  });
+  for(let f=0; f<=11; f++){ const s=document.createElement("span"); s.textContent=f; no.appendChild(s); }
+}
+
+function renderExercises(day,bpm){
+  const box = $("exerciseBox"); box.innerHTML = "";
+  const list = [
+    ["Exercise 1 — Quarter Notes", `เปิด metronome ${bpm} bpm แล้วเล่น 1 จังหวะ = 1 โน้ต นับ 1 2 3 4 เล่น TAB ขึ้นและลงให้ครบ`, ""],
+    ["Exercise 2 — Eighth Notes", `ยังใช้ ${bpm} bpm แต่นับ 1 & 2 & 3 & 4 & เล่น 1 จังหวะ = 2 โน้ต ใช้ alternate picking ลง-ขึ้น`, "orange"],
+    [modeTitle(day.mode), modeExercise(day), "green"],
+    ["Mini Lick / Riff", miniLickText(day), "red"]
+  ];
+  list.forEach(x => {
+    const div = document.createElement("div");
+    div.className = "exercise " + x[2];
+    div.innerHTML = `<strong>${x[0]}</strong><div>${x[1]}</div>`;
+    box.appendChild(div);
+  });
+}
+
+function modeTitle(mode){
+  return ({learn:"Exercise 3 — จำฟอร์ม", alternate:"Exercise 3 — Alternate Picking", sequence:"Exercise 3 — Sequence", connect:"Exercise 3 — Connecting", riff:"Exercise 3 — Rock/Metal Riff", review:"Exercise 3 — Review", apply:"Exercise 3 — Application", compare:"Exercise 3 — Major/Minor Compare", test:"Exercise 3 — Mock Test"})[mode] || "Exercise 3";
+}
+function modeExercise(day){
+  return ({
+    learn:"เล่นช้ามากก่อน มอง root note ทุกครั้งที่เจอ ห้ามเร่งจนกว่าจะเล่นขึ้นลงสะอาด",
+    alternate:"ดีดลง-ขึ้นทุกโน้ต ห้ามดีดลงอย่างเดียว ฟังให้เสียงแต่ละโน้ตดังเท่ากัน",
+    sequence:"เล่นลำดับ 1-2-3, 2-3-4, 3-4-5 แล้วค่อยย้อนกลับ",
+    connect:`เชื่อม Position ${day.positions.join(" → ")} โดยไม่หยุดมือ ถ้าหลุดให้ลด BPM ลงทันที`,
+    riff:"เลือกโน้ต 3-5 ตัว สร้าง riff สั้น ใช้ palm mute หรือพักจังหวะ อย่าไล่ scale ตรง ๆ ทั้งหมด",
+    review:"เล่นทุกอย่างช้าลง 10 bpm แล้วตรวจเสียงให้สะอาดกว่าเดิม",
+    apply:"เปิด backing track แล้วสร้าง phrase 1-2 ห้อง จบที่ root note",
+    compare:"เล่น Minor 1 รอบ แล้ว Major 1 รอบ ฟังความต่างของ b3/3 และ b7/7",
+    test:"ตั้งเวลา 5 นาที เล่นต่อเนื่องโดยไม่หยุด ถ้าหลุดให้กลับมาเริ่มที่ root note"
+  })[day.mode] || "ฝึกช้า ชัด และตรงจังหวะ";
+}
+function miniLickText(day){
+  return `เริ่มจาก root note <span class="kbd">${day.root}</span> → โน้ตถัดไป → ${day.type === "Major" ? "3" : "b3"} → กลับ root แล้วพัก 1 จังหวะ เป้าหมายคือให้ฟังเป็นดนตรี ไม่ใช่แค่ไล่ scale`;
+}
+
+function renderChecklist(){
+  const box = $("checklistBox"); box.innerHTML = "";
+  CHECK_ITEMS.forEach((item,i)=>{
+    const label = document.createElement("label"); label.className="checkItem";
+    const input = document.createElement("input"); input.type="checkbox"; input.checked = getCheck(i);
+    input.addEventListener("change",()=>{ setCheck(i,input.checked); updateChecklistProgress(); });
+    const span = document.createElement("span"); span.textContent = item;
+    label.appendChild(input); label.appendChild(span); box.appendChild(label);
+  });
+}
+function updateChecklistProgress(){
+  let done=0; CHECK_ITEMS.forEach((_,i)=>{ if(getCheck(i)) done++; });
+  const pct = Math.round(done/CHECK_ITEMS.length*100);
+  $("localFill").style.width = pct + "%";
+  $("checkPercent").textContent = pct + "%";
+  const complete = pct === 100;
+  $("completeBanner").style.display = complete ? "block" : "none";
+  $("completeStatus").textContent = complete ? "ฝึกครบแล้ว" : "ยังไม่ครบ";
+  $("completeStatus").className = complete ? "badge green" : "badge orange";
+}
+function markAll(){ CHECK_ITEMS.forEach((_,i)=>setCheck(i,true)); renderChecklist(); updateChecklistProgress(); }
+function clearToday(){ if(!confirm("ล้าง checklist และ note ของวันนี้?")) return; CHECK_ITEMS.forEach((_,i)=>localStorage.removeItem(dayKey("check_"+i))); localStorage.removeItem(dayKey("note")); renderChecklist(); updateChecklistProgress(); loadNote(); }
+
+function renderLinks(day,bpm){
+  const links = [
+    [`Metronome ${bpm} bpm`, googleUrl(`online metronome ${bpm} bpm`)],
+    [`${day.root} ${day.type} scale lesson`, youtubeUrl(`${day.root} ${day.type} scale guitar lesson 5 positions rock metal`)],
+    [`${day.root} ${day.type} backing track`, youtubeUrl(`${day.root} ${day.type} rock metal backing track guitar ${bpm} bpm`)],
+    ["Alternate picking exercise", youtubeUrl("alternate picking scale exercise guitar rock metal")]
+  ];
+  $("linkBox").innerHTML = links.map(l => `<a href="${l[1]}" target="_blank" rel="noopener">${l[0]}</a>`).join("");
+}
+
+function startPlayer(){
+  stopPlayer(false);
+  unlockAudio();
+  player.running = true; player.paused = false; player.elapsed = 0; player.lastTick = performance.now(); player.spoken = {};
+  setButtons("play");
+  tickPlayer();
+  player.tickTimer = setInterval(tickPlayer,250);
+  if($("metroOn").value === "1") startMetronome();
+  speak(buildStartSpeech());
+}
+function pausePlayer(){ if(!player.running || player.paused) return; player.paused=true; clearInterval(player.tickTimer); player.tickTimer=null; stopMetronome(); if(speechSynthesis) speechSynthesis.pause(); setButtons("pause"); }
+function resumePlayer(){ if(!player.running || !player.paused) return; player.paused=false; player.lastTick=performance.now(); player.tickTimer=setInterval(tickPlayer,250); if($("metroOn").value === "1") startMetronome(); if(speechSynthesis) speechSynthesis.resume(); setButtons("play"); }
+function stopPlayer(reset=true){
+  if(player.tickTimer) clearInterval(player.tickTimer); player.tickTimer=null; player.running=false; player.paused=false; player.elapsed=0; player.currentSegment="ready"; stopMetronome(); if(window.speechSynthesis) speechSynthesis.cancel(); setButtons("stop");
+  if(reset){ $("timerText").textContent=fmt(totalDuration()); $("playerProgress").style.width="0%"; renderTimeline(null); setCue("READY","กด Start เพื่อเริ่มฝึกตามเสียงนำ", "ระบบจะพูด cue แต่ละช่วง และ metronome จะเริ่มหลังคุณกดปุ่ม"); }
+}
+function setButtons(state){
+  $("startBtn").disabled = state === "play";
+  $("pauseBtn").disabled = state !== "play";
+  $("resumeBtn").disabled = state !== "pause";
+  $("stopBtn").disabled = state === "stop";
+}
+function tickPlayer(){
+  if(!player.running || player.paused) return;
+  const now = performance.now();
+  const delta = (now - player.lastTick)/1000;
+  player.lastTick = now;
+  player.elapsed += delta;
+  const total = totalDuration();
+  if(player.elapsed >= total){
+    player.elapsed = total; updateStage(); speak("จบการฝึกวันนี้แล้วครับ ให้ติ๊ก checklist และบันทึกสิ่งที่ยังติดขัดไว้"); stopPlayer(false); setButtons("stop"); return;
+  }
+  updateStage();
+}
+function updateStage(){
+  const total = totalDuration();
+  const seg = getSegmentAt(player.elapsed);
+  const remain = Math.max(0, total-player.elapsed);
+  $("timerText").textContent = fmt(Math.ceil(remain));
+  $("playerProgress").style.width = (player.elapsed/total*100).toFixed(1) + "%";
+  if(seg.id !== player.currentSegment){
+    player.currentSegment = seg.id; renderTimeline(seg.id); const cue = cueFor(seg.id,0); setCue(cue.label,cue.text,cue.hint); speakOnce("segment_"+seg.id, cue.speech);
+  }
+  if(seg.id === "main"){
+    const pct = seg.localElapsed / seg.duration;
+    let phase = pct < .34 ? "quarter" : pct < .67 ? "eighth" : "plus";
+    const cue = mainPhaseCue(phase);
+    setCue(cue.label,cue.text,cue.hint);
+    speakOnce("main_"+phase, cue.speech);
+  }
+}
+function getSegmentAt(elapsed){
+  const mode = $("modeSelect").value; let acc=0;
+  for(const s of SEGMENTS){ const dur=s[mode]; if(elapsed < acc+dur) return {...s,duration:dur,localElapsed:elapsed-acc}; acc+=dur; }
+  const last=SEGMENTS[SEGMENTS.length-1]; return {...last,duration:last[mode],localElapsed:last[mode]};
+}
+function totalDuration(){ const mode=$("modeSelect").value; return SEGMENTS.reduce((a,s)=>a+s[mode],0); }
+function cueFor(id){
+  const {day,bpm} = current();
+  const roots = rootLocations(day).slice(0,3).join(" และ ");
+  if(id === "warm") return {label:"WARM UP", text:"Chromatic 1-2-3-4 ทุกสาย", hint:"ใช้ alternate picking ลง-ขึ้น เสียงต้องเท่ากัน ไม่ต้องเร็ว", speech:"เริ่มวอร์มอัพ เล่นโครมาติก หนึ่ง สอง สาม สี่ ทุกสาย ใช้ดีดลงขึ้นให้เท่ากัน"};
+  if(id === "main") return {label:"MAIN DRILL", text:`เล่น ${day.root} ${day.type} Position ${day.positions.join(", ")} ขึ้นและลง`, hint:`BPM วันนี้ ${bpm}. เจอ root note ให้คิดว่า ${day.root}`, speech:`เข้าสู่เมนสเกลดริล เล่น ${day.root} ${day.type} position ${day.positions.join(" ")} ขึ้นและลง`};
+  if(id === "review") return {label:"REVIEW", text: day.positions.length > 1 ? `เชื่อม Position ${day.positions.join(" → ")}` : "ทบทวน position เดิมแบบช้าและสะอาด", hint:`Root note วันนี้: ${roots}`, speech:"เข้าสู่ช่วงรีวิว เล่นช้าลง ตรวจเสียง และหยุดที่รูทโน้ต"};
+  return {label:"APPLICATION", text:"สร้าง lick 1-2 ห้อง แล้วจบที่ root note", hint:"เปิด backing track หรือใช้ metronome เล่นสั้น มีพัก และอย่าไล่ scale ยาวตลอด", speech:"เข้าสู่ช่วงประยุกต์ สร้างลิคสั้นหนึ่งถึงสองห้อง แล้วจบที่รูทโน้ต"};
+}
+function mainPhaseCue(phase){
+  const {day,bpm} = current();
+  if(phase === "quarter") return {label:"MAIN: QUARTER NOTES", text:`รอบที่ 1: quarter notes ที่ ${bpm} bpm`, hint:"1 จังหวะ = 1 โน้ต เล่นให้สะอาดก่อน", speech:`รอบที่หนึ่ง ควอเตอร์โน้ต ที่ ${bpm} บีพีเอ็ม หนึ่งจังหวะหนึ่งโน้ต`};
+  if(phase === "eighth") return {label:"MAIN: EIGHTH NOTES", text:`รอบที่ 2: eighth notes ที่ ${bpm} bpm`, hint:"นับ 1 and 2 and 3 and 4 and ใช้ alternate picking", speech:`รอบที่สอง เอธโน้ต ที่ ${bpm} บีพีเอ็ม หนึ่งจังหวะสองโน้ต ใช้ดีดลงขึ้น`};
+  return {label:"MAIN: CLEAN SPEED", text:`รอบที่ 3: เพิ่มเป็น ${Number(bpm)+4} bpm ถ้าเสียงยังสะอาด`, hint:`ถ้าเริ่มหลุด ให้กลับมาที่ ${bpm} bpm ทันที`, speech:`รอบที่สาม ถ้าเสียงยังสะอาด เพิ่มเป็น ${Number(bpm)+4} บีพีเอ็ม ถ้าหลุดให้ลดกลับ`};
+}
+function setCue(label,text,hint){ $("cueLabel").textContent=label; $("cueText").textContent=text; $("cueHint").textContent=hint; }
+function buildStartSpeech(){ const {weekNo,dayNo,day,bpm}=current(); return `เริ่มฝึก กีตาร์สเกล สัปดาห์ที่ ${weekNo} วันที่ ${dayNo}. วันนี้ฝึก ${day.root} ${day.type}. บีพีเอ็ม ${bpm}. เป้าหมายคือเสียงสะอาดและจำรูทโน้ต`; }
+function speakOnce(k,text){ if(player.spoken[k]) return; player.spoken[k]=true; speak(text); }
+function speakCurrentCue(){ speak($("cueText").textContent + ". " + $("cueHint").textContent); }
+function testVoice(){ speak("ทดสอบเสียงครับ วันนี้ให้เล่นช้า สะอาด และตรงจังหวะ เจอ root note ให้พูดชื่อโน้ตในใจ"); }
+function speak(text){
+  if($("voiceOn").value !== "1") return;
+  if(!("speechSynthesis" in window)) return;
+  try{
+    const u = new SpeechSynthesisUtterance(text);
+    const selected = $("voiceSelect").value;
+    const voice = voices.find(v => v.name === selected) || voices.find(v => /th|Thai/i.test(v.lang + v.name)) || voices[0];
+    if(voice) u.voice = voice;
+    u.lang = voice && voice.lang ? voice.lang : "th-TH";
+    u.rate = Number($("speechRate").value || .95);
+    u.pitch = 1;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }catch(e){ console.warn(e); }
+}
+function loadVoices(){
+  voices = (window.speechSynthesis ? speechSynthesis.getVoices() : []);
+  const sel = $("voiceSelect"); const old = sel.value; sel.innerHTML = "";
+  voices.forEach(v => sel.appendChild(new Option(`${v.name} (${v.lang})`, v.name)));
+  const saved = localStorage.getItem("guitar_voice_name");
+  const thai = voices.find(v => /th|Thai/i.test(v.lang + v.name));
+  if(saved && voices.some(v=>v.name===saved)) sel.value = saved; else if(thai) sel.value = thai.name; else if(old) sel.value = old;
+}
+function saveAudioSettings(){ localStorage.setItem("guitar_voice_name", $("voiceSelect").value); localStorage.setItem("guitar_speech_rate", $("speechRate").value); localStorage.setItem("guitar_voice_on", $("voiceOn").value); localStorage.setItem("guitar_metro_on", $("metroOn").value); }
+function loadAudioSettings(){ $("speechRate").value = localStorage.getItem("guitar_speech_rate") || "0.95"; $("voiceOn").value = localStorage.getItem("guitar_voice_on") || "1"; $("metroOn").value = localStorage.getItem("guitar_metro_on") || "1"; }
+
+function unlockAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === "suspended") audioCtx.resume(); }
+function startMetronome(){ stopMetronome(); unlockAudio(); const {bpm}=current(); const interval = 60000 / bpm; beatCount = 0; metroTimer = setInterval(playClick, interval); playClick(); $("metroText").textContent = `Metronome: ${bpm} bpm`; }
+function stopMetronome(){ if(metroTimer) clearInterval(metroTimer); metroTimer=null; $("beatDot").classList.remove("active"); $("metroText").textContent = "Metronome: พร้อม"; }
+function playClick(){
+  if(!audioCtx) return;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  const accent = beatCount % 4 === 0;
+  osc.frequency.value = accent ? 1050 : 760; gain.gain.value = accent ? .22 : .15;
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + .045);
+  beatCount++;
+  const dot = $("beatDot"); dot.classList.remove("active"); void dot.offsetWidth; dot.classList.add("active");
+}
+
+function rootLocations(day){
+  const roots = [];
+  const frets = new Set(); day.positions.forEach(p => { for(let f=WINDOWS[p][0]; f<=WINDOWS[p][1]; f++) frets.add(f); });
+  STRINGS.forEach(str => frets.forEach(f => { if(noteAt(str.open,f) === day.root) roots.push(`สาย ${str.label} fret ${f}`); }));
+  return [...new Set(roots)];
+}
+function scaleInfo(root,type){ const ri=noteIndex(root); return {notes: FORMULAS[type].intervals.map(i => NOTES[(ri+i)%12])}; }
+function noteIndex(n){ return NOTES.indexOf(n); }
+function noteAt(open,fret){ return NOTES[(noteIndex(open)+fret)%12]; }
+function defaultBpm(week){ return CONFIG.baseBpm + ((week-1)*CONFIG.bpmStepPerWeek); }
+function fmt(sec){ sec=Math.max(0,Math.round(sec)); const m=Math.floor(sec/60); const s=sec%60; return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0"); }
+function dayKey(s){ return keyFor($("weekSelect").value,$("daySelect").value,s); }
+function keyFor(w,d,s){ return `guitar84_w${w}_d${d}_${s}`; }
+function saveBpm(){ const {weekNo,dayNo}=current(); localStorage.setItem(keyFor(weekNo,dayNo,"bpm"), $("bpmInput").value); }
+function getCheck(i){ return localStorage.getItem(dayKey("check_"+i)) === "1"; }
+function setCheck(i,v){ localStorage.setItem(dayKey("check_"+i), v ? "1" : "0"); }
+function saveNote(){ localStorage.setItem(dayKey("note"), $("noteBox").value); $("saveStatus").textContent="บันทึกแล้ว"; setTimeout(()=>$("saveStatus").textContent="",1500); }
+function loadNote(){ $("noteBox").value = localStorage.getItem(dayKey("note")) || ""; }
+function goTo(w,d){ $("weekSelect").value=w; $("daySelect").value=d; render(); }
+function goToday(){
+  const start = new Date(CONFIG.startDate + "T00:00:00"); const now = new Date(); const diff = Math.floor((now-start)/(1000*60*60*24));
+  const index = Math.min(Math.max(diff,0),83); goTo(Math.floor(index/7)+1, (index%7)+1);
+}
+function youtubeUrl(q){ return "https://www.youtube.com/results?search_query=" + encodeURIComponent(q); }
+function googleUrl(q){ return "https://www.google.com/search?q=" + encodeURIComponent(q); }
+async function copyTodaySummary(){
+  const {weekNo,dayNo,day,bpm}=current();
+  const text = `Guitar Scale 12 Weeks\nWeek ${weekNo} / Day ${dayNo}\n${day.focus}\nBPM: ${bpm}\nNotes: ${scaleInfo(day.root,day.type).notes.join(" - ")}\nPositions: ${day.positions.join(", ")}\nRoot: ${rootLocations(day).join(" / ")}\n\n${$("tabBox").textContent}`;
+  try{ await navigator.clipboard.writeText(text); $("copyStatus").textContent="คัดลอกแล้ว"; }catch(e){ $("copyStatus").textContent="คัดลอกไม่ได้ใน browser นี้"; }
+  setTimeout(()=>$("copyStatus").textContent="",1800);
+}
+</script>
+</body>
+</html>

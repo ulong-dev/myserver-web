@@ -1,51 +1,242 @@
-# 🚨 คู่มือฉุกเฉิน: กู้คืนระบบ VS Code Remote Tunnel (2PFamily Home Server)
+# 🚨 คู่มือฉุกเฉิน: กู้คืนระบบ VS Code Remote Tunnel และ Home Server
 
-**เป้าหมาย:** รีเซ็ตระบบให้กลับมาออนไลน์เป็น Service เบื้องหลัง หลังจากเหตุการณ์ไฟตก เครื่องดับ หรือรีสตาร์ทแล้วเชื่อมต่อไม่ได้
+อัปเดตล่าสุด: 2026-07-03
 
----
-
-## ส่วนที่ 1: การเตรียมความพร้อม (ฝั่งเครื่อง iMac)
-1. ใช้โปรแกรม **AnyDesk** รีโมทเข้าไปที่เครื่อง iMac
-2. ตรวจสอบให้แน่ใจว่าเครื่อง iMac เชื่อมต่ออินเทอร์เน็ตเรียบร้อยแล้ว
-3. ตรวจสอบว่าล็อกอินเข้าสู่หน้า Desktop ด้วยบัญชี `2pfamily` เรียบร้อยแล้ว (ต้องไม่ค้างอยู่หน้าใส่รหัสผ่าน FileVault)
+คู่มือนี้ใช้สำหรับเครื่อง iMac ของ `2pfamily` และโปรเจกต์ `myserver` เมื่อเกิดเหตุไฟตก เครื่องดับ รีสตาร์ทแล้วเข้า VS Code Tunnel ไม่ได้ หรือเว็บ/API ทำงานผิดปกติ
 
 ---
 
-## ส่วนที่ 2: เช็คและซ่อมคำสั่งระบบ 
-*(ทำเฉพาะถ้าพิมพ์คำสั่งใน Terminal แล้วขึ้นแจ้งเตือนว่า `-bash: code: command not found`)*
+## 1. เช็กเร็วภายใน 2 นาที
 
-1. เปิดโปรแกรม **VS Code** บนเครื่อง iMac
-2. กดปุ่ม **`Cmd` + `Shift` + `P`** บนคีย์บอร์ด เพื่อเปิด Command Palette
-3. พิมพ์ค้นหาคำว่า `code in path`
-4. คลิกเลือกเมนู **"Shell Command: Install 'code' command in PATH"**
-5. รอจนมีแจ้งเตือนมุมขวาล่างว่า Successfully installed
-6. **ปิดโปรแกรม VS Code ทิ้งให้สนิท** (คลิกขวาที่ไอคอนบน Dock ด้านล่าง แล้วเลือก Quit)
+ให้ไล่ตามลำดับนี้ก่อน อย่าเพิ่งแก้หลายอย่างพร้อมกัน
 
----
+1. iMac เปิดอยู่และเข้า Desktop ของบัญชี `2pfamily` แล้ว
+2. อินเทอร์เน็ตใช้งานได้
+3. ปิด VS Code ที่เปิดค้างบน iMac ให้สนิท
+4. เปิด Terminal บน iMac
+5. เช็กว่า `code` ใช้ได้:
 
-## ส่วนที่ 3: รีเซ็ต Service เบื้องหลัง (ขั้นตอนหลัก)
-1. เปิดโปรแกรม **Terminal** บนเครื่อง iMac
-2. พิมพ์คำสั่งล้างค่า Service เก่าที่อาจรวนตอนไฟดับ:
-   `code tunnel service uninstall`
-   (แล้วกด Enter)
-3. พิมพ์คำสั่งติดตั้งและรันระบบ Service ใหม่:
-   `code tunnel service install`
-   (แล้วกด Enter)
+```bash
+code --version
+```
+
+ถ้าขึ้น `command not found` ให้ไปหัวข้อ 3
 
 ---
 
-## ส่วนที่ 4: การยืนยันตัวตน GitHub 
-*(ทำเฉพาะถ้าระบบใน Terminal แจ้ง Error 401 และให้รหัส 8 หลักมา เช่น 406E-CF5C)*
+## 2. แผนที่ระบบ
 
-1. เปิดเว็บเบราว์เซอร์ (ทำผ่านเครื่องคอมพิวเตอร์หลักที่กำลังใช้งานอยู่ได้เลย)
-2. เข้าไปที่ลิงก์: https://github.com/login/device
-3. นำรหัส 8 หลักที่แสดงในหน้าจอ Terminal ของ iMac ไปกรอกในเว็บ
-4. กด Continue และกดยืนยัน (Authorize) บัญชี GitHub ให้เรียบร้อย
-5. กลับไปดูที่หน้าจอ Terminal ของ iMac ระบบจะวิ่งต่อและต้องจบด้วยข้อความ:
-   `Service successfully installed!` และ `Tunnel service successfully started`
+โปรเจกต์อยู่ที่:
+
+```text
+/Users/2pfamily/Library/Mobile Documents/com~apple~CloudDocs/myserver
+```
+
+โครงสร้างสำคัญ:
+
+```text
+myserver/
+├─ index.html                         หน้า Home หลัก
+├─ coffee-shop/                       POS ร้านกาแฟ
+├─ guitar-learning/                   Guitar Learning 12 weeks / 84 days
+├─ library/                           Library Lab
+├─ running-app/                       Running Log + Dashboard
+├─ space-game/                        Space Explorer
+└─ fire-api/                          Node.js API + dashboard ถังดับเพลิง
+   ├─ server.js
+   ├─ public/index.html
+   ├─ public/scan.html
+   └─ public/check.html
+```
+
+หน้า static หลักเปิดผ่านเว็บเซิร์ฟเวอร์ของเครื่องได้ ส่วน `fire-api` ต้องรัน Node.js API ถ้าจะใช้ dashboard/API ถังดับเพลิง
 
 ---
 
-## ⚠️ กฎเหล็กที่ต้องจำสำหรับการทำ Home Server
-1. **ห้ามเปิดค้าง:** เมื่อทำขั้นตอนทั้งหมดเสร็จแล้ว ห้ามเปิดโปรแกรม VS Code ค้างไว้บนหน้าจอ iMac โดยเด็ดขาด ให้ปล่อยหน้าจอ iMac โล่งๆ ไว้เท่านั้น
-2. **วิธีเข้าใช้งาน:** ให้เข้าเขียนโค้ดผ่านทางเว็บเบราว์เซอร์ (`vscode.dev`) หรือผ่านโปรแกรม VS Code บนเครื่องหลัก โดยเลือกเชื่อมต่อกับ Tunnel ที่ชื่อว่า `imac-khxng-2pfamily1`
+## 3. ซ่อมคำสั่ง `code`
+
+ทำเฉพาะกรณี Terminal แจ้งว่า:
+
+```text
+-bash: code: command not found
+```
+
+ขั้นตอน:
+
+1. เปิด VS Code บน iMac
+2. กด `Cmd + Shift + P`
+3. ค้นหา `code in path`
+4. เลือก `Shell Command: Install 'code' command in PATH`
+5. รอแจ้งเตือนว่า installed สำเร็จ
+6. ปิด VS Code ให้สนิท
+7. กลับไป Terminal แล้วลอง:
+
+```bash
+code --version
+```
+
+---
+
+## 4. รีเซ็ต VS Code Remote Tunnel
+
+ใช้เมื่อเข้า Tunnel จากเครื่องหลักไม่ได้ หรือไฟดับแล้ว Tunnel ไม่กลับมาเอง
+
+```bash
+code tunnel service uninstall
+code tunnel service install
+```
+
+ถ้าสำเร็จ ควรเห็นข้อความใกล้เคียง:
+
+```text
+Service successfully installed!
+Tunnel service successfully started
+```
+
+หลังเสร็จแล้วให้ปิด VS Code บน iMac อย่าเปิดค้างไว้
+
+---
+
+## 5. ยืนยันตัวตน GitHub สำหรับ Tunnel
+
+ทำเมื่อ Terminal แจ้ง Error 401 หรือให้รหัส 8 หลัก เช่น `406E-CF5C`
+
+1. เปิดเว็บ https://github.com/login/device
+2. ใส่รหัส 8 หลักจาก Terminal
+3. กด Continue และ Authorize
+4. กลับไปดู Terminal บน iMac
+5. รอจนเห็นว่า service started
+
+---
+
+## 6. เช็ก Fire API
+
+เข้าโฟลเดอร์ API:
+
+```bash
+cd "/Users/2pfamily/Library/Mobile Documents/com~apple~CloudDocs/myserver/fire-api"
+```
+
+ติดตั้ง dependency ถ้ายังไม่มี:
+
+```bash
+npm install
+```
+
+เช็ก syntax:
+
+```bash
+npm test
+```
+
+รัน API:
+
+```bash
+npm start
+```
+
+ค่าเริ่มต้นคือ:
+
+```text
+http://localhost:3000
+```
+
+ไฟล์ลับที่ต้องมีในเครื่องแต่ห้าม commit:
+
+```text
+fire-api/credentials.json
+fire-api/.env
+fire-api/public/uploads/
+```
+
+ดูตัวอย่างค่า env ได้ที่:
+
+```text
+fire-api/.env.example
+```
+
+---
+
+## 7. เช็ก Git ว่า commit/push สำเร็จหรือยัง
+
+เข้า root โปรเจกต์:
+
+```bash
+cd "/Users/2pfamily/Library/Mobile Documents/com~apple~CloudDocs/myserver"
+```
+
+เช็กสถานะ:
+
+```bash
+git status --short --branch
+```
+
+อ่านผลแบบเร็ว:
+
+```text
+## main...origin/main
+```
+
+แปลว่า clean และ sync แล้ว
+
+```text
+## main...origin/main [ahead 1]
+```
+
+แปลว่า commit แล้ว แต่ยังไม่ได้ push
+
+```text
+Changes to be committed
+```
+
+แปลว่า staged แล้ว แต่ยังไม่ได้ commit
+
+```text
+Changes not staged for commit
+```
+
+แปลว่าแก้ไฟล์แล้ว แต่ยังไม่ได้ stage
+
+ดู commit ล่าสุด:
+
+```bash
+git log -5 --oneline --decorate
+```
+
+commit:
+
+```bash
+git add .
+git commit -m "ข้อความสรุปงาน"
+```
+
+push:
+
+```bash
+git push
+```
+
+---
+
+## 8. กฎเหล็ก
+
+1. ห้าม commit ไฟล์ลับ เช่น `credentials.json`, `.env`, รูป upload จริง, log, `node_modules/`
+2. อย่าใช้ `git reset --hard` ถ้าไม่แน่ใจ
+3. ก่อน commit ให้เช็ก `git status --short --branch`
+4. ถ้า VS Code เปิดหน้า `COMMIT_EDITMSG` แปลว่า commit อาจยังรอข้อความอยู่ ให้ใส่ข้อความ commit แล้ว save/close
+5. หลังแก้เว็บ static ให้เช็ก path ของลิงก์แบบ relative เช่น `../index.html`
+6. หลังแก้ `fire-api/server.js` ให้รัน `npm test`
+
+---
+
+## 9. วิธีเข้าใช้งานปกติ
+
+ใช้เครื่องหลักเข้า VS Code ผ่าน Tunnel ชื่อ:
+
+```text
+imac-khxng-2pfamily1
+```
+
+หรือเข้าใช้งานผ่าน `vscode.dev` แล้วเลือก Remote Tunnel เดียวกัน
+
+หลังซ่อมเสร็จ ให้ปล่อย iMac อยู่หน้า Desktop และปิด VS Code ที่เปิดค้างบน iMac ให้เรียบร้อย

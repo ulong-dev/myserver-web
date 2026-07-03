@@ -9,6 +9,7 @@ myserver/
 ├─ index.html                 # หน้าเว็บหลัก
 ├─ coffee-shop/               # เว็บร้านกาแฟ static
 ├─ fire-api/                  # Node.js API + dashboard ถังดับเพลิง
+├─ guitar-learning/           # หน้าเรียนกีตาร์และฝึก scale
 ├─ library/                   # เว็บ library static
 ├─ running-app/               # เว็บ running app static
 └─ space-game/                # เกม static
