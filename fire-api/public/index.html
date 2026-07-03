@@ -38,6 +38,16 @@
         .header h1 { margin: 0; color: #1a73e8; font-size: 1.6em; display: flex; align-items: center; gap: 10px; }
         .header-actions { display: flex; align-items: center; gap: 15px; }
         .last-update { font-size: 0.9em; color: #70757a; }
+        .btn-home {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-home:hover { background-color: #d2e3fc; }
         
         .btn-refresh {
             background-color: #1a73e8;
@@ -110,6 +120,7 @@
         <div class="header">
             <h1>📊 Dashboard ระบบถังดับเพลิง</h1>
             <div class="header-actions">
+                <a class="btn-home" href="../../index.html">&larr; Home</a>
                 <span class="last-update" id="lastUpdate">อัปเดตล่าสุด: กำลังโหลด...</span>
                 <button class="btn-refresh" onclick="fetchDashboardData()">🔄 รีเฟรชข้อมูล</button>
             </div>

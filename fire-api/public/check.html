@@ -9,6 +9,8 @@
         
         body { font-family: 'Sarabun', sans-serif; background-color: #f0f2f5; margin: 0; padding: 15px; display: flex; justify-content: center; }
         .container { background: white; max-width: 500px; width: 100%; border-radius: 16px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .home-link { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; color: #1a73e8; background: #e8f0fe; text-decoration: none; padding: 9px 14px; border-radius: 999px; font-weight: 600; }
+        .home-link:hover { background: #d2e3fc; }
         
         /* Header & GPS */
         .header-box { background: #1a73e8; color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
@@ -49,6 +51,7 @@
 <body>
 
 <div class="container">
+    <a class="home-link" href="../../index.html">&larr; Home</a>
     <div class="header-box">
         <h2>📝 ตรวจเช็คถังรหัส: <span id="fire-id-title">...</span></h2>
         <div class="gps-info" id="gps-display">🛰️ กำลังระบุพิกัด GPS...</div>
@@ -111,6 +114,7 @@
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const fireId = urlParams.get('id');
+    const authToken = sessionStorage.getItem(`fireAuthToken:${fireId}`);
     let lat = 0, lng = 0;
 
     // ระบบ GPS
@@ -149,6 +153,12 @@
     // โหลดข้อมูลเริ่มต้น
     window.onload = async () => {
         if (!fireId) return alert("ไม่พบ ID");
+        if (!authToken) {
+            alert("กรุณาเข้าสู่ระบบก่อนบันทึกผล");
+            window.location.href = `scan.html?id=${fireId}`;
+            return;
+        }
+
         document.getElementById('fire-id-title').innerText = fireId;
         getGPS();
         
@@ -183,14 +193,26 @@
         if (photo) formData.append('photo', photo);
 
         try {
-            const res = await fetch('/api/check', { method: 'POST', body: formData });
+            const res = await fetch('/api/check', {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${authToken}` },
+                body: formData
+            });
+            const result = await res.json();
+
             if (res.ok) {
                 alert("✅ บันทึกข้อมูลและรูปภาพสำเร็จ!");
                 window.location.href = 'index.html';
+            } else {
+                alert(`❌ ${result.message || 'บันทึกไม่สำเร็จ'}`);
+                if (res.status === 401) window.location.href = `scan.html?id=${fireId}`;
+                btn.disabled = false;
+                btn.innerText = "💾 บันทึกและอัปโหลดข้อมูล";
             }
         } catch (err) {
             alert("❌ เกิดข้อผิดพลาด");
             btn.disabled = false;
+            btn.innerText = "💾 บันทึกและอัปโหลดข้อมูล";
         }
     };
 </script>

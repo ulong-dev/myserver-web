@@ -24,6 +24,8 @@
             padding: 25px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
         }
+        .home-link { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; color: #1a73e8; background: #e8f0fe; text-decoration: none; padding: 9px 14px; border-radius: 999px; font-weight: 600; }
+        .home-link:hover { background: #d2e3fc; }
 
         .header { 
             text-align: center; 
@@ -137,6 +139,7 @@
 <body>
 
 <div class="container">
+    <a class="home-link" href="../../index.html">&larr; Home</a>
     <div id="loading">
         <div style="font-size: 2em; margin-bottom: 10px;">⏳</div>
         กำลังโหลดข้อมูลถังดับเพลิง...
@@ -247,13 +250,22 @@
         errDiv.style.display = 'block';
     }
 
-    function checkPassword() {
+    async function checkPassword() {
         const pass = document.getElementById('staff-password').value;
-        if (pass === '1234') { 
-            // นำทางไปยังหน้า check.html พร้อมส่ง ID ไปด้วย
+        try {
+            const response = await fetch('/api/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pass })
+            });
+            const result = await response.json();
+
+            if (!result.success) throw new Error(result.message || 'รหัสผ่านไม่ถูกต้อง');
+
+            sessionStorage.setItem(`fireAuthToken:${fireId}`, result.token);
             window.location.href = `check.html?id=${fireId}`;
-        } else {
-            alert("รหัสผ่านไม่ถูกต้อง");
+        } catch (error) {
+            alert(error.message || "รหัสผ่านไม่ถูกต้อง");
             document.getElementById('staff-password').value = '';
         }
     }

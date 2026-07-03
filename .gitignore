@@ -1,1 +1,19 @@
+# macOS/system files
+.DS_Store
+**/.DS_Store
+
+# Logs/runtime output
+*.log
+nohup.out
+
+# Node dependencies and generated files
+node_modules/
+fire-api/node_modules/
+fire-api/public/uploads/
+
+# Secrets
+.env
+.env.*
+!.env.example
+!fire-api/.env.example
 fire-api/credentials.json
