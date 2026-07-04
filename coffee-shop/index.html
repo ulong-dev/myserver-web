@@ -142,7 +142,7 @@
       border-radius: 999px;
       padding: 6px 14px;
       border: 1px solid var(--border-soft);
-      background: #FDF9F3;
+      background: var(--bg-panel);
       font-size: 13px;
       display: flex;
       align-items: center;
@@ -318,7 +318,7 @@
       border-radius: 999px;
       border: 1px solid var(--border-soft);
       font-size: 13px;
-      background: #FBF6EF;
+      background: var(--bg-panel);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -353,7 +353,7 @@
 
     .product-card {
       border-radius: var(--radius-md);
-      background: #FFFFFF;
+      background: var(--bg-panel);
       border: 1px solid var(--border-soft);
       padding: 8px 10px;
       display: flex;
@@ -370,43 +370,37 @@
       transform: translateY(-2px);
     }
 
-    .product-card {
-  border-radius: var(--radius-md);
-  background: #FFFFFF;
-  border: 1px solid var(--border-soft);
-  padding: 8px 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  min-height: 92px;
-}
+    .product-img {
+      width: 100%;
+      height: 90px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 6px;
+      background: var(--bg-panel-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-/* เพิ่มส่วนนี้ */
-.product-img {
-  width: 100%;
-  height: 90px;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 6px;
-  background: #f5eee5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    .product-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-.product-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+    .product-card.empty-state {
+      min-height: 72px;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      cursor: default;
+    }
 
-.product-card:hover {
-  border-color: var(--border-strong);
-  box-shadow: 0 6px 16px rgba(120, 96, 72, 0.18);
-  transform: translateY(-2px);
-}
+    .product-card.empty-state:hover {
+      border-color: var(--border-soft);
+      box-shadow: none;
+      transform: none;
+    }
 
 
     .product-name {
@@ -480,7 +474,7 @@
       margin-top: 4px;
       border-radius: var(--radius-md);
       border: 1px solid var(--border-soft);
-      background: #FBF6EF;
+      background: var(--bg-panel-soft);
       padding: 8px 10px;
       overflow-y: auto;
     }
@@ -544,7 +538,8 @@
     .order-item-btn {
       border-radius: 999px;
       border: 1px solid var(--border-soft);
-      background: #ffffff;
+      background: var(--bg-panel);
+      color: var(--text-main);
       font-size: 10px;
       padding: 2px 6px;
       cursor: pointer;
@@ -553,7 +548,7 @@
     .order-summary {
       border-radius: var(--radius-md);
       border: 1px solid var(--border-soft);
-      background: #F7F0E7;
+      background: var(--bg-panel-soft);
       padding: 8px 10px;
       font-size: 13px;
       display: flex;
@@ -599,7 +594,7 @@
     }
 
     .btn-pay.secondary {
-      background: #FBF6EF;
+      background: var(--bg-panel);
       border-color: var(--border-soft);
       color: var(--text-main);
     }
@@ -841,12 +836,68 @@
         margin: 4px;
         border-radius: 0;
       }
+      .pos-header {
+        height: auto;
+        min-height: var(--header-height);
+        flex-wrap: wrap;
+        align-items: flex-start;
+      }
+      .pos-logo {
+        min-width: 180px;
+      }
+      .order-type-group,
+      .header-actions {
+        flex-wrap: wrap;
+      }
+      .search-wrap {
+        flex-basis: 100%;
+        order: 3;
+      }
+      .search-input {
+        max-width: none;
+      }
       .pos-main {
         flex-direction: column;
       }
       .menu-panel {
         border-right: none;
         border-bottom: 1px solid var(--border-soft);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .pos-shell {
+        margin: 0;
+        min-height: 100vh;
+      }
+      .pos-header {
+        padding: 10px;
+        gap: 10px;
+      }
+      .pos-logo {
+        width: 100%;
+        border-right: 0;
+        padding-right: 0;
+      }
+      .order-type-group,
+      .category-tabs {
+        width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+      }
+      .header-actions {
+        width: 100%;
+      }
+      .header-actions .btn-pill {
+        flex: 1 1 auto;
+        justify-content: center;
+      }
+      .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .payment-actions {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -885,7 +936,7 @@
       <div class="header-actions">
         <a class="btn-pill" href="../index.html">&larr; Home</a>
         <button class="btn-pill primary" id="newOrderBtn">+ เปิดบิลใหม่</button>
-        <button class="btn-pill">ใบเสร็จล่าสุด</button>
+        <button class="btn-pill" id="latestReceiptBtn">ใบเสร็จล่าสุด</button>
         <button class="btn-pill" id="themeToggleBtn">🌙 โหมดกลางคืน</button>
         <div class="user-chip">
           <div class="user-avatar">A</div>
@@ -914,7 +965,7 @@
           </div>
           <div class="order-actions-top">
             <div class="order-tag">โต๊ะ: -</div>
-            <button class="btn-pill" style="font-size:12px;">โน้ตลูกค้า</button>
+            <button class="btn-pill" id="customerNoteBtn" style="font-size:12px;">โน้ตลูกค้า</button>
           </div>
         </div>
 
@@ -1011,7 +1062,7 @@
     <div class="modal modal-receipt">
       <div class="modal-header">
         <div>
-          <div class="modal-title">ยืนยันการชำระเงิน</div>
+          <div class="modal-title" id="paymentModalTitle">ยืนยันการชำระเงิน</div>
           <div class="modal-subtitle">Niksen &amp; Co · Slow coffee, slow life</div>
         </div>
         <button class="modal-close" id="paymentModalCloseBtn">✕</button>
@@ -1032,6 +1083,10 @@
           <span>ยอดสุทธิ</span>
           <span id="receiptTotal">฿0.00</span>
         </div>
+        <div class="receipt-row">
+          <span>เวลา</span>
+          <span id="receiptTime">-</span>
+        </div>
         <div class="receipt-note">
           ขอให้มีเวลาพักผ่อนเล็ก ๆ กับกาแฟแก้วนี้นะ ☕
         </div>
@@ -1040,7 +1095,7 @@
       <div class="modal-footer">
         <button class="btn-outline" id="paymentModalCancelBtn">ย้อนกลับ</button>
         <button class="btn-solid" id="paymentModalConfirmBtn">
-          ปิดบิล
+          <span id="paymentConfirmLabel">ปิดบิล</span>
           <span class="price-tag" id="paymentConfirmTotal">฿0.00</span>
         </button>
       </div>
@@ -1050,6 +1105,7 @@
   <script>
   /********** CATEGORY (คงเดิม) **********/
   const categories = [
+    { id: "all",         name: "ทั้งหมด",   emoji: "◌" },
     { id: "coffee",      name: "กาแฟ",       emoji: "⚪" },
     { id: "non_coffee",  name: "Non-coffee", emoji: "●" },
     { id: "tea",         name: "ชา",         emoji: "△" },
@@ -1061,16 +1117,45 @@
   /********** PRODUCTS: โหลดจาก products.json **********/
   let products = [];
 
+  const fallbackProducts = [
+    { id: 1, category: "coffee", name: "Latte เย็น", basePrice: 65, popular: true, image: "assets/menu/latte_iced.png" },
+    { id: 2, category: "coffee", name: "Latte ร้อน", basePrice: 55, image: "assets/menu/latte_hot.png" },
+    { id: 3, category: "coffee", name: "Americano เย็น", basePrice: 55, popular: true, image: "assets/menu/americano_iced.png" },
+    { id: 4, category: "coffee", name: "Americano ร้อน", basePrice: 50, popular: true, image: "assets/menu/americano_hot.png" },
+    { id: 5, category: "coffee", name: "Cappuccino เย็น", basePrice: 60, image: "assets/menu/cappuccino_iced.png" },
+    { id: 6, category: "coffee", name: "Cappuccino ร้อน", basePrice: 55, image: "assets/menu/cappuccino_hot.png" },
+    { id: 7, category: "coffee", name: "Espresso เย็น", basePrice: 45, image: "assets/menu/espresso_iced.png" },
+    { id: 8, category: "coffee", name: "Espresso ร้อน", basePrice: 40, image: "assets/menu/espresso_hot.png" },
+    { id: 9, category: "non_coffee", name: "โกโก้เย็น", basePrice: 60, image: "assets/menu/cocoa_iced.png" },
+    { id: 10, category: "tea", name: "ชาเขียว เย็น", basePrice: 55, image: "assets/menu/greentea_iced.png" },
+    { id: 11, category: "tea", name: "ชาดำ เย็น", basePrice: 55, image: "assets/menu/blacktea_iced.png" },
+    { id: 12, category: "soda", name: "เลมอนโซดา", basePrice: 50, image: "assets/menu/lemon_soda.png" },
+    { id: 13, category: "bakery", name: "ครัวซองต์เนยสด", basePrice: 45, image: "assets/menu/croissant.png" },
+    { id: 14, category: "signature", name: "Ulong Dirty", basePrice: 85, popular: true, image: "assets/menu/ulong_dirty.png" },
+    { id: "mocha_iced", name: "Mocha เย็น", category: "coffee", basePrice: 70, popular: false, image: "assets/menu/mocha_iced.png" }
+  ];
+
+  function normalizeProducts(list) {
+    return (list || []).map(p => ({
+      ...p,
+      image: (p.image || "")
+        .replace(/\.jpg$/i, ".png")
+        .replace("croissant_butter.png", "croissant.png")
+    }));
+  }
+
   async function loadProducts() {
     try {
+      if (window.location.protocol === "file:") {
+        throw new Error("เปิดจากไฟล์ตรง ใช้ข้อมูลเมนูสำรอง");
+      }
       const res = await fetch('products.json');
       if (!res.ok) throw new Error('โหลด products.json ไม่สำเร็จ');
       const data = await res.json();
-      products = data.products || [];
+      products = normalizeProducts(data.products || fallbackProducts);
     } catch (err) {
-      console.error(err);
-      alert('ไม่สามารถโหลดรายการเมนูได้ กรุณาตรวจสอบไฟล์ products.json');
-      products = [];
+      console.warn(err);
+      products = normalizeProducts(fallbackProducts);
     }
   }
 
@@ -1103,10 +1188,13 @@
   ];
 
   /********** STATE **********/
-  let currentCategoryId = "coffee";
+  let currentCategoryId = "all";
   let currentOrderItems = [];
   let currentOrderType = "takeaway";
   let lastPaymentInfo = { method: null, total: 0 };
+  let lastReceipt = null;
+  let paymentModalMode = "checkout";
+  let customerNote = "";
 
   let modalState = {
     product: null,
@@ -1127,6 +1215,9 @@
   const summaryTotalEl = document.getElementById("summaryTotal");
   const orderTypeLabelEl = document.getElementById("orderTypeLabel");
   const orderSubmetaEl = document.getElementById("orderSubmeta");
+  const searchInputEl = document.getElementById("searchInput");
+  const latestReceiptBtn = document.getElementById("latestReceiptBtn");
+  const customerNoteBtn = document.getElementById("customerNoteBtn");
 
   const modalBackdrop = document.getElementById("modalBackdrop");
   const modalCloseBtn = document.getElementById("modalCloseBtn");
@@ -1148,9 +1239,12 @@
   const paymentModalCloseBtn = document.getElementById("paymentModalCloseBtn");
   const paymentModalCancelBtn = document.getElementById("paymentModalCancelBtn");
   const paymentModalConfirmBtn = document.getElementById("paymentModalConfirmBtn");
+  const paymentModalTitleEl = document.getElementById("paymentModalTitle");
+  const paymentConfirmLabelEl = document.getElementById("paymentConfirmLabel");
   const receiptOrderIdEl = document.getElementById("receiptOrderId");
   const receiptMethodEl = document.getElementById("receiptMethod");
   const receiptTotalEl = document.getElementById("receiptTotal");
+  const receiptTimeEl = document.getElementById("receiptTime");
   const paymentConfirmTotalEl = document.getElementById("paymentConfirmTotal");
 
   /********** INIT **********/
@@ -1163,7 +1257,12 @@
     attachModalEvents();
     attachPaymentEvents();
     document.getElementById("newOrderBtn").addEventListener("click", resetOrder);
+    latestReceiptBtn.addEventListener("click", openLatestReceipt);
+    customerNoteBtn.addEventListener("click", editCustomerNote);
+    searchInputEl.addEventListener("input", renderProductGrid);
     setupThemeToggle();
+    setupKeyboardShortcuts();
+    loadLastReceipt();
     resetOrder();
     setupPaymentModal();
   }
@@ -1187,15 +1286,16 @@
   }
 
   /********** PRODUCT GRID **********/
-  /********** PRODUCT GRID **********/
 function renderProductGrid() {
-  const keyword = (document.getElementById("searchInput").value || "").toLowerCase();
+  const keyword = (searchInputEl.value || "").trim().toLowerCase();
   productGridEl.innerHTML = "";
 
   const list = products || [];
   const filtered = list.filter(p => {
-    const matchCategory = p.category === currentCategoryId;
-    const matchKeyword = p.name.toLowerCase().includes(keyword);
+    const category = categories.find(cat => cat.id === p.category);
+    const matchCategory = currentCategoryId === "all" || p.category === currentCategoryId;
+    const haystack = [p.name, p.category, category?.name || ""].join(" ").toLowerCase();
+    const matchKeyword = !keyword || haystack.includes(keyword);
     return matchCategory && matchKeyword;
   });
 
@@ -1214,24 +1314,23 @@ function renderProductGrid() {
     `;
     // คลิกการ์ดแล้วเปิด modal
     card.addEventListener("click", () => openModifierModal(p));
+    const img = card.querySelector("img");
+    img.addEventListener("error", () => {
+      const imageWrap = card.querySelector(".product-img");
+      imageWrap.textContent = "ไม่มีรูป";
+    });
     productGridEl.appendChild(card);
   });
 
   // ถ้าไม่พบเมนูเลย
   if (filtered.length === 0) {
     const empty = document.createElement("div");
+    empty.className = "product-card empty-state";
     empty.style.gridColumn = "1 / -1";
-    empty.style.fontSize = "13px";
-    empty.style.color = "#9ca3af";
-    empty.style.textAlign = "center";
-    empty.style.padding = "16px 8px";
     empty.textContent = "ไม่พบเมนูในหมวดนี้";
     productGridEl.appendChild(empty);
   }
 }
-
-document.getElementById("searchInput").addEventListener("input", renderProductGrid);
-
 
   /********** ORDER **********/
   function renderOrder() {
@@ -1305,9 +1404,34 @@ document.getElementById("searchInput").addEventListener("input", renderProductGr
 
   function resetOrder() {
     currentOrderItems = [];
+    customerNote = "";
+    customerNoteBtn.textContent = "โน้ตลูกค้า";
     orderSubmetaEl.textContent =
       "บิล #TEMP-" + Math.floor(Math.random() * 999).toString().padStart(3, "0");
     recalcTotals();
+  }
+
+  function editCustomerNote() {
+    const note = window.prompt("โน้ตลูกค้า", customerNote);
+    if (note === null) return;
+    customerNote = note.trim();
+    customerNoteBtn.textContent = customerNote ? "มีโน้ตลูกค้า" : "โน้ตลูกค้า";
+  }
+
+  function setupKeyboardShortcuts() {
+    document.addEventListener("keydown", (e) => {
+      const isSearchShortcut = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k";
+      if (isSearchShortcut) {
+        e.preventDefault();
+        searchInputEl.focus();
+        searchInputEl.select();
+      }
+
+      if (e.key === "Escape") {
+        closeModal();
+        paymentModal.classList.remove("active");
+      }
+    });
   }
 
   /********** ORDER TYPE **********/
@@ -1470,22 +1594,73 @@ document.getElementById("searchInput").addEventListener("input", renderProductGr
         const totalText = summaryTotalEl.textContent || "฿0.00";
         const numeric = parseFloat(totalText.replace(/[^\d.]/g, "")) || 0;
 
-        lastPaymentInfo = { method, total: numeric };
-
         const methodLabel = {
           cash: "เงินสด",
           qr: "โอน/QR พร้อมเพย์",
           card: "บัตรเครดิต/เดบิต",
         }[method] || "อื่น ๆ";
 
-        receiptOrderIdEl.textContent = orderSubmetaEl.textContent.replace("บิล ", "");
-        receiptMethodEl.textContent = methodLabel;
-        receiptTotalEl.textContent = `฿${numeric.toFixed(2)}`;
-        paymentConfirmTotalEl.textContent = `฿${numeric.toFixed(2)}`;
+        lastPaymentInfo = {
+          method,
+          methodLabel,
+          total: numeric,
+          orderId: orderSubmetaEl.textContent.replace("บิล ", ""),
+          closedAt: formatDateTime(new Date()),
+          note: customerNote
+        };
 
-        paymentModal.classList.add("active");
+        openReceiptModal(lastPaymentInfo, "checkout");
       });
     });
+  }
+
+  function formatDateTime(date) {
+    return date.toLocaleString("th-TH", {
+      dateStyle: "short",
+      timeStyle: "short"
+    });
+  }
+
+  function openReceiptModal(receipt, mode = "checkout") {
+    paymentModalMode = mode;
+    paymentModalTitleEl.textContent = mode === "latest" ? "ใบเสร็จล่าสุด" : "ยืนยันการชำระเงิน";
+    paymentModalCancelBtn.style.display = mode === "latest" ? "none" : "";
+    paymentConfirmLabelEl.textContent = mode === "latest" ? "ปิด" : "ปิดบิล";
+
+    receiptOrderIdEl.textContent = receipt.orderId || "-";
+    receiptMethodEl.textContent = receipt.methodLabel || "เงินสด";
+    receiptTotalEl.textContent = `฿${Number(receipt.total || 0).toFixed(2)}`;
+    receiptTimeEl.textContent = receipt.closedAt || "-";
+    paymentConfirmTotalEl.textContent = `฿${Number(receipt.total || 0).toFixed(2)}`;
+
+    paymentModal.classList.add("active");
+  }
+
+  function loadLastReceipt() {
+    try {
+      const raw = window.localStorage.getItem("niksen_last_receipt");
+      lastReceipt = raw ? JSON.parse(raw) : null;
+    } catch (err) {
+      console.warn(err);
+      lastReceipt = null;
+    }
+  }
+
+  function saveLastReceipt(receipt) {
+    lastReceipt = receipt;
+    try {
+      window.localStorage.setItem("niksen_last_receipt", JSON.stringify(receipt));
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  function openLatestReceipt() {
+    if (!lastReceipt) {
+      alert("ยังไม่มีใบเสร็จล่าสุด");
+      return;
+    }
+    openReceiptModal(lastReceipt, "latest");
   }
 
   function setupPaymentModal() {
@@ -1503,9 +1678,11 @@ document.getElementById("searchInput").addEventListener("input", renderProductGr
     });
 
     paymentModalConfirmBtn.addEventListener("click", () => {
-      // อนาคตใช้ส่งข้อมูลไป backend เพื่อบันทึกยอดขายจริง
       closePaymentModal();
-      resetOrder();
+      if (paymentModalMode === "checkout") {
+        saveLastReceipt(lastPaymentInfo);
+        resetOrder();
+      }
     });
   }
 
