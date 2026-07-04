@@ -1051,6 +1051,8 @@
         <a class="btn-pill" href="../index.html">&larr; Home</a>
         <button class="btn-pill primary" id="newOrderBtn">+ เปิดบิลใหม่</button>
         <button class="btn-pill" id="latestReceiptBtn">ใบเสร็จล่าสุด</button>
+        <button class="btn-pill" id="exportJsonBtn">Export JSON</button>
+        <button class="btn-pill" id="exportCsvBtn">Export CSV</button>
         <button class="btn-pill" id="themeToggleBtn">🌙 โหมดกลางคืน</button>
         <div class="user-chip">
           <div class="user-avatar">A</div>
@@ -1343,13 +1345,27 @@
   let activePromptPayReceipt = null;
   let customerNote = "";
 
-  const LAST_RECEIPT_STORAGE_KEY = "niksen_last_receipt";
-  const SALES_HISTORY_STORAGE_KEY = "niksen_sales_history_v1";
-  const SALES_HISTORY_MAX_AGE_DAYS = 90;
-  const SALES_HISTORY_MAX_ITEMS = 500;
+  // Move salesHistory to IndexedDB or a backend DB when analysis data outgrows localStorage.
+  const STORAGE_CONFIG = {
+    latestReceipt: {
+      key: "niksen_last_receipt",
+      schemaVersion: 1,
+      retention: "indefinite"
+    },
+    salesHistory: {
+      key: "niksen_sales_history_v1",
+      schemaVersion: 1,
+      maxAgeDays: 90,
+      maxItems: 500,
+      exportFilePrefix: "niksen-sales-history"
+    },
+    promptPay: {
+      key: "niksen_promptpay_config_v1",
+      schemaVersion: 1
+    }
+  };
   const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
-  const PROMPTPAY_STORAGE_KEY = "niksen_promptpay_config_v1";
   const PROMPTPAY_AID = "A000000677010111";
   const PROMPTPAY_MERCHANT_NAME = "NIKSEN AND CO";
   const PROMPTPAY_MERCHANT_CITY = "BANGKOK";
@@ -1393,6 +1409,8 @@
   const orderSubmetaEl = document.getElementById("orderSubmeta");
   const searchInputEl = document.getElementById("searchInput");
   const latestReceiptBtn = document.getElementById("latestReceiptBtn");
+  const exportJsonBtn = document.getElementById("exportJsonBtn");
+  const exportCsvBtn = document.getElementById("exportCsvBtn");
   const customerNoteBtn = document.getElementById("customerNoteBtn");
 
   const modalBackdrop = document.getElementById("modalBackdrop");
@@ -1443,6 +1461,8 @@
     attachPaymentEvents();
     document.getElementById("newOrderBtn").addEventListener("click", resetOrder);
     latestReceiptBtn.addEventListener("click", openLatestReceipt);
+    exportJsonBtn.addEventListener("click", exportSalesHistoryJson);
+    exportCsvBtn.addEventListener("click", exportSalesHistoryCsv);
     customerNoteBtn.addEventListener("click", editCustomerNote);
     searchInputEl.addEventListener("input", renderProductGrid);
     setupThemeToggle();
@@ -1625,6 +1645,42 @@ function renderProductGrid() {
     });
   }
 
+  function isStorageQuotaError(err) {
+    return err &&
+      (err.name === "QuotaExceededError" ||
+       err.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
+       err.code === 22 ||
+       err.code === 1014);
+  }
+
+  function setLocalStorageItem(key, value, options = {}) {
+    try {
+      window.localStorage.setItem(key, value);
+      return true;
+    } catch (err) {
+      console.warn(err);
+
+      if (isStorageQuotaError(err) && typeof options.onQuota === "function") {
+        return options.onQuota(err) === true;
+      }
+
+      if (isStorageQuotaError(err) && options.warnUser) {
+        alert("พื้นที่จัดเก็บในเบราว์เซอร์เต็ม ระบบบันทึกข้อมูลล่าสุดไม่ได้");
+      }
+
+      return false;
+    }
+  }
+
+  function setLocalStorageJson(key, value, options = {}) {
+    try {
+      return setLocalStorageItem(key, JSON.stringify(value), options);
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  }
+
   function setupKeyboardShortcuts() {
     document.addEventListener("keydown", (e) => {
       const isSearchShortcut = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k";
@@ -1796,7 +1852,7 @@ function renderProductGrid() {
 
   function loadPromptPayConfig() {
     try {
-      const raw = window.localStorage.getItem(PROMPTPAY_STORAGE_KEY);
+      const raw = window.localStorage.getItem(STORAGE_CONFIG.promptPay.key);
       if (!raw) return { type: "mobile", target: "" };
       const parsed = JSON.parse(raw);
       const type = promptPayTargetTypes[parsed.type] ? parsed.type : "mobile";
@@ -1812,11 +1868,10 @@ function renderProductGrid() {
 
   function savePromptPayConfig(config) {
     promptPayConfig = config;
-    try {
-      window.localStorage.setItem(PROMPTPAY_STORAGE_KEY, JSON.stringify(config));
-    } catch (err) {
-      console.warn(err);
-    }
+    setLocalStorageJson(STORAGE_CONFIG.promptPay.key, {
+      schemaVersion: STORAGE_CONFIG.promptPay.schemaVersion,
+      ...config
+    }, { warnUser: true });
   }
 
   function syncPromptPayForm() {
@@ -2133,7 +2188,7 @@ function renderProductGrid() {
 
   function loadLastReceipt() {
     try {
-      const raw = window.localStorage.getItem(LAST_RECEIPT_STORAGE_KEY);
+      const raw = window.localStorage.getItem(STORAGE_CONFIG.latestReceipt.key);
       lastReceipt = raw ? JSON.parse(raw) : null;
     } catch (err) {
       console.warn(err);
@@ -2142,19 +2197,33 @@ function renderProductGrid() {
   }
 
   function saveLastReceipt(receipt) {
-    lastReceipt = receipt;
-    try {
-      window.localStorage.setItem(LAST_RECEIPT_STORAGE_KEY, JSON.stringify(receipt));
-    } catch (err) {
-      console.warn(err);
-    }
+    lastReceipt = createLatestReceiptRecord(receipt);
+    setLocalStorageJson(STORAGE_CONFIG.latestReceipt.key, lastReceipt, { warnUser: true });
+  }
+
+  function createLatestReceiptRecord(receipt) {
+    return {
+      schemaVersion: STORAGE_CONFIG.latestReceipt.schemaVersion,
+      orderId: receipt.orderId || "",
+      closedAt: receipt.closedAt || "",
+      closedAtMs: Number(receipt.closedAtMs || Date.now()),
+      method: receipt.method || "",
+      methodLabel: receipt.methodLabel || "",
+      orderType: receipt.orderType || "",
+      orderTypeLabel: receipt.orderTypeLabel || "",
+      total: Number(receipt.total || 0),
+      promptPayPayload: receipt.promptPayPayload || "",
+      promptPayTargetType: receipt.promptPayTargetType || "",
+      promptPayTarget: receipt.promptPayTarget || ""
+    };
   }
 
   function readSalesHistory() {
     try {
-      const raw = window.localStorage.getItem(SALES_HISTORY_STORAGE_KEY);
+      const raw = window.localStorage.getItem(STORAGE_CONFIG.salesHistory.key);
       const parsed = raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      const records = Array.isArray(parsed) ? parsed : (parsed.records || []);
+      return Array.isArray(records) ? records.map(normalizeSalesHistoryRecord) : [];
     } catch (err) {
       console.warn(err);
       return [];
@@ -2162,21 +2231,17 @@ function renderProductGrid() {
   }
 
   function pruneSalesHistory(history, now = Date.now()) {
-    const cutoff = now - (SALES_HISTORY_MAX_AGE_DAYS * DAY_IN_MS);
+    const cutoff = now - (STORAGE_CONFIG.salesHistory.maxAgeDays * DAY_IN_MS);
 
     return (history || [])
       .filter(record => Number(record.closedAtMs || 0) >= cutoff)
       .sort((a, b) => Number(b.closedAtMs || 0) - Number(a.closedAtMs || 0))
-      .slice(0, SALES_HISTORY_MAX_ITEMS);
+      .slice(0, STORAGE_CONFIG.salesHistory.maxItems);
   }
 
   function pruneStoredSalesHistory() {
-    try {
-      const pruned = pruneSalesHistory(readSalesHistory());
-      window.localStorage.setItem(SALES_HISTORY_STORAGE_KEY, JSON.stringify(pruned));
-    } catch (err) {
-      console.warn(err);
-    }
+    const pruned = pruneSalesHistory(readSalesHistory());
+    setSalesHistoryStorage(pruned);
   }
 
   function createSalesHistoryRecord(receipt) {
@@ -2184,6 +2249,7 @@ function renderProductGrid() {
     const closedAtMs = Number(receipt.closedAtMs || Date.now());
 
     return {
+      schemaVersion: STORAGE_CONFIG.salesHistory.schemaVersion,
       id: `${receipt.orderId || "ORDER"}-${closedAtMs}`,
       orderId: receipt.orderId || "",
       closedAt: receipt.closedAt || "",
@@ -2194,21 +2260,195 @@ function renderProductGrid() {
       orderTypeLabel: receipt.orderTypeLabel || "",
       total: Number(receipt.total || 0),
       itemCount: items.reduce((sum, item) => sum + Number(item.quantity || 0), 0),
-      note: receipt.note || "",
-      promptPayTarget: receipt.promptPayTarget || "",
-      items
+      hasCustomerNote: Boolean(receipt.note),
+      hasPromptPayReceiver: Boolean(receipt.promptPayTarget),
+      items: items.map(item => ({ ...item }))
     };
   }
 
   function saveSalesHistory(receipt) {
-    try {
-      const record = createSalesHistoryRecord(receipt);
-      const withoutDuplicate = readSalesHistory().filter(item => item.id !== record.id);
-      const nextHistory = pruneSalesHistory([record, ...withoutDuplicate]);
-      window.localStorage.setItem(SALES_HISTORY_STORAGE_KEY, JSON.stringify(nextHistory));
-    } catch (err) {
-      console.warn(err);
+    const record = createSalesHistoryRecord(receipt);
+    const withoutDuplicate = readSalesHistory().filter(item => item.id !== record.id);
+    const nextHistory = pruneSalesHistory([record, ...withoutDuplicate]);
+    setSalesHistoryStorage(nextHistory);
+  }
+
+  function normalizeSalesHistoryRecord(record) {
+    const items = Array.isArray(record.items) ? record.items : [];
+
+    return {
+      schemaVersion: Number(record.schemaVersion || STORAGE_CONFIG.salesHistory.schemaVersion),
+      id: String(record.id || `${record.orderId || "ORDER"}-${record.closedAtMs || Date.now()}`),
+      orderId: String(record.orderId || ""),
+      closedAt: String(record.closedAt || ""),
+      closedAtMs: Number(record.closedAtMs || 0),
+      method: String(record.method || ""),
+      methodLabel: String(record.methodLabel || ""),
+      orderType: String(record.orderType || ""),
+      orderTypeLabel: String(record.orderTypeLabel || ""),
+      total: Number(record.total || 0),
+      itemCount: Number(record.itemCount || items.reduce((sum, item) => sum + Number(item.quantity || 0), 0)),
+      hasCustomerNote: Boolean(record.hasCustomerNote || record.note),
+      hasPromptPayReceiver: Boolean(record.hasPromptPayReceiver || record.promptPayTarget),
+      items: items.map(item => ({
+        productId: item.productId || "",
+        name: item.name || "",
+        category: item.category || "",
+        quantity: Number(item.quantity || 0),
+        unitPrice: Number(item.unitPrice || 0),
+        totalPrice: Number(item.totalPrice || 0),
+        size: item.size || "",
+        sweet: item.sweet || "",
+        milk: item.milk || "",
+        extras: Array.isArray(item.extras) ? item.extras : []
+      }))
+    };
+  }
+
+  function setSalesHistoryStorage(history) {
+    const pruned = pruneSalesHistory(history);
+    const saved = setLocalStorageJson(STORAGE_CONFIG.salesHistory.key, pruned, {
+      onQuota: () => {
+        const compactLimit = Math.max(50, Math.floor(STORAGE_CONFIG.salesHistory.maxItems / 2));
+        const compactHistory = pruned.slice(0, compactLimit);
+        const compactSaved = setLocalStorageJson(STORAGE_CONFIG.salesHistory.key, compactHistory);
+
+        if (compactSaved) {
+          alert(`พื้นที่จัดเก็บใกล้เต็ม ระบบลดประวัติวิเคราะห์เหลือ ${compactHistory.length} บิลล่าสุด`);
+        } else {
+          alert("พื้นที่จัดเก็บในเบราว์เซอร์เต็ม ระบบบันทึกประวัติวิเคราะห์ไม่ได้");
+        }
+
+        return compactSaved;
+      }
+    });
+
+    return saved;
+  }
+
+  function getExportableSalesHistory() {
+    return pruneSalesHistory(readSalesHistory()).map(normalizeSalesHistoryRecord);
+  }
+
+  function buildSalesHistoryExport(records = getExportableSalesHistory()) {
+    return {
+      schemaVersion: STORAGE_CONFIG.salesHistory.schemaVersion,
+      storageKey: STORAGE_CONFIG.salesHistory.key,
+      exportedAt: new Date().toISOString(),
+      retention: {
+        maxAgeDays: STORAGE_CONFIG.salesHistory.maxAgeDays,
+        maxItems: STORAGE_CONFIG.salesHistory.maxItems
+      },
+      privacy: {
+        anonymized: true,
+        excludedFields: ["customerNote", "promptPayPayload", "promptPayReceiver"]
+      },
+      count: records.length,
+      records
+    };
+  }
+
+  function exportSalesHistoryJson() {
+    const records = getExportableSalesHistory();
+    if (!records.length) {
+      alert("ยังไม่มีประวัติบิลสำหรับ export");
+      return;
     }
+
+    downloadTextFile(
+      `${STORAGE_CONFIG.salesHistory.exportFilePrefix}-${formatExportTimestamp()}.json`,
+      JSON.stringify(buildSalesHistoryExport(records), null, 2),
+      "application/json"
+    );
+  }
+
+  function exportSalesHistoryCsv() {
+    const records = getExportableSalesHistory();
+    if (!records.length) {
+      alert("ยังไม่มีประวัติบิลสำหรับ export");
+      return;
+    }
+
+    const headers = [
+      "schemaVersion",
+      "orderId",
+      "closedAt",
+      "method",
+      "methodLabel",
+      "orderType",
+      "orderTypeLabel",
+      "orderTotal",
+      "orderItemCount",
+      "hasCustomerNote",
+      "productId",
+      "productName",
+      "category",
+      "quantity",
+      "unitPrice",
+      "itemTotal",
+      "size",
+      "sweet",
+      "milk",
+      "extras"
+    ];
+
+    const rows = records.flatMap(record => {
+      const items = record.items.length ? record.items : [{}];
+      return items.map(item => [
+        record.schemaVersion,
+        record.orderId,
+        record.closedAt,
+        record.method,
+        record.methodLabel,
+        record.orderType,
+        record.orderTypeLabel,
+        record.total,
+        record.itemCount,
+        record.hasCustomerNote ? "yes" : "no",
+        item.productId || "",
+        item.name || "",
+        item.category || "",
+        item.quantity || 0,
+        item.unitPrice || 0,
+        item.totalPrice || 0,
+        item.size || "",
+        item.sweet || "",
+        item.milk || "",
+        Array.isArray(item.extras) ? item.extras.join("|") : ""
+      ]);
+    });
+
+    const csv = [
+      headers.map(csvEscape).join(","),
+      ...rows.map(row => row.map(csvEscape).join(","))
+    ].join("\n");
+
+    downloadTextFile(
+      `${STORAGE_CONFIG.salesHistory.exportFilePrefix}-${formatExportTimestamp()}.csv`,
+      csv,
+      "text/csv"
+    );
+  }
+
+  function csvEscape(value) {
+    const text = String(value ?? "");
+    return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  }
+
+  function formatExportTimestamp(date = new Date()) {
+    return date.toISOString().replace(/[:.]/g, "-");
+  }
+
+  function downloadTextFile(filename, content, mimeType) {
+    const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   }
 
   function openLatestReceipt() {
@@ -2260,7 +2500,7 @@ function renderProductGrid() {
     if (!themeToggleBtn) return;
     themeToggleBtn.addEventListener("click", () => {
       const isDark = document.body.classList.toggle("theme-dark");
-      window.localStorage.setItem("niksen_theme", isDark ? "dark" : "light");
+      setLocalStorageItem("niksen_theme", isDark ? "dark" : "light");
       themeToggleBtn.textContent = isDark ? "☀️ โหมดกลางวัน" : "🌙 โหมดกลางคืน";
     });
   }
