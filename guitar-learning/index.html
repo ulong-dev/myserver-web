@@ -362,6 +362,7 @@ const SEGMENTS = [
 
 const DEMO_VIDEO = {
   localSrc: "videos/a-minor-p1-slow-demo.mp4",
+  hasEmbeddedNarration: true,
   duration: 45,
   cues: [
     {time:0, end:5, label:"SETUP", text:"A Minor Position 1: วางมือที่ fret 0-3", hint:"ดูตำแหน่ง root note A ก่อนเริ่มเล่น", speech:"เตรียมเล่น เอ ไมเนอร์ position หนึ่ง วางมือที่เฟร็ต ศูนย์ ถึง สาม"},
@@ -666,16 +667,16 @@ function initVideoDemo(){
     if(player.running) stopPlayer(true);
     if(video.currentTime < .25) videoDemo.spoken = {};
     unlockAudio();
-    updateVideoCue(true);
+    updateVideoCue(!DEMO_VIDEO.hasEmbeddedNarration);
   });
   video.addEventListener("pause", () => {
     if(window.speechSynthesis) speechSynthesis.cancel();
   });
   video.addEventListener("seeked", () => {
     videoDemo.spoken = {};
-    updateVideoCue(!video.paused);
+    updateVideoCue(!video.paused && !DEMO_VIDEO.hasEmbeddedNarration);
   });
-  video.addEventListener("timeupdate", () => updateVideoCue(!video.paused));
+  video.addEventListener("timeupdate", () => updateVideoCue(!video.paused && !DEMO_VIDEO.hasEmbeddedNarration));
   video.addEventListener("ended", () => {
     setVideoStatus("จบเดโม", "dark");
     if(window.speechSynthesis) speechSynthesis.cancel();
