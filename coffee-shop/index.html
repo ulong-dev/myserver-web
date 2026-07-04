@@ -1116,6 +1116,7 @@
 
   /********** PRODUCTS: โหลดจาก products.json **********/
   let products = [];
+  const MENU_ASSET_VERSION = "20260704-menu-v2";
 
   const fallbackProducts = [
     { id: 1, category: "coffee", name: "Latte เย็น", basePrice: 65, popular: true, image: "assets/menu/latte_iced.png" },
@@ -1144,12 +1145,18 @@
     }));
   }
 
+  function withAssetVersion(path) {
+    if (!path) return "";
+    const separator = path.includes("?") ? "&" : "?";
+    return `${path}${separator}v=${MENU_ASSET_VERSION}`;
+  }
+
   async function loadProducts() {
     try {
       if (window.location.protocol === "file:") {
         throw new Error("เปิดจากไฟล์ตรง ใช้ข้อมูลเมนูสำรอง");
       }
-      const res = await fetch('products.json');
+      const res = await fetch(`products.json?v=${MENU_ASSET_VERSION}`);
       if (!res.ok) throw new Error('โหลด products.json ไม่สำเร็จ');
       const data = await res.json();
       products = normalizeProducts(data.products || fallbackProducts);
@@ -1304,7 +1311,7 @@ function renderProductGrid() {
     card.className = "product-card";
     card.innerHTML = `
       <div class="product-img">
-        <img src="${p.image}" alt="${p.name}">
+        <img src="${withAssetVersion(p.image)}" alt="${p.name}">
       </div>
       <div class="product-name">${p.name}</div>
       <div class="product-meta">
