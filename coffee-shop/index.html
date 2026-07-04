@@ -1343,6 +1343,12 @@
   let activePromptPayReceipt = null;
   let customerNote = "";
 
+  const LAST_RECEIPT_STORAGE_KEY = "niksen_last_receipt";
+  const SALES_HISTORY_STORAGE_KEY = "niksen_sales_history_v1";
+  const SALES_HISTORY_MAX_AGE_DAYS = 90;
+  const SALES_HISTORY_MAX_ITEMS = 500;
+  const DAY_IN_MS = 24 * 60 * 60 * 1000;
+
   const PROMPTPAY_STORAGE_KEY = "niksen_promptpay_config_v1";
   const PROMPTPAY_AID = "A000000677010111";
   const PROMPTPAY_MERCHANT_NAME = "NIKSEN AND CO";
@@ -1442,6 +1448,7 @@
     setupThemeToggle();
     setupKeyboardShortcuts();
     loadLastReceipt();
+    pruneStoredSalesHistory();
     resetOrder();
     setupPromptPaySettings();
     setupPaymentModal();
@@ -1596,6 +1603,26 @@ function renderProductGrid() {
     if (note === null) return;
     customerNote = note.trim();
     customerNoteBtn.textContent = customerNote ? "มีโน้ตลูกค้า" : "โน้ตลูกค้า";
+  }
+
+  function createOrderSnapshot() {
+    return currentOrderItems.map(item => {
+      const quantity = Number(item.quantity || 0);
+      const totalPrice = Number(item.totalPrice || 0);
+
+      return {
+        productId: item.product?.id || "",
+        name: item.product?.name || "",
+        category: item.product?.category || "",
+        quantity,
+        unitPrice: quantity ? Number((totalPrice / quantity).toFixed(2)) : 0,
+        totalPrice: Number(totalPrice.toFixed(2)),
+        size: item.size?.label || "",
+        sweet: item.sweet?.label || "",
+        milk: item.milk?.label || "",
+        extras: (item.extras || []).map(extra => extra.label)
+      };
+    });
   }
 
   function setupKeyboardShortcuts() {
@@ -2048,6 +2075,7 @@ function renderProductGrid() {
           return;
         }
         const method = btn.dataset.pay;
+        const closedAtDate = new Date();
         const totalText = summaryTotalEl.textContent || "฿0.00";
         const numeric = parseFloat(totalText.replace(/[^\d.]/g, "")) || 0;
 
@@ -2062,8 +2090,12 @@ function renderProductGrid() {
           methodLabel,
           total: numeric,
           orderId: orderSubmetaEl.textContent.replace("บิล ", ""),
-          closedAt: formatDateTime(new Date()),
-          note: customerNote
+          orderType: currentOrderType,
+          orderTypeLabel: orderTypeLabelEl.textContent,
+          closedAt: formatDateTime(closedAtDate),
+          closedAtMs: closedAtDate.getTime(),
+          note: customerNote,
+          items: createOrderSnapshot()
         };
 
         openReceiptModal(lastPaymentInfo, "checkout");
@@ -2101,7 +2133,7 @@ function renderProductGrid() {
 
   function loadLastReceipt() {
     try {
-      const raw = window.localStorage.getItem("niksen_last_receipt");
+      const raw = window.localStorage.getItem(LAST_RECEIPT_STORAGE_KEY);
       lastReceipt = raw ? JSON.parse(raw) : null;
     } catch (err) {
       console.warn(err);
@@ -2112,7 +2144,68 @@ function renderProductGrid() {
   function saveLastReceipt(receipt) {
     lastReceipt = receipt;
     try {
-      window.localStorage.setItem("niksen_last_receipt", JSON.stringify(receipt));
+      window.localStorage.setItem(LAST_RECEIPT_STORAGE_KEY, JSON.stringify(receipt));
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  function readSalesHistory() {
+    try {
+      const raw = window.localStorage.getItem(SALES_HISTORY_STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      console.warn(err);
+      return [];
+    }
+  }
+
+  function pruneSalesHistory(history, now = Date.now()) {
+    const cutoff = now - (SALES_HISTORY_MAX_AGE_DAYS * DAY_IN_MS);
+
+    return (history || [])
+      .filter(record => Number(record.closedAtMs || 0) >= cutoff)
+      .sort((a, b) => Number(b.closedAtMs || 0) - Number(a.closedAtMs || 0))
+      .slice(0, SALES_HISTORY_MAX_ITEMS);
+  }
+
+  function pruneStoredSalesHistory() {
+    try {
+      const pruned = pruneSalesHistory(readSalesHistory());
+      window.localStorage.setItem(SALES_HISTORY_STORAGE_KEY, JSON.stringify(pruned));
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  function createSalesHistoryRecord(receipt) {
+    const items = Array.isArray(receipt.items) ? receipt.items : [];
+    const closedAtMs = Number(receipt.closedAtMs || Date.now());
+
+    return {
+      id: `${receipt.orderId || "ORDER"}-${closedAtMs}`,
+      orderId: receipt.orderId || "",
+      closedAt: receipt.closedAt || "",
+      closedAtMs,
+      method: receipt.method || "",
+      methodLabel: receipt.methodLabel || "",
+      orderType: receipt.orderType || "",
+      orderTypeLabel: receipt.orderTypeLabel || "",
+      total: Number(receipt.total || 0),
+      itemCount: items.reduce((sum, item) => sum + Number(item.quantity || 0), 0),
+      note: receipt.note || "",
+      promptPayTarget: receipt.promptPayTarget || "",
+      items
+    };
+  }
+
+  function saveSalesHistory(receipt) {
+    try {
+      const record = createSalesHistoryRecord(receipt);
+      const withoutDuplicate = readSalesHistory().filter(item => item.id !== record.id);
+      const nextHistory = pruneSalesHistory([record, ...withoutDuplicate]);
+      window.localStorage.setItem(SALES_HISTORY_STORAGE_KEY, JSON.stringify(nextHistory));
     } catch (err) {
       console.warn(err);
     }
@@ -2150,6 +2243,7 @@ function renderProductGrid() {
       closePaymentModal();
       if (paymentModalMode === "checkout") {
         saveLastReceipt(lastPaymentInfo);
+        saveSalesHistory(lastPaymentInfo);
         resetOrder();
       }
     });
