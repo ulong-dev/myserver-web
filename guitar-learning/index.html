@@ -86,7 +86,21 @@
     .checklist{display:grid;gap:9px}.checkItem{display:flex;gap:10px;align-items:flex-start;padding:10px;background:#fafafa;border:1px solid var(--line);border-radius:14px}.checkItem input{width:auto;transform:scale(1.18);margin-top:5px}.localProgress{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden}.localFill{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#2563eb);transition:width .2s}
     .links{display:grid;gap:8px}.links a{text-decoration:none;background:#eff6ff;color:#1d4ed8;border-radius:14px;padding:10px 12px;font-weight:800;display:block}.links a:hover{text-decoration:underline}
     textarea{min-height:120px;resize:vertical}.miniGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:520px){.miniGrid{grid-template-columns:1fr}}
-    details{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:12px}summary{font-weight:900;cursor:pointer}.completeBanner{display:none;background:#dcfce7;border:1px solid #86efac;color:#166534;border-radius:16px;padding:12px;font-weight:900;margin-top:10px}.notice{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:16px;padding:12px}.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#e5e7eb;border-radius:8px;padding:1px 6px;color:#111827}
+    .videoDemoHead{align-items:flex-start;margin-bottom:12px}.videoDemoHead h2{margin-bottom:4px}.videoDemoHead code,.filePath{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#e5e7eb;color:#111827;border-radius:8px;padding:2px 6px}
+    .videoDemoGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:14px;align-items:start}
+    @media(max-width:860px){.videoDemoGrid{grid-template-columns:1fr}}
+    .videoFrame{position:relative;background:#080f1d;border:1px solid #111827;border-radius:18px;overflow:hidden;aspect-ratio:16/9;box-shadow:0 14px 36px rgba(15,23,42,.16)}
+    .videoFrame video{display:block;width:100%;height:100%;object-fit:cover;background:#080f1d}
+    .videoMissing{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:20px;background:linear-gradient(135deg,rgba(8,15,29,.94),rgba(30,64,175,.70));color:#e2e8f0}
+    .videoMissing.show{display:flex}.videoMissing strong{display:block;color:#fff;font-size:18px;margin-bottom:6px}
+    .videoCueBox{background:#f8fafc;border:1px solid var(--line);border-radius:18px;padding:14px}
+    .demoCueLabel{font-size:12px;font-weight:900;color:#1d4ed8;text-transform:uppercase}.demoCueText{font-size:clamp(18px,2.6vw,28px);font-weight:950;line-height:1.25;margin-top:5px}.demoCueHint{font-size:14px;color:var(--muted);margin-top:8px}
+    .videoProgressTrack{height:12px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:12px 0}.videoProgressFill{height:100%;width:0;background:linear-gradient(90deg,#2563eb,#16a34a,#facc15);transition:width .15s linear}
+    .videoMeta{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:13px;margin-bottom:10px}.videoSourceTools{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.videoSourceTools button{width:auto;white-space:nowrap}
+    @media(max-width:560px){.videoSourceTools{grid-template-columns:1fr}.videoSourceTools button{width:100%}}
+    .videoCueList{display:grid;gap:8px;margin-top:12px}.videoCueItem{display:grid;grid-template-columns:58px 1fr;gap:10px;padding:10px;border:1px solid var(--line);border-radius:14px;background:#fff}.videoCueItem.active{background:#eff6ff;border-color:#93c5fd}.videoCueItem strong{display:block}.videoCueItem small{color:var(--muted)}
+    .productionSteps{margin:10px 0 0;padding-left:20px}.productionSteps li{margin:7px 0}.completeBanner{display:none;background:#dcfce7;border:1px solid #86efac;color:#166534;border-radius:16px;padding:12px;font-weight:900;margin-top:10px}.notice{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:16px;padding:12px}.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#e5e7eb;border-radius:8px;padding:1px 6px;color:#111827}
+    details{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:12px}summary{font-weight:900;cursor:pointer}
   </style>
 </head>
 <body>
@@ -142,6 +156,65 @@
             <button class="ghost" onclick="speakCurrentCue()">🔊 พูดซ้ำ</button>
           </div>
         </div>
+      </section>
+
+      <section class="card videoDemoCard">
+        <div class="between videoDemoHead">
+          <div>
+            <h2>Video Demo Player</h2>
+            <p class="small">ไฟล์ตัวอย่าง: <code>videos/a-minor-p1-slow-demo.mp4</code> พร้อม cue จาก <code>videos/a-minor-p1-slow-demo.vtt</code></p>
+          </div>
+          <span class="badge orange" id="videoStatus">รอไฟล์วิดีโอ</span>
+        </div>
+
+        <div class="videoDemoGrid">
+          <div>
+            <div class="videoFrame">
+              <video id="demoVideo" controls playsinline preload="metadata">
+                <source id="demoVideoSource" src="videos/a-minor-p1-slow-demo.mp4" type="video/mp4" />
+                <track src="videos/a-minor-p1-slow-demo.vtt" kind="subtitles" srclang="th" label="Thai cues" default />
+                Browser นี้ไม่รองรับ video player
+              </video>
+              <div class="videoMissing show" id="videoMissing">
+                <div>
+                  <strong>ยังไม่พบไฟล์วิดีโอเดโม</strong>
+                  <div>วางไฟล์ MP4 ที่ <span class="filePath">guitar-learning/videos/a-minor-p1-slow-demo.mp4</span> หรือใส่ Cloud URL ด้านขวา</div>
+                </div>
+              </div>
+            </div>
+            <div class="videoSourceTools">
+              <input id="videoUrlInput" type="url" placeholder="Cloud video URL หรือปล่อยว่างเพื่อใช้ /videos/a-minor-p1-slow-demo.mp4" />
+              <button class="secondary" onclick="loadDemoVideoSource()">โหลดวิดีโอ</button>
+            </div>
+          </div>
+
+          <div class="videoCueBox">
+            <div class="demoCueLabel" id="videoCueLabel">READY</div>
+            <div class="demoCueText" id="videoCueText">เตรียมเล่นเดโม A Minor Position 1 แบบช้า</div>
+            <div class="demoCueHint" id="videoCueHint">กด Play แล้ว cue ด้านล่างจะเปลี่ยนตามเวลา และ voice guide จะพูดตามจังหวะวิดีโอ</div>
+            <div class="videoProgressTrack"><div class="videoProgressFill" id="videoProgressFill"></div></div>
+            <div class="videoMeta">
+              <span id="videoTimeText">00:00 / 00:45</span>
+              <span id="videoCueCount">0/0 cues</span>
+            </div>
+            <div class="miniGrid">
+              <button onclick="playDemoVideo()">เล่นเดโม</button>
+              <button class="ghost" onclick="speakDemoCue()">พูด cue ปัจจุบัน</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="videoCueList" id="videoCueList"></div>
+
+        <details style="margin-top:12px">
+          <summary>Workflow สำหรับผลิตวิดีโอเดโมจริง</summary>
+          <ol class="productionSteps">
+            <li><strong>บันทึกวิดีโอ:</strong> ถ่ายฟรีตบอร์ดมุมบนหรือมุมเฉียง 45-60 วินาที เล่น A Minor Position 1 ช้า ๆ ขึ้นและลง</li>
+            <li><strong>เพิ่ม voice guide:</strong> ใช้ DAW หรือ CapCut ใส่เสียง AI/เสียงพูด เช่น "เริ่มจากสาย E ต่ำ", "จบที่ root note A"</li>
+            <li><strong>ซิงก์ cue:</strong> ใช้ไฟล์ <span class="filePath">a-minor-p1-slow-demo.vtt</span> หรือ cue list ในหน้านี้ให้ตรงกับ timestamp ของวิดีโอ</li>
+            <li><strong>Upload:</strong> export เป็น MP4 H.264 แล้วเก็บไว้ใน <span class="filePath">guitar-learning/videos/</span> หรือวาง Cloud URL ในช่องด้านบน</li>
+          </ol>
+        </details>
       </section>
 
       <section class="card">
@@ -287,9 +360,23 @@ const SEGMENTS = [
   {id:"apply", label:"Application", full:300, demo:30}
 ];
 
+const DEMO_VIDEO = {
+  localSrc: "videos/a-minor-p1-slow-demo.mp4",
+  duration: 45,
+  cues: [
+    {time:0, end:5, label:"SETUP", text:"A Minor Position 1: วางมือที่ fret 0-3", hint:"ดูตำแหน่ง root note A ก่อนเริ่มเล่น", speech:"เตรียมเล่น เอ ไมเนอร์ position หนึ่ง วางมือที่เฟร็ต ศูนย์ ถึง สาม"},
+    {time:5, end:12, label:"LOW STRINGS", text:"เริ่มจากสาย E ต่ำ แล้วขึ้นไปสาย A", hint:"เล่นช้ามาก ทุกโน้ตต้องดังเท่ากัน", speech:"เริ่มจากสายอีต่ำ แล้วขึ้นไปสายเอ เล่นช้ามาก ให้เสียงทุกโน้ตเท่ากัน"},
+    {time:12, end:20, label:"MIDDLE STRINGS", text:"ต่อด้วยสาย D และ G มองหา root note A", hint:"เจอ A ให้พักหายใจสั้น ๆ และจำตำแหน่งไว้", speech:"ต่อด้วยสายดี และสายจี มองหารูทโน้ต เอ ทุกครั้งที่เจอ ให้จำตำแหน่งไว้"},
+    {time:20, end:28, label:"HIGH STRINGS", text:"ขึ้นสาย B และ e เล็ก อย่าเร่งจังหวะ", hint:"นิ้วซ้ายแตะใกล้เฟร็ต เสียงจะสะอาดกว่า", speech:"ขึ้นสายบี และอีเล็ก อย่าเร่งจังหวะ แตะนิ้วใกล้เฟร็ตเพื่อให้เสียงสะอาด"},
+    {time:28, end:37, label:"DESCEND", text:"ย้อนกลับลงมาทีละสายด้วย alternate picking", hint:"ดีดลง-ขึ้นสม่ำเสมอ และอย่าให้มือขวาเกร็ง", speech:"ย้อนกลับลงมาทีละสาย ใช้ดีดลงขึ้นอย่างสม่ำเสมอ อย่าให้มือขวาเกร็ง"},
+    {time:37, end:45, label:"RESOLVE", text:"จบ phrase ที่ root note A ให้เสียงนิ่ง", hint:"หยุดบน A แล้วฟังความรู้สึกกลับบ้านของ scale", speech:"จบเฟรสที่รูทโน้ต เอ ให้เสียงนิ่ง แล้วฟังความรู้สึกกลับบ้านของสเกล"}
+  ]
+};
+
 let PLAN = buildPlan();
 let voices = [];
 let player = {running:false, paused:false, elapsed:0, lastTick:0, tickTimer:null, currentSegment:"ready", spoken:{}};
+let videoDemo = {activeIndex:-1, spoken:{}};
 let audioCtx = null;
 let metroTimer = null;
 let beatCount = 0;
@@ -309,6 +396,7 @@ function init(){
   loadAudioSettings();
   loadVoices();
   if("speechSynthesis" in window){ window.speechSynthesis.onvoiceschanged = loadVoices; }
+  initVideoDemo();
   goTo(1,1);
 }
 
@@ -551,8 +639,149 @@ function renderLinks(day,bpm){
   $("linkBox").innerHTML = links.map(l => `<a href="${l[1]}" target="_blank" rel="noopener">${l[0]}</a>`).join("");
 }
 
+function initVideoDemo(){
+  const video = $("demoVideo");
+  if(!video) return;
+  renderVideoCueList();
+  video.addEventListener("loadedmetadata", () => {
+    $("videoMissing").classList.remove("show");
+    setVideoStatus("พร้อมเล่น", "green");
+    updateVideoCue(false);
+  });
+  video.addEventListener("canplay", () => {
+    $("videoMissing").classList.remove("show");
+    setVideoStatus("พร้อมเล่น", "green");
+  });
+  video.addEventListener("error", () => {
+    $("videoMissing").classList.add("show");
+    setVideoStatus("รอไฟล์วิดีโอ", "orange");
+    updateVideoCue(false);
+  });
+  video.addEventListener("play", () => {
+    if(player.running) stopPlayer(true);
+    if(video.currentTime < .25) videoDemo.spoken = {};
+    unlockAudio();
+    updateVideoCue(true);
+  });
+  video.addEventListener("pause", () => {
+    if(window.speechSynthesis) speechSynthesis.cancel();
+  });
+  video.addEventListener("seeked", () => {
+    videoDemo.spoken = {};
+    updateVideoCue(!video.paused);
+  });
+  video.addEventListener("timeupdate", () => updateVideoCue(!video.paused));
+  video.addEventListener("ended", () => {
+    setVideoStatus("จบเดโม", "dark");
+    if(window.speechSynthesis) speechSynthesis.cancel();
+  });
+
+  const savedSrc = localStorage.getItem("guitar_demo_video_src") || "";
+  $("videoUrlInput").value = savedSrc;
+  setDemoVideoSource(savedSrc || DEMO_VIDEO.localSrc, false);
+  updateVideoCue(false);
+}
+
+function renderVideoCueList(){
+  const box = $("videoCueList");
+  if(!box) return;
+  box.innerHTML = DEMO_VIDEO.cues.map((cue, i) => (
+    `<div class="videoCueItem" data-cue-index="${i}">
+      <div><strong>${fmt(cue.time)}</strong><small>${fmt(cue.end)}</small></div>
+      <div><strong>${cue.label}</strong><small>${cue.text}</small></div>
+    </div>`
+  )).join("");
+  $("videoCueCount").textContent = `1/${DEMO_VIDEO.cues.length} cues`;
+}
+
+function setDemoVideoSource(src, remember=true){
+  const video = $("demoVideo");
+  const source = $("demoVideoSource");
+  const cleanSrc = (src || DEMO_VIDEO.localSrc).trim() || DEMO_VIDEO.localSrc;
+  source.src = cleanSrc;
+  videoDemo.activeIndex = -1;
+  videoDemo.spoken = {};
+  video.load();
+  setVideoStatus(cleanSrc === DEMO_VIDEO.localSrc ? "กำลังหา /videos" : "กำลังโหลด", "orange");
+  $("videoMissing").classList.add("show");
+  if(remember){
+    if(cleanSrc === DEMO_VIDEO.localSrc) localStorage.removeItem("guitar_demo_video_src");
+    else localStorage.setItem("guitar_demo_video_src", cleanSrc);
+  }
+  updateVideoCue(false);
+}
+
+function loadDemoVideoSource(){
+  setDemoVideoSource($("videoUrlInput").value);
+}
+
+async function playDemoVideo(){
+  const video = $("demoVideo");
+  try{
+    if(player.running) stopPlayer(true);
+    unlockAudio();
+    await video.play();
+  }catch(e){
+    setVideoStatus("กด Play ที่วิดีโอ", "orange");
+  }
+}
+
+function pauseDemoVideo(cancelSpeech=true){
+  const video = $("demoVideo");
+  if(video && !video.paused) video.pause();
+  if(cancelSpeech && window.speechSynthesis) speechSynthesis.cancel();
+}
+
+function updateVideoCue(allowSpeech){
+  const video = $("demoVideo");
+  if(!video) return;
+  const duration = Number.isFinite(video.duration) ? video.duration : DEMO_VIDEO.duration;
+  const time = Math.min(video.currentTime || 0, duration);
+  const index = demoCueIndexAt(time);
+  const cue = DEMO_VIDEO.cues[index];
+  const pct = duration ? Math.min(100, (time / duration) * 100) : 0;
+  $("videoProgressFill").style.width = pct.toFixed(1) + "%";
+  $("videoTimeText").textContent = `${fmt(time)} / ${fmt(duration)}`;
+  $("videoCueCount").textContent = `${index + 1}/${DEMO_VIDEO.cues.length} cues`;
+
+  if(index !== videoDemo.activeIndex){
+    videoDemo.activeIndex = index;
+    $("videoCueLabel").textContent = cue.label;
+    $("videoCueText").textContent = cue.text;
+    $("videoCueHint").textContent = cue.hint;
+    highlightVideoCue(index);
+  }
+  if(allowSpeech && !videoDemo.spoken[index]){
+    videoDemo.spoken[index] = true;
+    speak(cue.speech);
+  }
+}
+
+function demoCueIndexAt(time){
+  let active = 0;
+  DEMO_VIDEO.cues.forEach((cue, i) => { if(time >= cue.time) active = i; });
+  return active;
+}
+
+function highlightVideoCue(index){
+  document.querySelectorAll(".videoCueItem").forEach((item, i) => item.classList.toggle("active", i === index));
+}
+
+function speakDemoCue(){
+  const index = videoDemo.activeIndex >= 0 ? videoDemo.activeIndex : demoCueIndexAt($("demoVideo").currentTime || 0);
+  const cue = DEMO_VIDEO.cues[index];
+  speak(cue.speech || cue.text);
+}
+
+function setVideoStatus(text, tone){
+  const status = $("videoStatus");
+  status.textContent = text;
+  status.className = "badge" + (tone ? " " + tone : "");
+}
+
 function startPlayer(){
   stopPlayer(false);
+  pauseDemoVideo(false);
   unlockAudio();
   player.running = true; player.paused = false; player.elapsed = 0; player.lastTick = performance.now(); player.spoken = {};
   setButtons("play");
