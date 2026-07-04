@@ -175,7 +175,7 @@
                 <track src="videos/a-minor-p1-slow-demo.vtt" kind="subtitles" srclang="th" label="Thai cues" default />
                 Browser นี้ไม่รองรับ video player
               </video>
-              <div class="videoMissing show" id="videoMissing">
+              <div class="videoMissing" id="videoMissing">
                 <div>
                   <strong>ยังไม่พบไฟล์วิดีโอเดโม</strong>
                   <div>วางไฟล์ MP4 ที่ <span class="filePath">guitar-learning/videos/a-minor-p1-slow-demo.mp4</span> หรือใส่ Cloud URL ด้านขวา</div>
@@ -652,9 +652,14 @@ function initVideoDemo(){
     $("videoMissing").classList.remove("show");
     setVideoStatus("พร้อมเล่น", "green");
   });
+  video.addEventListener("loadeddata", () => {
+    $("videoMissing").classList.remove("show");
+    setVideoStatus("พร้อมเล่น", "green");
+  });
   video.addEventListener("error", () => {
+    const mediaError = video.error ? ` (${video.error.code})` : "";
     $("videoMissing").classList.add("show");
-    setVideoStatus("รอไฟล์วิดีโอ", "orange");
+    setVideoStatus("โหลดวิดีโอไม่ได้" + mediaError, "red");
     updateVideoCue(false);
   });
   video.addEventListener("play", () => {
@@ -676,9 +681,8 @@ function initVideoDemo(){
     if(window.speechSynthesis) speechSynthesis.cancel();
   });
 
-  const savedSrc = localStorage.getItem("guitar_demo_video_src") || "";
-  $("videoUrlInput").value = savedSrc;
-  setDemoVideoSource(savedSrc || DEMO_VIDEO.localSrc, false);
+  $("videoUrlInput").value = "";
+  setDemoVideoSource(DEMO_VIDEO.localSrc, false);
   updateVideoCue(false);
 }
 
@@ -698,17 +702,30 @@ function setDemoVideoSource(src, remember=true){
   const video = $("demoVideo");
   const source = $("demoVideoSource");
   const cleanSrc = (src || DEMO_VIDEO.localSrc).trim() || DEMO_VIDEO.localSrc;
-  source.src = cleanSrc;
+  source.src = resolveDemoVideoSrc(cleanSrc);
   videoDemo.activeIndex = -1;
   videoDemo.spoken = {};
+  $("videoMissing").classList.remove("show");
   video.load();
   setVideoStatus(cleanSrc === DEMO_VIDEO.localSrc ? "กำลังหา /videos" : "กำลังโหลด", "orange");
-  $("videoMissing").classList.add("show");
   if(remember){
     if(cleanSrc === DEMO_VIDEO.localSrc) localStorage.removeItem("guitar_demo_video_src");
     else localStorage.setItem("guitar_demo_video_src", cleanSrc);
   }
   updateVideoCue(false);
+}
+
+function resolveDemoVideoSrc(src){
+  if(/^https?:|^file:|^blob:|^data:/i.test(src)) return src;
+  const pageUrl = new URL(window.location.href);
+  const cleanHref = pageUrl.href.split("#")[0].split("?")[0];
+  const lastPathPart = pageUrl.pathname.split("/").pop() || "";
+  const baseHref = cleanHref.endsWith("/") || !lastPathPart.includes(".")
+    ? cleanHref.replace(/\/?$/, "/")
+    : cleanHref.replace(/[^/]*$/, "");
+  const resolved = new URL(src, baseHref);
+  if(resolved.protocol === "http:" || resolved.protocol === "https:") resolved.searchParams.set("v", "20260705");
+  return resolved.href;
 }
 
 function loadDemoVideoSource(){
