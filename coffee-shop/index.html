@@ -802,6 +802,112 @@
       line-height: 1.4;
     }
 
+    .promptpay-box {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border-soft);
+    }
+
+    .promptpay-status {
+      display: grid;
+      grid-template-columns: 124px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .promptpay-qr {
+      width: 124px;
+      aspect-ratio: 1;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      background: #FFFFFF;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      overflow: hidden;
+    }
+
+    .promptpay-qr img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .promptpay-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 3px;
+    }
+
+    .promptpay-help {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .promptpay-edit {
+      margin-top: 8px;
+      padding: 5px 10px;
+      font-size: 11px;
+    }
+
+    .promptpay-settings {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .promptpay-settings[hidden],
+    .promptpay-payload[hidden],
+    .promptpay-edit[hidden] {
+      display: none;
+    }
+
+    .promptpay-grid {
+      display: grid;
+      grid-template-columns: minmax(105px, 0.55fr) minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    .promptpay-select,
+    .promptpay-input {
+      width: 100%;
+      min-height: 34px;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      background: var(--bg-panel);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      font-size: 12px;
+      padding: 6px 9px;
+    }
+
+    .promptpay-save-row {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .promptpay-save-row .btn-outline {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .promptpay-payload {
+      margin-top: 8px;
+      padding: 7px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-panel-soft);
+      color: var(--text-muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+      line-height: 1.35;
+      word-break: break-all;
+    }
+
     .btn-outline {
       border-radius: 999px;
       border: 1px solid var(--border-soft);
@@ -898,6 +1004,14 @@
       }
       .payment-actions {
         grid-template-columns: 1fr;
+      }
+      .promptpay-status,
+      .promptpay-grid {
+        grid-template-columns: 1fr;
+      }
+      .promptpay-qr {
+        width: min(220px, 100%);
+        justify-self: center;
       }
     }
   </style>
@@ -1087,6 +1201,30 @@
           <span>เวลา</span>
           <span id="receiptTime">-</span>
         </div>
+        <div class="promptpay-box" id="promptPayBox" hidden>
+          <div class="promptpay-status">
+            <div class="promptpay-qr" id="promptPayQr">PromptPay</div>
+            <div>
+              <div class="promptpay-title">PromptPay QR</div>
+              <div class="promptpay-help" id="promptPayHelp">ตั้งค่าผู้รับเงินก่อนสร้าง QR</div>
+              <button class="btn-outline promptpay-edit" id="promptPayEditBtn" type="button" hidden>แก้ไขผู้รับเงิน</button>
+            </div>
+          </div>
+          <div class="promptpay-settings" id="promptPaySettings">
+            <div class="promptpay-grid">
+              <select class="promptpay-select" id="promptPayType" aria-label="ประเภท PromptPay">
+                <option value="mobile">เบอร์มือถือ</option>
+                <option value="national_id">เลขบัตรประชาชน</option>
+                <option value="ewallet">E-Wallet ID</option>
+              </select>
+              <input class="promptpay-input" id="promptPayTarget" type="text" inputmode="numeric" autocomplete="off" placeholder="0812345678" aria-label="PromptPay ID" />
+            </div>
+            <div class="promptpay-save-row">
+              <button class="btn-outline" id="promptPaySaveBtn" type="button">บันทึก PromptPay</button>
+            </div>
+          </div>
+          <div class="promptpay-payload" id="promptPayPayload" hidden></div>
+        </div>
         <div class="receipt-note">
           ขอให้มีเวลาพักผ่อนเล็ก ๆ กับกาแฟแก้วนี้นะ ☕
         </div>
@@ -1102,6 +1240,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <script>
   /********** CATEGORY (คงเดิม) **********/
   const categories = [
@@ -1201,7 +1340,31 @@
   let lastPaymentInfo = { method: null, total: 0 };
   let lastReceipt = null;
   let paymentModalMode = "checkout";
+  let activePromptPayReceipt = null;
   let customerNote = "";
+
+  const PROMPTPAY_STORAGE_KEY = "niksen_promptpay_config_v1";
+  const PROMPTPAY_AID = "A000000677010111";
+  const PROMPTPAY_MERCHANT_NAME = "NIKSEN AND CO";
+  const PROMPTPAY_MERCHANT_CITY = "BANGKOK";
+  const promptPayTargetTypes = {
+    mobile: {
+      tag: "01",
+      placeholder: "0812345678",
+      hint: "เบอร์มือถือไทย 10 หลัก เช่น 0812345678"
+    },
+    national_id: {
+      tag: "02",
+      placeholder: "1234567890123",
+      hint: "เลขบัตรประชาชนหรือเลขนิติบุคคล 13 หลัก"
+    },
+    ewallet: {
+      tag: "03",
+      placeholder: "123456789012345",
+      hint: "E-Wallet ID 15 หลัก"
+    }
+  };
+  let promptPayConfig = loadPromptPayConfig();
 
   let modalState = {
     product: null,
@@ -1253,6 +1416,15 @@
   const receiptTotalEl = document.getElementById("receiptTotal");
   const receiptTimeEl = document.getElementById("receiptTime");
   const paymentConfirmTotalEl = document.getElementById("paymentConfirmTotal");
+  const promptPayBoxEl = document.getElementById("promptPayBox");
+  const promptPayQrEl = document.getElementById("promptPayQr");
+  const promptPayHelpEl = document.getElementById("promptPayHelp");
+  const promptPayEditBtn = document.getElementById("promptPayEditBtn");
+  const promptPaySettingsEl = document.getElementById("promptPaySettings");
+  const promptPayTypeEl = document.getElementById("promptPayType");
+  const promptPayTargetEl = document.getElementById("promptPayTarget");
+  const promptPaySaveBtn = document.getElementById("promptPaySaveBtn");
+  const promptPayPayloadEl = document.getElementById("promptPayPayload");
 
   /********** INIT **********/
   async function init() {
@@ -1271,6 +1443,7 @@
     setupKeyboardShortcuts();
     loadLastReceipt();
     resetOrder();
+    setupPromptPaySettings();
     setupPaymentModal();
   }
 
@@ -1589,6 +1762,283 @@ function renderProductGrid() {
     });
   }
 
+  /********** PROMPTPAY QR **********/
+  function getPromptPayTypeInfo(type) {
+    return promptPayTargetTypes[type] || promptPayTargetTypes.mobile;
+  }
+
+  function loadPromptPayConfig() {
+    try {
+      const raw = window.localStorage.getItem(PROMPTPAY_STORAGE_KEY);
+      if (!raw) return { type: "mobile", target: "" };
+      const parsed = JSON.parse(raw);
+      const type = promptPayTargetTypes[parsed.type] ? parsed.type : "mobile";
+      return {
+        type,
+        target: String(parsed.target || "")
+      };
+    } catch (err) {
+      console.warn(err);
+      return { type: "mobile", target: "" };
+    }
+  }
+
+  function savePromptPayConfig(config) {
+    promptPayConfig = config;
+    try {
+      window.localStorage.setItem(PROMPTPAY_STORAGE_KEY, JSON.stringify(config));
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  function syncPromptPayForm() {
+    if (!promptPayTypeEl || !promptPayTargetEl) return;
+    promptPayTypeEl.value = promptPayConfig.type || "mobile";
+    promptPayTargetEl.value = promptPayConfig.target || "";
+    updatePromptPayPlaceholder();
+  }
+
+  function updatePromptPayPlaceholder() {
+    if (!promptPayTypeEl || !promptPayTargetEl) return;
+    const typeInfo = getPromptPayTypeInfo(promptPayTypeEl.value);
+    promptPayTargetEl.placeholder = typeInfo.placeholder;
+    if (!promptPaySettingsEl.hidden) {
+      promptPayHelpEl.textContent = typeInfo.hint;
+    }
+  }
+
+  function setupPromptPaySettings() {
+    if (!promptPayBoxEl) return;
+    syncPromptPayForm();
+
+    promptPayTypeEl.addEventListener("change", updatePromptPayPlaceholder);
+
+    promptPayEditBtn.addEventListener("click", () => {
+      syncPromptPayForm();
+      promptPaySettingsEl.hidden = false;
+      promptPayEditBtn.hidden = true;
+      updatePromptPayPlaceholder();
+      promptPayTargetEl.focus();
+    });
+
+    promptPaySaveBtn.addEventListener("click", () => {
+      const config = {
+        type: promptPayTypeEl.value,
+        target: promptPayTargetEl.value.trim()
+      };
+
+      try {
+        normalizePromptPayTarget(config.type, config.target);
+        savePromptPayConfig(config);
+
+        if (activePromptPayReceipt && activePromptPayReceipt.method === "qr") {
+          delete activePromptPayReceipt.promptPayPayload;
+          renderPromptPayPayment(activePromptPayReceipt);
+        } else {
+          promptPaySettingsEl.hidden = true;
+          promptPayEditBtn.hidden = false;
+          promptPayHelpEl.textContent = "บันทึกผู้รับ PromptPay แล้ว";
+        }
+      } catch (err) {
+        promptPayHelpEl.textContent = err.message || "ตรวจสอบข้อมูล PromptPay อีกครั้ง";
+        promptPaySettingsEl.hidden = false;
+        promptPayEditBtn.hidden = true;
+      }
+    });
+  }
+
+  function resetPromptPayBox() {
+    if (!promptPayBoxEl) return;
+    activePromptPayReceipt = null;
+    promptPayBoxEl.hidden = true;
+    promptPayQrEl.textContent = "PromptPay";
+    promptPayPayloadEl.hidden = true;
+    promptPayPayloadEl.textContent = "";
+    promptPaySettingsEl.hidden = false;
+    promptPayEditBtn.hidden = true;
+  }
+
+  function showPromptPaySetup(message) {
+    promptPayBoxEl.hidden = false;
+    promptPayQrEl.textContent = "PromptPay";
+    promptPayPayloadEl.hidden = true;
+    promptPayPayloadEl.textContent = "";
+    promptPaySettingsEl.hidden = false;
+    promptPayEditBtn.hidden = true;
+    syncPromptPayForm();
+    promptPayHelpEl.textContent = message || getPromptPayTypeInfo(promptPayTypeEl.value).hint;
+  }
+
+  function renderPromptPayPayment(receipt) {
+    if (!promptPayBoxEl) return;
+
+    activePromptPayReceipt = receipt;
+    promptPayBoxEl.hidden = false;
+    promptPayQrEl.textContent = "PromptPay";
+    promptPayPayloadEl.hidden = true;
+    promptPayPayloadEl.textContent = "";
+    syncPromptPayForm();
+
+    if (receipt.promptPayPayload) {
+      renderPromptPayPayload(receipt.promptPayPayload, receipt, true);
+      return;
+    }
+
+    if (!promptPayConfig.target) {
+      showPromptPaySetup("ตั้งค่าผู้รับเงินก่อนสร้าง QR สำหรับบิลนี้");
+      return;
+    }
+
+    try {
+      const payload = buildPromptPayPayload({
+        type: promptPayConfig.type,
+        target: promptPayConfig.target,
+        amount: Number(receipt.total || 0)
+      });
+      receipt.promptPayPayload = payload;
+      receipt.promptPayTargetType = promptPayConfig.type;
+      receipt.promptPayTarget = maskPromptPayTarget(promptPayConfig.type, promptPayConfig.target);
+      renderPromptPayPayload(payload, receipt, false);
+    } catch (err) {
+      showPromptPaySetup(err.message || "สร้าง PromptPay QR ไม่สำเร็จ");
+    }
+  }
+
+  function renderPromptPayPayload(payload, receipt, fromReceipt) {
+    const rendered = drawPromptPayQr(payload);
+    promptPayPayloadEl.textContent = payload;
+    promptPayPayloadEl.hidden = false;
+    promptPaySettingsEl.hidden = true;
+    promptPayEditBtn.hidden = paymentModalMode === "latest" && fromReceipt;
+
+    const totalText = `฿${Number(receipt.total || 0).toFixed(2)}`;
+    const targetText = receipt.promptPayTarget ? ` · ผู้รับ ${receipt.promptPayTarget}` : "";
+    const qrText = fromReceipt && paymentModalMode === "latest" ? "QR จากใบเสร็จนี้" : "สแกนเพื่อชำระ";
+    promptPayHelpEl.textContent = rendered
+      ? `${qrText} ${totalText}${targetText}`
+      : `โหลดไลบรารี QR ไม่สำเร็จ ใช้ payload ด้านล่างแทน ${totalText}`;
+  }
+
+  function drawPromptPayQr(payload) {
+    promptPayQrEl.innerHTML = "";
+
+    if (typeof window.qrcode !== "function") {
+      promptPayQrEl.textContent = "QR library ไม่พร้อม";
+      return false;
+    }
+
+    try {
+      const qr = window.qrcode(0, "M");
+      qr.addData(payload);
+      qr.make();
+      promptPayQrEl.innerHTML = qr.createImgTag(5, 6);
+      return true;
+    } catch (err) {
+      console.warn(err);
+      promptPayQrEl.textContent = "สร้าง QR ไม่สำเร็จ";
+      return false;
+    }
+  }
+
+  function buildPromptPayPayload({ type, target, amount }) {
+    const normalizedTarget = normalizePromptPayTarget(type, target);
+    const amountNumber = Number(amount);
+
+    if (!Number.isFinite(amountNumber) || amountNumber <= 0) {
+      throw new Error("ยอดชำระต้องมากกว่า 0 บาท");
+    }
+
+    const typeInfo = getPromptPayTypeInfo(type);
+    const merchantAccountInfo =
+      emvTlv("00", PROMPTPAY_AID) +
+      emvTlv(typeInfo.tag, normalizedTarget);
+
+    const payloadWithoutCrc = [
+      emvTlv("00", "01"),
+      emvTlv("01", "12"),
+      emvTlv("29", merchantAccountInfo),
+      emvTlv("52", "0000"),
+      emvTlv("53", "764"),
+      emvTlv("54", amountNumber.toFixed(2)),
+      emvTlv("58", "TH"),
+      emvTlv("59", sanitizeMerchantText(PROMPTPAY_MERCHANT_NAME, 25, "NIKSEN")),
+      emvTlv("60", sanitizeMerchantText(PROMPTPAY_MERCHANT_CITY, 15, "BANGKOK"))
+    ].join("") + "6304";
+
+    return `${payloadWithoutCrc}${crc16CcittFalse(payloadWithoutCrc)}`;
+  }
+
+  function emvTlv(id, value) {
+    const text = String(value);
+    return `${id}${String(text.length).padStart(2, "0")}${text}`;
+  }
+
+  function crc16CcittFalse(input) {
+    let crc = 0xFFFF;
+
+    for (let i = 0; i < input.length; i++) {
+      crc ^= input.charCodeAt(i) << 8;
+      for (let bit = 0; bit < 8; bit++) {
+        crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
+        crc &= 0xFFFF;
+      }
+    }
+
+    return crc.toString(16).toUpperCase().padStart(4, "0");
+  }
+
+  function normalizePromptPayTarget(type, rawTarget) {
+    const digits = String(rawTarget || "").replace(/\D/g, "");
+
+    if (type === "mobile") {
+      if (/^0066\d{9}$/.test(digits)) return digits;
+      if (/^66\d{9}$/.test(digits)) return `00${digits}`;
+      if (/^0\d{9}$/.test(digits)) return `0066${digits.slice(1)}`;
+      throw new Error("เบอร์ PromptPay ต้องเป็นเบอร์มือถือไทย 10 หลัก");
+    }
+
+    if (type === "national_id") {
+      if (/^\d{13}$/.test(digits)) return digits;
+      throw new Error("เลขบัตรประชาชน/นิติบุคคลต้องมี 13 หลัก");
+    }
+
+    if (type === "ewallet") {
+      if (/^\d{15}$/.test(digits)) return digits;
+      throw new Error("E-Wallet ID ต้องมี 15 หลัก");
+    }
+
+    throw new Error("ประเภท PromptPay ไม่ถูกต้อง");
+  }
+
+  function maskPromptPayTarget(type, target) {
+    const digits = String(target || "").replace(/\D/g, "");
+
+    if (type === "mobile" && digits.length >= 10) {
+      return `${digits.slice(0, 3)}***${digits.slice(-3)}`;
+    }
+
+    if (type === "national_id" && digits.length === 13) {
+      return `${digits.slice(0, 1)}-****-****-${digits.slice(-3)}`;
+    }
+
+    if (digits.length > 4) {
+      return `***${digits.slice(-4)}`;
+    }
+
+    return "PromptPay";
+  }
+
+  function sanitizeMerchantText(value, maxLength, fallback) {
+    const text = String(value || "")
+      .replace(/[^\x20-\x7E]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toUpperCase()
+      .slice(0, maxLength);
+    return text || fallback;
+  }
+
   /********** PAYMENT **********/
   function attachPaymentEvents() {
     document.querySelectorAll(".btn-pay").forEach(btn => {
@@ -1640,6 +2090,12 @@ function renderProductGrid() {
     receiptTimeEl.textContent = receipt.closedAt || "-";
     paymentConfirmTotalEl.textContent = `฿${Number(receipt.total || 0).toFixed(2)}`;
 
+    if (receipt.method === "qr") {
+      renderPromptPayPayment(receipt);
+    } else {
+      resetPromptPayBox();
+    }
+
     paymentModal.classList.add("active");
   }
 
@@ -1685,6 +2141,12 @@ function renderProductGrid() {
     });
 
     paymentModalConfirmBtn.addEventListener("click", () => {
+      if (paymentModalMode === "checkout" && lastPaymentInfo?.method === "qr" && !lastPaymentInfo.promptPayPayload) {
+        renderPromptPayPayment(lastPaymentInfo);
+        alert("ตั้งค่า PromptPay และสร้าง QR ก่อนปิดบิล");
+        return;
+      }
+
       closePaymentModal();
       if (paymentModalMode === "checkout") {
         saveLastReceipt(lastPaymentInfo);
