@@ -88,9 +88,9 @@
     .cueCard{border-radius:22px;padding:18px;background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.10)}
     .cueLabel{font-size:13px;color:#bfdbfe;font-weight:900;text-transform:uppercase;letter-spacing:.04em}.cueText{font-size:34px;font-weight:950;line-height:1.25;margin-top:6px;overflow-wrap:anywhere}.cueHint{font-size:15px;color:#e2e8f0;margin-top:8px}
     .progressTrack{height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}.progressFill{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#facc15,#ea580c);transition:width .25s linear}
-    .stageActions{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:14px}
+    .stageActions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
     .stageActions button,.miniGrid button,.videoSourceTools button{min-height:48px}
-    @media(max-width:650px){.stageActions{grid-template-columns:1fr 1fr}.stageActions button:last-child{grid-column:1/-1}}
+    @media(max-width:650px){.stageActions{grid-template-columns:1fr 1fr}}
     .beatRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.beatDot{width:18px;height:18px;border-radius:999px;background:#334155;box-shadow:0 0 0 0 rgba(250,204,21,.5)}.beatDot.active{background:#facc15;box-shadow:0 0 0 10px rgba(250,204,21,0);animation:pulse .28s ease-out}@keyframes pulse{from{box-shadow:0 0 0 0 rgba(250,204,21,.7)}to{box-shadow:0 0 0 14px rgba(250,204,21,0)}}
     .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}@media(max-width:650px){.timeline{grid-template-columns:1fr 1fr}}
     .tl{padding:10px;border-radius:16px;background:#f8fafc;border:1px solid var(--line)}.tl.active{background:#eff6ff;border-color:#93c5fd}.tl strong{display:block}.tl small{color:var(--muted)}
@@ -101,7 +101,7 @@
     .exercise{border-left:5px solid var(--primary);background:#f8fafc;border-radius:16px;padding:12px;margin-bottom:10px;overflow-wrap:anywhere}.exercise.orange{border-left-color:var(--orange)}.exercise.green{border-left-color:var(--green)}.exercise.red{border-left-color:var(--red)}
     .checklist{display:grid;gap:9px}.checkItem{display:flex;gap:10px;align-items:flex-start;padding:10px;background:#fafafa;border:1px solid var(--line);border-radius:14px}.checkItem input{width:auto;transform:scale(1.18);margin-top:5px}.localProgress{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden}.localFill{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#2563eb);transition:width .2s}
     .links{display:grid;gap:8px}.links a{text-decoration:none;background:#eff6ff;color:#1d4ed8;border-radius:14px;padding:10px 12px;font-weight:800;display:block;overflow-wrap:anywhere}.links a:hover{text-decoration:underline}
-    textarea{min-height:120px;resize:vertical}.miniGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:520px){.miniGrid{grid-template-columns:1fr}}
+    textarea{min-height:120px;resize:vertical}.miniGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.miniGrid.singleAction{grid-template-columns:1fr}@media(max-width:520px){.miniGrid{grid-template-columns:1fr}}
     .videoDemoHead{align-items:flex-start;margin-bottom:12px}.videoDemoHead h2{margin-bottom:4px}.videoDemoHead code,.filePath{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#e5e7eb;color:#111827;border-radius:8px;padding:2px 6px;overflow-wrap:anywhere;word-break:break-word}
     .videoDemoGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:14px;align-items:start}
     @media(max-width:860px){.videoDemoGrid{grid-template-columns:1fr}}
@@ -131,7 +131,7 @@
       .hero h1{font-size:34px}
       .videoDemoGrid{grid-template-columns:1fr}
       .videoFrame{aspect-ratio:16/9}
-      .stageActions{grid-template-columns:repeat(5,minmax(0,1fr))}
+      .stageActions{grid-template-columns:repeat(4,minmax(0,1fr))}
     }
     @media(max-width:980px) and (min-width:761px){
       .app{max-width:820px}
@@ -166,7 +166,6 @@
       .cueCard{border-radius:18px;padding:14px}
       .cueText{font-size:25px}
       .stageActions{grid-template-columns:1fr 1fr;gap:8px}
-      .stageActions button:last-child{grid-column:1/-1}
       .videoFrame{border-radius:14px}
       .videoCueBox{border-radius:16px;padding:12px}
       .demoCueText{font-size:22px}
@@ -206,7 +205,7 @@
 
   <section class="hero">
     <h1>🎸 Guitar Learning — 12 Weeks / 84 Days Training Player</h1>
-    <p>หน้าเดียวจบสำหรับฝึกตามแบบวิดีโอจำลอง: มีเสียงพูดนำฝึก, metronome, TAB, fretboard, checklist และ note รายวัน</p>
+    <p>หน้าเดียวจบสำหรับฝึกตามแบบวิดีโอจำลอง: มี metronome, TAB, fretboard, checklist และ note รายวัน</p>
   </section>
 
   <section class="topbar">
@@ -237,8 +236,8 @@
         <div class="stageBody">
           <div class="cueCard">
             <div class="cueLabel" id="cueLabel">READY</div>
-            <div class="cueText" id="cueText">กด Start เพื่อเริ่มฝึกตามเสียงนำ</div>
-            <div class="cueHint" id="cueHint">ระบบจะพูด cue แต่ละช่วง และ metronome จะเริ่มหลังคุณกดปุ่ม</div>
+            <div class="cueText" id="cueText">กด Start เพื่อเริ่มฝึก</div>
+            <div class="cueHint" id="cueHint">ดู cue บนหน้าจอและเล่นตาม metronome หลังคุณกดปุ่ม</div>
           </div>
           <div class="progressTrack"><div class="progressFill" id="playerProgress"></div></div>
           <div class="beatRow">
@@ -250,7 +249,6 @@
             <button id="pauseBtn" class="orangeBtn" onclick="pausePlayer()" disabled>⏸ Pause</button>
             <button id="resumeBtn" class="greenBtn" onclick="resumePlayer()" disabled>⏵ Resume</button>
             <button id="stopBtn" class="danger" onclick="stopPlayer()" disabled>⏹ Stop</button>
-            <button class="ghost" onclick="speakCurrentCue()">🔊 พูดซ้ำ</button>
           </div>
         </div>
       </section>
@@ -289,15 +287,14 @@
           <div class="videoCueBox">
             <div class="demoCueLabel" id="videoCueLabel">READY</div>
             <div class="demoCueText" id="videoCueText">เตรียมเล่นเดโม A Minor Position 1 แบบช้า</div>
-            <div class="demoCueHint" id="videoCueHint">กด Play แล้ว cue ด้านล่างจะเปลี่ยนตามเวลา และ voice guide จะพูดตามจังหวะวิดีโอ</div>
+            <div class="demoCueHint" id="videoCueHint">กด Play แล้ว cue ด้านล่างจะเปลี่ยนตามเวลาโดยไม่มีเสียงพูดแทรก</div>
             <div class="videoProgressTrack"><div class="videoProgressFill" id="videoProgressFill"></div></div>
             <div class="videoMeta">
               <span id="videoTimeText">00:00 / 00:45</span>
               <span id="videoCueCount">0/0 cues</span>
             </div>
-            <div class="miniGrid">
+            <div class="miniGrid singleAction">
               <button id="demoPlayBtn" onclick="playDemoVideo()">เล่นเดโมวันนี้</button>
-              <button class="ghost" onclick="speakDemoCue()">พูด cue ปัจจุบัน</button>
             </div>
           </div>
         </div>
@@ -308,7 +305,7 @@
           <summary>Workflow สำหรับผลิตวิดีโอเดโมจริง</summary>
           <ol class="productionSteps">
             <li><strong>บันทึกวิดีโอ:</strong> ถ่ายฟรีตบอร์ดมุมบนหรือมุมเฉียง 45-60 วินาที เล่น A Minor Position 1 ช้า ๆ ขึ้นและลง</li>
-            <li><strong>เพิ่ม voice guide:</strong> ใช้ DAW หรือ CapCut ใส่เสียง AI/เสียงพูด เช่น "เริ่มจากสาย E ต่ำ", "จบที่ root note A"</li>
+            <li><strong>เพิ่ม cue text:</strong> ใช้ subtitle หรือ text overlay เช่น "เริ่มจากสาย E ต่ำ", "จบที่ root note A" โดยไม่ต้องใส่เสียงพูด</li>
             <li><strong>ซิงก์ cue:</strong> ใช้ไฟล์ <span class="filePath">a-minor-p1-slow-demo.vtt</span> หรือ cue list ในหน้านี้ให้ตรงกับ timestamp ของวิดีโอ</li>
             <li><strong>Upload:</strong> export เป็น MP4 H.264 แล้วเก็บไว้ใน <span class="filePath">guitar-learning/videos/</span> หรือวาง Cloud URL ในช่องด้านบน</li>
           </ol>
@@ -357,23 +354,13 @@
 
     <aside>
       <section class="card">
-        <h3>Audio Settings</h3>
-        <div class="miniGrid">
-          <label class="small">เสียงพูด
-            <select id="voiceSelect"></select>
-          </label>
-          <label class="small">ความเร็วเสียงพูด
-            <input id="speechRate" type="number" min="0.6" max="1.4" step="0.1" value="0.95" />
-          </label>
-          <label class="small">เปิดเสียงพูด
-            <select id="voiceOn"><option value="1">เปิด</option><option value="0">ปิด</option></select>
-          </label>
+        <h3>Metronome Settings</h3>
+        <div class="miniGrid singleAction">
           <label class="small">เปิด Metronome
             <select id="metroOn"><option value="1">เปิด</option><option value="0">ปิด</option></select>
           </label>
         </div>
-        <button class="secondary" onclick="testVoice()" style="margin-top:10px">ทดสอบเสียง</button>
-        <p class="small">หมายเหตุ: browser จะยอมให้เล่นเสียงหลังจากกดปุ่ม Start/Test เท่านั้น</p>
+        <p class="small">หมายเหตุ: เหลือเฉพาะ metronome และเสียงโน้ตในเดโม ไม่มีเสียงพูดนำฝึก</p>
       </section>
 
       <section class="card">
@@ -467,9 +454,8 @@ const DEMO_VIDEO = {
 };
 
 let PLAN = buildPlan();
-let voices = [];
-let player = {running:false, paused:false, elapsed:0, lastTick:0, tickTimer:null, currentSegment:"ready", spoken:{}};
-let videoDemo = {activeIndex:-1, noteIndex:-1, spoken:{}, cues:[], notes:[], hasEmbeddedNarration:false, raf:null};
+let player = {running:false, paused:false, elapsed:0, lastTick:0, tickTimer:null, currentSegment:"ready"};
+let videoDemo = {activeIndex:-1, noteIndex:-1, cues:[], notes:[], raf:null};
 let audioCtx = null;
 let metroTimer = null;
 let beatCount = 0;
@@ -481,14 +467,9 @@ init();
 function init(){
   for(let w=1; w<=CONFIG.totalWeeks; w++) $("weekSelect").appendChild(new Option("Week " + w, w));
   for(let d=1; d<=CONFIG.daysPerWeek; d++) $("daySelect").appendChild(new Option("Day " + d, d));
-  ["weekSelect","daySelect","modeSelect","bpmInput","voiceOn","metroOn"].forEach(id => $(id).addEventListener("change", () => { if(id === "bpmInput") saveBpm(); render(); }));
-  $("speechRate").addEventListener("change", saveAudioSettings);
-  $("voiceSelect").addEventListener("change", saveAudioSettings);
-  $("voiceOn").addEventListener("change", saveAudioSettings);
+  ["weekSelect","daySelect","modeSelect","bpmInput","metroOn"].forEach(id => $(id).addEventListener("change", () => { if(id === "bpmInput") saveBpm(); render(); }));
   $("metroOn").addEventListener("change", saveAudioSettings);
   loadAudioSettings();
-  loadVoices();
-  if("speechSynthesis" in window){ window.speechSynthesis.onvoiceschanged = loadVoices; }
   initVideoDemo();
   goTo(1,1);
 }
@@ -570,7 +551,7 @@ function render(){
   $("bpmInput").value = bpm;
   $("timerText").textContent = fmt(totalDuration());
   $("playerProgress").style.width = "0%";
-  setCue("READY","กด Start เพื่อเริ่มฝึกตามเสียงนำ", "ระบบจะพูด cue แต่ละช่วง และ metronome จะเริ่มหลังคุณกดปุ่ม");
+  setCue("READY","กด Start เพื่อเริ่มฝึก", "ดู cue บนหน้าจอและเล่นตาม metronome หลังคุณกดปุ่ม");
   renderScaleInfo(day);
   renderTimeline(null);
   renderTab(day);
@@ -742,7 +723,7 @@ function initVideoDemo(){
   video.addEventListener("loadedmetadata", () => {
     $("videoMissing").classList.remove("show");
     setVideoStatus("พร้อมเล่น", "green");
-    updateVideoCue(false);
+    updateVideoCue();
   });
   video.addEventListener("canplay", () => {
     $("videoMissing").classList.remove("show");
@@ -756,41 +737,38 @@ function initVideoDemo(){
     const mediaError = video.error ? ` (${video.error.code})` : "";
     $("videoMissing").classList.add("show");
     setVideoStatus("โหลดวิดีโอไม่ได้" + mediaError, "red");
-    updateVideoCue(false);
+    updateVideoCue();
   });
   video.addEventListener("play", () => {
     if(player.running) stopPlayer(true);
-    if(video.currentTime < .25){ videoDemo.spoken = {}; videoDemo.noteIndex = -1; }
+    if(video.currentTime < .25) videoDemo.noteIndex = -1;
     unlockAudio();
     $("demoPlayBtn").textContent = "พักเดโม";
     startDemoAnimation();
-    updateVideoCue(!videoDemo.hasEmbeddedNarration);
+    updateVideoCue();
   });
   video.addEventListener("pause", () => {
     $("demoPlayBtn").textContent = "เล่นเดโมวันนี้";
     stopDemoAnimation();
-    if(window.speechSynthesis) speechSynthesis.cancel();
   });
   video.addEventListener("seeked", () => {
-    videoDemo.spoken = {};
     videoDemo.noteIndex = -1;
     updateLessonDemoFrame(video.currentTime || 0, !video.paused);
-    updateVideoCue(!video.paused && !videoDemo.hasEmbeddedNarration);
+    updateVideoCue();
   });
   video.addEventListener("timeupdate", () => {
     updateLessonDemoFrame(video.currentTime || 0, !video.paused);
-    updateVideoCue(!video.paused && !videoDemo.hasEmbeddedNarration);
+    updateVideoCue();
   });
   video.addEventListener("ended", () => {
     stopDemoAnimation();
     $("demoPlayBtn").textContent = "เล่นเดโมวันนี้";
     setVideoStatus("จบเดโม", "dark");
-    if(window.speechSynthesis) speechSynthesis.cancel();
   });
 
   $("videoUrlInput").value = "";
   setDemoVideoSource(DEMO_VIDEO.localSrc, false);
-  updateVideoCue(false);
+  updateVideoCue();
 }
 
 function renderLessonVideoDemo(){
@@ -800,29 +778,27 @@ function renderLessonVideoDemo(){
   videoDemo.notes = buildDemoNoteSequence(day);
   videoDemo.activeIndex = -1;
   videoDemo.noteIndex = -1;
-  videoDemo.spoken = {};
-  videoDemo.hasEmbeddedNarration = day.root === "A" && day.type === "Minor" && day.positions.length === 1 && day.positions[0] === 1;
   if(video){
     video.pause();
-    video.muted = !videoDemo.hasEmbeddedNarration;
+    video.muted = true;
     try{ video.currentTime = 0; }catch(e){}
   }
   $("videoDemoLessonText").textContent = `Week ${weekNo} / Day ${dayNo} — ${day.focus} | demo notes: ${scaleInfo(day.root, day.type).notes.join(" - ")}`;
   renderVideoCueList();
   updateLessonDemoFrame(0, false);
-  updateVideoCue(false);
+  updateVideoCue();
 }
 
 function demoCuesFor(day, bpm){
   const pos = day.positions.join(", ");
   const scale = `${day.root} ${day.type}`;
   return [
-    {time:0, end:5, label:"SETUP", text:`${scale} Position ${pos}: เตรียมดู root note ${day.root}`, hint:`เดโมนี้สร้างตามบทเรียนวันนี้ BPM ${bpm}`, speech:`เตรียมเดโม ${day.root} ${day.type} position ${day.positions.join(" ")}`},
-    {time:5, end:12, label:"LOW STRINGS", text:"เริ่มจากสาย E ต่ำ แล้วไล่โน้ตในตำแหน่งวันนี้", hint:"ฟังเสียงโน้ตแต่ละตัวและดูจุดสีเหลืองบนฟรีตบอร์ด", speech:"เริ่มจากสายอีต่ำ ฟังเสียงโน้ตและมองตำแหน่งบนฟรีตบอร์ด"},
-    {time:12, end:20, label:"MIDDLE STRINGS", text:"ต่อสาย A, D, G ตามโน้ตใน scale", hint:`จุดสีแดงคือ root note ${day.root}`, speech:`ต่อสายกลาง มองหารูทโน้ต ${day.root}`},
-    {time:20, end:28, label:"HIGH STRINGS", text:"ขึ้นสาย B และ e เล็กแบบช้าและตรงจังหวะ", hint:"เสียงโน้ตจะตามจุด highlight สีเหลือง", speech:"ขึ้นสายสูงแบบช้าและตรงจังหวะ"},
-    {time:28, end:37, label:"DESCEND", text: day.positions.length > 1 ? `ทบทวน Position ${pos} โดยไม่หลุดจังหวะ` : "ย้อนกลับลงมาและฟังความสัมพันธ์ของโน้ต", hint:"ถ้าเสียงกระโดดมาก ให้ลด BPM ในบทเรียนจริง", speech:"ทบทวนและย้อนกลับลงมา ฟังความสัมพันธ์ของโน้ต"},
-    {time:37, end:45, label:"RESOLVE", text:`จบ phrase ที่ root note ${day.root}`, hint:"เสียง root จะให้ความรู้สึกนิ่งและกลับบ้าน", speech:`จบเฟรสที่รูทโน้ต ${day.root}`}
+    {time:0, end:5, label:"SETUP", text:`${scale} Position ${pos}: เตรียมดู root note ${day.root}`, hint:`เดโมนี้สร้างตามบทเรียนวันนี้ BPM ${bpm}`},
+    {time:5, end:12, label:"LOW STRINGS", text:"เริ่มจากสาย E ต่ำ แล้วไล่โน้ตในตำแหน่งวันนี้", hint:"ฟังเสียงโน้ตแต่ละตัวและดูจุดสีเหลืองบนฟรีตบอร์ด"},
+    {time:12, end:20, label:"MIDDLE STRINGS", text:"ต่อสาย A, D, G ตามโน้ตใน scale", hint:`จุดสีแดงคือ root note ${day.root}`},
+    {time:20, end:28, label:"HIGH STRINGS", text:"ขึ้นสาย B และ e เล็กแบบช้าและตรงจังหวะ", hint:"เสียงโน้ตจะตามจุด highlight สีเหลือง"},
+    {time:28, end:37, label:"DESCEND", text: day.positions.length > 1 ? `ทบทวน Position ${pos} โดยไม่หลุดจังหวะ` : "ย้อนกลับลงมาและฟังความสัมพันธ์ของโน้ต", hint:"ถ้าเสียงกระโดดมาก ให้ลด BPM ในบทเรียนจริง"},
+    {time:37, end:45, label:"RESOLVE", text:`จบ phrase ที่ root note ${day.root}`, hint:"เสียง root จะให้ความรู้สึกนิ่งและกลับบ้าน"}
   ];
 }
 
@@ -862,7 +838,6 @@ function setDemoVideoSource(src, remember=true){
   const cleanSrc = (src || DEMO_VIDEO.localSrc).trim() || DEMO_VIDEO.localSrc;
   source.src = resolveDemoVideoSrc(cleanSrc);
   videoDemo.activeIndex = -1;
-  videoDemo.spoken = {};
   $("videoMissing").classList.remove("show");
   video.load();
   setVideoStatus(cleanSrc === DEMO_VIDEO.localSrc ? "กำลังหา /videos" : "กำลังโหลด", "orange");
@@ -870,7 +845,7 @@ function setDemoVideoSource(src, remember=true){
     if(cleanSrc === DEMO_VIDEO.localSrc) localStorage.removeItem("guitar_demo_video_src");
     else localStorage.setItem("guitar_demo_video_src", cleanSrc);
   }
-  updateVideoCue(false);
+  updateVideoCue();
 }
 
 function resolveDemoVideoSrc(src){
@@ -907,13 +882,12 @@ async function playDemoVideo(){
   }
 }
 
-function pauseDemoVideo(cancelSpeech=true){
+function pauseDemoVideo(){
   const video = $("demoVideo");
   if(video && !video.paused) video.pause();
-  if(cancelSpeech && window.speechSynthesis) speechSynthesis.cancel();
 }
 
-function updateVideoCue(allowSpeech){
+function updateVideoCue(){
   const video = $("demoVideo");
   if(!video) return;
   const duration = Number.isFinite(video.duration) ? video.duration : DEMO_VIDEO.duration;
@@ -933,10 +907,6 @@ function updateVideoCue(allowSpeech){
     $("videoCueHint").textContent = cue.hint;
     highlightVideoCue(index);
   }
-  if(allowSpeech && !videoDemo.spoken[index]){
-    videoDemo.spoken[index] = true;
-    speak(cue.speech);
-  }
 }
 
 function demoCueIndexAt(time){
@@ -947,13 +917,6 @@ function demoCueIndexAt(time){
 
 function highlightVideoCue(index){
   document.querySelectorAll(".videoCueItem").forEach((item, i) => item.classList.toggle("active", i === index));
-}
-
-function speakDemoCue(){
-  const index = videoDemo.activeIndex >= 0 ? videoDemo.activeIndex : demoCueIndexAt($("demoVideo").currentTime || 0);
-  const cue = videoDemo.cues[index];
-  if(!cue) return;
-  speak(cue.speech || cue.text);
 }
 
 function setVideoStatus(text, tone){
@@ -1124,20 +1087,19 @@ function strokeRoundRect(ctx,x,y,w,h,r){
 
 function startPlayer(){
   stopPlayer(false);
-  pauseDemoVideo(false);
+  pauseDemoVideo();
   unlockAudio();
-  player.running = true; player.paused = false; player.elapsed = 0; player.lastTick = performance.now(); player.spoken = {};
+  player.running = true; player.paused = false; player.elapsed = 0; player.lastTick = performance.now();
   setButtons("play");
   tickPlayer();
   player.tickTimer = setInterval(tickPlayer,250);
   if($("metroOn").value === "1") startMetronome();
-  speak(buildStartSpeech());
 }
-function pausePlayer(){ if(!player.running || player.paused) return; player.paused=true; clearInterval(player.tickTimer); player.tickTimer=null; stopMetronome(); if(speechSynthesis) speechSynthesis.pause(); setButtons("pause"); }
-function resumePlayer(){ if(!player.running || !player.paused) return; player.paused=false; player.lastTick=performance.now(); player.tickTimer=setInterval(tickPlayer,250); if($("metroOn").value === "1") startMetronome(); if(speechSynthesis) speechSynthesis.resume(); setButtons("play"); }
+function pausePlayer(){ if(!player.running || player.paused) return; player.paused=true; clearInterval(player.tickTimer); player.tickTimer=null; stopMetronome(); setButtons("pause"); }
+function resumePlayer(){ if(!player.running || !player.paused) return; player.paused=false; player.lastTick=performance.now(); player.tickTimer=setInterval(tickPlayer,250); if($("metroOn").value === "1") startMetronome(); setButtons("play"); }
 function stopPlayer(reset=true){
-  if(player.tickTimer) clearInterval(player.tickTimer); player.tickTimer=null; player.running=false; player.paused=false; player.elapsed=0; player.currentSegment="ready"; stopMetronome(); if(window.speechSynthesis) speechSynthesis.cancel(); setButtons("stop");
-  if(reset){ $("timerText").textContent=fmt(totalDuration()); $("playerProgress").style.width="0%"; renderTimeline(null); setCue("READY","กด Start เพื่อเริ่มฝึกตามเสียงนำ", "ระบบจะพูด cue แต่ละช่วง และ metronome จะเริ่มหลังคุณกดปุ่ม"); }
+  if(player.tickTimer) clearInterval(player.tickTimer); player.tickTimer=null; player.running=false; player.paused=false; player.elapsed=0; player.currentSegment="ready"; stopMetronome(); setButtons("stop");
+  if(reset){ $("timerText").textContent=fmt(totalDuration()); $("playerProgress").style.width="0%"; renderTimeline(null); setCue("READY","กด Start เพื่อเริ่มฝึก", "ดู cue บนหน้าจอและเล่นตาม metronome หลังคุณกดปุ่ม"); }
 }
 function setButtons(state){
   $("startBtn").disabled = state === "play";
@@ -1153,7 +1115,7 @@ function tickPlayer(){
   player.elapsed += delta;
   const total = totalDuration();
   if(player.elapsed >= total){
-    player.elapsed = total; updateStage(); speak("จบการฝึกวันนี้แล้วครับ ให้ติ๊ก checklist และบันทึกสิ่งที่ยังติดขัดไว้"); stopPlayer(false); setButtons("stop"); return;
+    player.elapsed = total; updateStage(); stopPlayer(false); setButtons("stop"); return;
   }
   updateStage();
 }
@@ -1164,14 +1126,13 @@ function updateStage(){
   $("timerText").textContent = fmt(Math.ceil(remain));
   $("playerProgress").style.width = (player.elapsed/total*100).toFixed(1) + "%";
   if(seg.id !== player.currentSegment){
-    player.currentSegment = seg.id; renderTimeline(seg.id); const cue = cueFor(seg.id,0); setCue(cue.label,cue.text,cue.hint); speakOnce("segment_"+seg.id, cue.speech);
+    player.currentSegment = seg.id; renderTimeline(seg.id); const cue = cueFor(seg.id,0); setCue(cue.label,cue.text,cue.hint);
   }
   if(seg.id === "main"){
     const pct = seg.localElapsed / seg.duration;
     let phase = pct < .34 ? "quarter" : pct < .67 ? "eighth" : "plus";
     const cue = mainPhaseCue(phase);
     setCue(cue.label,cue.text,cue.hint);
-    speakOnce("main_"+phase, cue.speech);
   }
 }
 function getSegmentAt(elapsed){
@@ -1183,47 +1144,20 @@ function totalDuration(){ const mode=$("modeSelect").value; return SEGMENTS.redu
 function cueFor(id){
   const {day,bpm} = current();
   const roots = rootLocations(day).slice(0,3).join(" และ ");
-  if(id === "warm") return {label:"WARM UP", text:"Chromatic 1-2-3-4 ทุกสาย", hint:"ใช้ alternate picking ลง-ขึ้น เสียงต้องเท่ากัน ไม่ต้องเร็ว", speech:"เริ่มวอร์มอัพ เล่นโครมาติก หนึ่ง สอง สาม สี่ ทุกสาย ใช้ดีดลงขึ้นให้เท่ากัน"};
-  if(id === "main") return {label:"MAIN DRILL", text:`เล่น ${day.root} ${day.type} Position ${day.positions.join(", ")} ขึ้นและลง`, hint:`BPM วันนี้ ${bpm}. เจอ root note ให้คิดว่า ${day.root}`, speech:`เข้าสู่เมนสเกลดริล เล่น ${day.root} ${day.type} position ${day.positions.join(" ")} ขึ้นและลง`};
-  if(id === "review") return {label:"REVIEW", text: day.positions.length > 1 ? `เชื่อม Position ${day.positions.join(" → ")}` : "ทบทวน position เดิมแบบช้าและสะอาด", hint:`Root note วันนี้: ${roots}`, speech:"เข้าสู่ช่วงรีวิว เล่นช้าลง ตรวจเสียง และหยุดที่รูทโน้ต"};
-  return {label:"APPLICATION", text:"สร้าง lick 1-2 ห้อง แล้วจบที่ root note", hint:"เปิด backing track หรือใช้ metronome เล่นสั้น มีพัก และอย่าไล่ scale ยาวตลอด", speech:"เข้าสู่ช่วงประยุกต์ สร้างลิคสั้นหนึ่งถึงสองห้อง แล้วจบที่รูทโน้ต"};
+  if(id === "warm") return {label:"WARM UP", text:"Chromatic 1-2-3-4 ทุกสาย", hint:"ใช้ alternate picking ลง-ขึ้น เสียงต้องเท่ากัน ไม่ต้องเร็ว"};
+  if(id === "main") return {label:"MAIN DRILL", text:`เล่น ${day.root} ${day.type} Position ${day.positions.join(", ")} ขึ้นและลง`, hint:`BPM วันนี้ ${bpm}. เจอ root note ให้คิดว่า ${day.root}`};
+  if(id === "review") return {label:"REVIEW", text: day.positions.length > 1 ? `เชื่อม Position ${day.positions.join(" → ")}` : "ทบทวน position เดิมแบบช้าและสะอาด", hint:`Root note วันนี้: ${roots}`};
+  return {label:"APPLICATION", text:"สร้าง lick 1-2 ห้อง แล้วจบที่ root note", hint:"เปิด backing track หรือใช้ metronome เล่นสั้น มีพัก และอย่าไล่ scale ยาวตลอด"};
 }
 function mainPhaseCue(phase){
   const {day,bpm} = current();
-  if(phase === "quarter") return {label:"MAIN: QUARTER NOTES", text:`รอบที่ 1: quarter notes ที่ ${bpm} bpm`, hint:"1 จังหวะ = 1 โน้ต เล่นให้สะอาดก่อน", speech:`รอบที่หนึ่ง ควอเตอร์โน้ต ที่ ${bpm} บีพีเอ็ม หนึ่งจังหวะหนึ่งโน้ต`};
-  if(phase === "eighth") return {label:"MAIN: EIGHTH NOTES", text:`รอบที่ 2: eighth notes ที่ ${bpm} bpm`, hint:"นับ 1 and 2 and 3 and 4 and ใช้ alternate picking", speech:`รอบที่สอง เอธโน้ต ที่ ${bpm} บีพีเอ็ม หนึ่งจังหวะสองโน้ต ใช้ดีดลงขึ้น`};
-  return {label:"MAIN: CLEAN SPEED", text:`รอบที่ 3: เพิ่มเป็น ${Number(bpm)+4} bpm ถ้าเสียงยังสะอาด`, hint:`ถ้าเริ่มหลุด ให้กลับมาที่ ${bpm} bpm ทันที`, speech:`รอบที่สาม ถ้าเสียงยังสะอาด เพิ่มเป็น ${Number(bpm)+4} บีพีเอ็ม ถ้าหลุดให้ลดกลับ`};
+  if(phase === "quarter") return {label:"MAIN: QUARTER NOTES", text:`รอบที่ 1: quarter notes ที่ ${bpm} bpm`, hint:"1 จังหวะ = 1 โน้ต เล่นให้สะอาดก่อน"};
+  if(phase === "eighth") return {label:"MAIN: EIGHTH NOTES", text:`รอบที่ 2: eighth notes ที่ ${bpm} bpm`, hint:"นับ 1 and 2 and 3 and 4 and ใช้ alternate picking"};
+  return {label:"MAIN: CLEAN SPEED", text:`รอบที่ 3: เพิ่มเป็น ${Number(bpm)+4} bpm ถ้าเสียงยังสะอาด`, hint:`ถ้าเริ่มหลุด ให้กลับมาที่ ${bpm} bpm ทันที`};
 }
 function setCue(label,text,hint){ $("cueLabel").textContent=label; $("cueText").textContent=text; $("cueHint").textContent=hint; }
-function buildStartSpeech(){ const {weekNo,dayNo,day,bpm}=current(); return `เริ่มฝึก กีตาร์สเกล สัปดาห์ที่ ${weekNo} วันที่ ${dayNo}. วันนี้ฝึก ${day.root} ${day.type}. บีพีเอ็ม ${bpm}. เป้าหมายคือเสียงสะอาดและจำรูทโน้ต`; }
-function speakOnce(k,text){ if(player.spoken[k]) return; player.spoken[k]=true; speak(text); }
-function speakCurrentCue(){ speak($("cueText").textContent + ". " + $("cueHint").textContent); }
-function testVoice(){ speak("ทดสอบเสียงครับ วันนี้ให้เล่นช้า สะอาด และตรงจังหวะ เจอ root note ให้พูดชื่อโน้ตในใจ"); }
-function speak(text){
-  if($("voiceOn").value !== "1") return;
-  if(!("speechSynthesis" in window)) return;
-  try{
-    const u = new SpeechSynthesisUtterance(text);
-    const selected = $("voiceSelect").value;
-    const voice = voices.find(v => v.name === selected) || voices.find(v => /th|Thai/i.test(v.lang + v.name)) || voices[0];
-    if(voice) u.voice = voice;
-    u.lang = voice && voice.lang ? voice.lang : "th-TH";
-    u.rate = Number($("speechRate").value || .95);
-    u.pitch = 1;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
-  }catch(e){ console.warn(e); }
-}
-function loadVoices(){
-  voices = (window.speechSynthesis ? speechSynthesis.getVoices() : []);
-  const sel = $("voiceSelect"); const old = sel.value; sel.innerHTML = "";
-  voices.forEach(v => sel.appendChild(new Option(`${v.name} (${v.lang})`, v.name)));
-  const saved = localStorage.getItem("guitar_voice_name");
-  const thai = voices.find(v => /th|Thai/i.test(v.lang + v.name));
-  if(saved && voices.some(v=>v.name===saved)) sel.value = saved; else if(thai) sel.value = thai.name; else if(old) sel.value = old;
-}
-function saveAudioSettings(){ localStorage.setItem("guitar_voice_name", $("voiceSelect").value); localStorage.setItem("guitar_speech_rate", $("speechRate").value); localStorage.setItem("guitar_voice_on", $("voiceOn").value); localStorage.setItem("guitar_metro_on", $("metroOn").value); }
-function loadAudioSettings(){ $("speechRate").value = localStorage.getItem("guitar_speech_rate") || "0.95"; $("voiceOn").value = localStorage.getItem("guitar_voice_on") || "1"; $("metroOn").value = localStorage.getItem("guitar_metro_on") || "1"; }
+function saveAudioSettings(){ localStorage.setItem("guitar_metro_on", $("metroOn").value); }
+function loadAudioSettings(){ $("metroOn").value = localStorage.getItem("guitar_metro_on") || "1"; }
 
 function unlockAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === "suspended") audioCtx.resume(); }
 function startMetronome(){ stopMetronome(); unlockAudio(); const {bpm}=current(); const interval = 60000 / bpm; beatCount = 0; metroTimer = setInterval(playClick, interval); playClick(); $("metroText").textContent = `Metronome: ${bpm} bpm`; }
