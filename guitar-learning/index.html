@@ -90,7 +90,8 @@
     .videoDemoGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:14px;align-items:start}
     @media(max-width:860px){.videoDemoGrid{grid-template-columns:1fr}}
     .videoFrame{position:relative;background:#080f1d;border:1px solid #111827;border-radius:18px;overflow:hidden;aspect-ratio:16/9;box-shadow:0 14px 36px rgba(15,23,42,.16)}
-    .videoFrame video{display:block;width:100%;height:100%;object-fit:cover;background:#080f1d}
+    .videoFrame video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;background:#080f1d;opacity:0}
+    .lessonDemoCanvas{position:absolute;inset:0;display:block;width:100%;height:100%;background:#07111f;z-index:1;pointer-events:none}
     .videoMissing{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:20px;background:linear-gradient(135deg,rgba(8,15,29,.94),rgba(30,64,175,.70));color:#e2e8f0}
     .videoMissing.show{display:flex}.videoMissing strong{display:block;color:#fff;font-size:18px;margin-bottom:6px}
     .videoCueBox{background:#f8fafc;border:1px solid var(--line);border-radius:18px;padding:14px}
@@ -162,7 +163,7 @@
         <div class="between videoDemoHead">
           <div>
             <h2>Video Demo Player</h2>
-            <p class="small">ไฟล์ตัวอย่าง: <code>videos/a-minor-p1-slow-demo.mp4</code> พร้อม cue จาก <code>videos/a-minor-p1-slow-demo.vtt</code></p>
+            <p class="small" id="videoDemoLessonText">เดโมจะเปลี่ยนตาม Week/Day ที่เลือก และเล่นเสียงโน้ตตาม scale วันนี้</p>
           </div>
           <span class="badge orange" id="videoStatus">รอไฟล์วิดีโอ</span>
         </div>
@@ -175,6 +176,7 @@
                 <track src="videos/a-minor-p1-slow-demo.vtt" kind="subtitles" srclang="th" label="Thai cues" default />
                 Browser นี้ไม่รองรับ video player
               </video>
+              <canvas class="lessonDemoCanvas" id="lessonDemoCanvas" width="1280" height="720"></canvas>
               <div class="videoMissing" id="videoMissing">
                 <div>
                   <strong>ยังไม่พบไฟล์วิดีโอเดโม</strong>
@@ -198,7 +200,7 @@
               <span id="videoCueCount">0/0 cues</span>
             </div>
             <div class="miniGrid">
-              <button onclick="playDemoVideo()">เล่นเดโม</button>
+              <button id="demoPlayBtn" onclick="playDemoVideo()">เล่นเดโมวันนี้</button>
               <button class="ghost" onclick="speakDemoCue()">พูด cue ปัจจุบัน</button>
             </div>
           </div>
@@ -341,6 +343,7 @@ const STRINGS = [
   {label:"e", open:"E"},{label:"B", open:"B"},{label:"G", open:"G"},{label:"D", open:"D"},{label:"A", open:"A"},{label:"E", open:"E"}
 ];
 const PLAY_ORDER = ["E","A","D","G","B","e"];
+const OPEN_MIDI = {E:40,A:45,D:50,G:55,B:59,e:64};
 const WINDOWS = {1:[0,3],2:[2,5],3:[4,7],4:[6,9],5:[8,11]};
 const CHECK_ITEMS = [
   "Warm up 5 นาทีครบ",
@@ -362,22 +365,15 @@ const SEGMENTS = [
 
 const DEMO_VIDEO = {
   localSrc: "videos/a-minor-p1-slow-demo.mp4",
-  hasEmbeddedNarration: true,
   duration: 45,
-  cues: [
-    {time:0, end:5, label:"SETUP", text:"A Minor Position 1: วางมือที่ fret 0-3", hint:"ดูตำแหน่ง root note A ก่อนเริ่มเล่น", speech:"เตรียมเล่น เอ ไมเนอร์ position หนึ่ง วางมือที่เฟร็ต ศูนย์ ถึง สาม"},
-    {time:5, end:12, label:"LOW STRINGS", text:"เริ่มจากสาย E ต่ำ แล้วขึ้นไปสาย A", hint:"เล่นช้ามาก ทุกโน้ตต้องดังเท่ากัน", speech:"เริ่มจากสายอีต่ำ แล้วขึ้นไปสายเอ เล่นช้ามาก ให้เสียงทุกโน้ตเท่ากัน"},
-    {time:12, end:20, label:"MIDDLE STRINGS", text:"ต่อด้วยสาย D และ G มองหา root note A", hint:"เจอ A ให้พักหายใจสั้น ๆ และจำตำแหน่งไว้", speech:"ต่อด้วยสายดี และสายจี มองหารูทโน้ต เอ ทุกครั้งที่เจอ ให้จำตำแหน่งไว้"},
-    {time:20, end:28, label:"HIGH STRINGS", text:"ขึ้นสาย B และ e เล็ก อย่าเร่งจังหวะ", hint:"นิ้วซ้ายแตะใกล้เฟร็ต เสียงจะสะอาดกว่า", speech:"ขึ้นสายบี และอีเล็ก อย่าเร่งจังหวะ แตะนิ้วใกล้เฟร็ตเพื่อให้เสียงสะอาด"},
-    {time:28, end:37, label:"DESCEND", text:"ย้อนกลับลงมาทีละสายด้วย alternate picking", hint:"ดีดลง-ขึ้นสม่ำเสมอ และอย่าให้มือขวาเกร็ง", speech:"ย้อนกลับลงมาทีละสาย ใช้ดีดลงขึ้นอย่างสม่ำเสมอ อย่าให้มือขวาเกร็ง"},
-    {time:37, end:45, label:"RESOLVE", text:"จบ phrase ที่ root note A ให้เสียงนิ่ง", hint:"หยุดบน A แล้วฟังความรู้สึกกลับบ้านของ scale", speech:"จบเฟรสที่รูทโน้ต เอ ให้เสียงนิ่ง แล้วฟังความรู้สึกกลับบ้านของสเกล"}
-  ]
+  noteStart: 5,
+  noteEnd: 37
 };
 
 let PLAN = buildPlan();
 let voices = [];
 let player = {running:false, paused:false, elapsed:0, lastTick:0, tickTimer:null, currentSegment:"ready", spoken:{}};
-let videoDemo = {activeIndex:-1, spoken:{}};
+let videoDemo = {activeIndex:-1, noteIndex:-1, spoken:{}, cues:[], notes:[], hasEmbeddedNarration:false, raf:null};
 let audioCtx = null;
 let metroTimer = null;
 let beatCount = 0;
@@ -486,6 +482,7 @@ function render(){
   renderExercises(day,bpm);
   renderChecklist();
   renderLinks(day,bpm);
+  renderLessonVideoDemo();
   loadNote();
   updateChecklistProgress();
 }
@@ -643,6 +640,8 @@ function renderLinks(day,bpm){
 function initVideoDemo(){
   const video = $("demoVideo");
   if(!video) return;
+  video.controls = false;
+  video.muted = true;
   renderVideoCueList();
   video.addEventListener("loadedmetadata", () => {
     $("videoMissing").classList.remove("show");
@@ -665,19 +664,30 @@ function initVideoDemo(){
   });
   video.addEventListener("play", () => {
     if(player.running) stopPlayer(true);
-    if(video.currentTime < .25) videoDemo.spoken = {};
+    if(video.currentTime < .25){ videoDemo.spoken = {}; videoDemo.noteIndex = -1; }
     unlockAudio();
-    updateVideoCue(!DEMO_VIDEO.hasEmbeddedNarration);
+    $("demoPlayBtn").textContent = "พักเดโม";
+    startDemoAnimation();
+    updateVideoCue(!videoDemo.hasEmbeddedNarration);
   });
   video.addEventListener("pause", () => {
+    $("demoPlayBtn").textContent = "เล่นเดโมวันนี้";
+    stopDemoAnimation();
     if(window.speechSynthesis) speechSynthesis.cancel();
   });
   video.addEventListener("seeked", () => {
     videoDemo.spoken = {};
-    updateVideoCue(!video.paused && !DEMO_VIDEO.hasEmbeddedNarration);
+    videoDemo.noteIndex = -1;
+    updateLessonDemoFrame(video.currentTime || 0, !video.paused);
+    updateVideoCue(!video.paused && !videoDemo.hasEmbeddedNarration);
   });
-  video.addEventListener("timeupdate", () => updateVideoCue(!video.paused && !DEMO_VIDEO.hasEmbeddedNarration));
+  video.addEventListener("timeupdate", () => {
+    updateLessonDemoFrame(video.currentTime || 0, !video.paused);
+    updateVideoCue(!video.paused && !videoDemo.hasEmbeddedNarration);
+  });
   video.addEventListener("ended", () => {
+    stopDemoAnimation();
+    $("demoPlayBtn").textContent = "เล่นเดโมวันนี้";
     setVideoStatus("จบเดโม", "dark");
     if(window.speechSynthesis) speechSynthesis.cancel();
   });
@@ -687,16 +697,67 @@ function initVideoDemo(){
   updateVideoCue(false);
 }
 
+function renderLessonVideoDemo(){
+  const {weekNo,dayNo,day,bpm} = current();
+  const video = $("demoVideo");
+  videoDemo.cues = demoCuesFor(day, bpm);
+  videoDemo.notes = buildDemoNoteSequence(day);
+  videoDemo.activeIndex = -1;
+  videoDemo.noteIndex = -1;
+  videoDemo.spoken = {};
+  videoDemo.hasEmbeddedNarration = day.root === "A" && day.type === "Minor" && day.positions.length === 1 && day.positions[0] === 1;
+  if(video){
+    video.pause();
+    video.muted = !videoDemo.hasEmbeddedNarration;
+    try{ video.currentTime = 0; }catch(e){}
+  }
+  $("videoDemoLessonText").textContent = `Week ${weekNo} / Day ${dayNo} — ${day.focus} | demo notes: ${scaleInfo(day.root, day.type).notes.join(" - ")}`;
+  renderVideoCueList();
+  updateLessonDemoFrame(0, false);
+  updateVideoCue(false);
+}
+
+function demoCuesFor(day, bpm){
+  const pos = day.positions.join(", ");
+  const scale = `${day.root} ${day.type}`;
+  return [
+    {time:0, end:5, label:"SETUP", text:`${scale} Position ${pos}: เตรียมดู root note ${day.root}`, hint:`เดโมนี้สร้างตามบทเรียนวันนี้ BPM ${bpm}`, speech:`เตรียมเดโม ${day.root} ${day.type} position ${day.positions.join(" ")}`},
+    {time:5, end:12, label:"LOW STRINGS", text:"เริ่มจากสาย E ต่ำ แล้วไล่โน้ตในตำแหน่งวันนี้", hint:"ฟังเสียงโน้ตแต่ละตัวและดูจุดสีเหลืองบนฟรีตบอร์ด", speech:"เริ่มจากสายอีต่ำ ฟังเสียงโน้ตและมองตำแหน่งบนฟรีตบอร์ด"},
+    {time:12, end:20, label:"MIDDLE STRINGS", text:"ต่อสาย A, D, G ตามโน้ตใน scale", hint:`จุดสีแดงคือ root note ${day.root}`, speech:`ต่อสายกลาง มองหารูทโน้ต ${day.root}`},
+    {time:20, end:28, label:"HIGH STRINGS", text:"ขึ้นสาย B และ e เล็กแบบช้าและตรงจังหวะ", hint:"เสียงโน้ตจะตามจุด highlight สีเหลือง", speech:"ขึ้นสายสูงแบบช้าและตรงจังหวะ"},
+    {time:28, end:37, label:"DESCEND", text: day.positions.length > 1 ? `ทบทวน Position ${pos} โดยไม่หลุดจังหวะ` : "ย้อนกลับลงมาและฟังความสัมพันธ์ของโน้ต", hint:"ถ้าเสียงกระโดดมาก ให้ลด BPM ในบทเรียนจริง", speech:"ทบทวนและย้อนกลับลงมา ฟังความสัมพันธ์ของโน้ต"},
+    {time:37, end:45, label:"RESOLVE", text:`จบ phrase ที่ root note ${day.root}`, hint:"เสียง root จะให้ความรู้สึกนิ่งและกลับบ้าน", speech:`จบเฟรสที่รูทโน้ต ${day.root}`}
+  ];
+}
+
+function buildDemoNoteSequence(day){
+  const set = new Set(scaleInfo(day.root, day.type).notes);
+  const allowed = new Set();
+  day.positions.forEach(p => { for(let f=WINDOWS[p][0]; f<=WINDOWS[p][1]; f++) allowed.add(f); });
+  const ascending = [];
+  PLAY_ORDER.forEach((label, stringIndex) => {
+    const open = label === "e" ? "E" : label;
+    for(let fret=0; fret<=11; fret++){
+      const note = noteAt(open, fret);
+      if(!allowed.has(fret) || !set.has(note)) continue;
+      ascending.push({stringLabel:label,stringIndex,fret,note,midi:OPEN_MIDI[label]+fret,root:note === day.root});
+    }
+  });
+  if(!ascending.length) return [];
+  return ascending.length <= 22 ? ascending.concat([...ascending].reverse()) : ascending;
+}
+
 function renderVideoCueList(){
   const box = $("videoCueList");
   if(!box) return;
-  box.innerHTML = DEMO_VIDEO.cues.map((cue, i) => (
+  const cues = videoDemo.cues.length ? videoDemo.cues : [];
+  box.innerHTML = cues.map((cue, i) => (
     `<div class="videoCueItem" data-cue-index="${i}">
       <div><strong>${fmt(cue.time)}</strong><small>${fmt(cue.end)}</small></div>
       <div><strong>${cue.label}</strong><small>${cue.text}</small></div>
     </div>`
   )).join("");
-  $("videoCueCount").textContent = `1/${DEMO_VIDEO.cues.length} cues`;
+  $("videoCueCount").textContent = cues.length ? `1/${cues.length} cues` : "0/0 cues";
 }
 
 function setDemoVideoSource(src, remember=true){
@@ -725,7 +786,7 @@ function resolveDemoVideoSrc(src){
     ? cleanHref.replace(/\/?$/, "/")
     : cleanHref.replace(/[^/]*$/, "");
   const resolved = new URL(src, baseHref);
-  if(resolved.protocol === "http:" || resolved.protocol === "https:") resolved.searchParams.set("v", "20260705");
+  if(resolved.protocol === "http:" || resolved.protocol === "https:") resolved.searchParams.set("v", "20260705-notes");
   return resolved.href;
 }
 
@@ -735,8 +796,14 @@ function loadDemoVideoSource(){
 
 async function playDemoVideo(){
   const video = $("demoVideo");
+  if(!video.paused){
+    video.pause();
+    setVideoStatus("พักเดโม", "orange");
+    return;
+  }
   try{
     if(player.running) stopPlayer(true);
+    if(video.ended) video.currentTime = 0;
     unlockAudio();
     await video.play();
   }catch(e){
@@ -756,11 +823,12 @@ function updateVideoCue(allowSpeech){
   const duration = Number.isFinite(video.duration) ? video.duration : DEMO_VIDEO.duration;
   const time = Math.min(video.currentTime || 0, duration);
   const index = demoCueIndexAt(time);
-  const cue = DEMO_VIDEO.cues[index];
+  const cue = videoDemo.cues[index];
+  if(!cue) return;
   const pct = duration ? Math.min(100, (time / duration) * 100) : 0;
   $("videoProgressFill").style.width = pct.toFixed(1) + "%";
   $("videoTimeText").textContent = `${fmt(time)} / ${fmt(duration)}`;
-  $("videoCueCount").textContent = `${index + 1}/${DEMO_VIDEO.cues.length} cues`;
+  $("videoCueCount").textContent = `${index + 1}/${videoDemo.cues.length} cues`;
 
   if(index !== videoDemo.activeIndex){
     videoDemo.activeIndex = index;
@@ -777,7 +845,7 @@ function updateVideoCue(allowSpeech){
 
 function demoCueIndexAt(time){
   let active = 0;
-  DEMO_VIDEO.cues.forEach((cue, i) => { if(time >= cue.time) active = i; });
+  videoDemo.cues.forEach((cue, i) => { if(time >= cue.time) active = i; });
   return active;
 }
 
@@ -787,7 +855,8 @@ function highlightVideoCue(index){
 
 function speakDemoCue(){
   const index = videoDemo.activeIndex >= 0 ? videoDemo.activeIndex : demoCueIndexAt($("demoVideo").currentTime || 0);
-  const cue = DEMO_VIDEO.cues[index];
+  const cue = videoDemo.cues[index];
+  if(!cue) return;
   speak(cue.speech || cue.text);
 }
 
@@ -795,6 +864,166 @@ function setVideoStatus(text, tone){
   const status = $("videoStatus");
   status.textContent = text;
   status.className = "badge" + (tone ? " " + tone : "");
+}
+
+function startDemoAnimation(){
+  stopDemoAnimation();
+  const loop = () => {
+    const video = $("demoVideo");
+    if(!video || video.paused || video.ended) return;
+    updateLessonDemoFrame(video.currentTime || 0, true);
+    videoDemo.raf = requestAnimationFrame(loop);
+  };
+  videoDemo.raf = requestAnimationFrame(loop);
+}
+
+function stopDemoAnimation(){
+  if(videoDemo.raf) cancelAnimationFrame(videoDemo.raf);
+  videoDemo.raf = null;
+}
+
+function updateLessonDemoFrame(time, allowSound){
+  drawLessonDemoFrame(time);
+  const index = activeDemoNoteIndexAt(time);
+  if(index < 0){ videoDemo.noteIndex = -1; return; }
+  if(index !== videoDemo.noteIndex){
+    videoDemo.noteIndex = index;
+    if(allowSound) playDemoNote(videoDemo.notes[index]);
+  }
+}
+
+function activeDemoNoteIndexAt(time){
+  if(!videoDemo.notes.length || time < DEMO_VIDEO.noteStart) return -1;
+  if(time >= DEMO_VIDEO.noteEnd){
+    const rootIndex = videoDemo.notes.findIndex(n => n.root);
+    return rootIndex >= 0 ? rootIndex : videoDemo.notes.length - 1;
+  }
+  const pct = (time - DEMO_VIDEO.noteStart) / (DEMO_VIDEO.noteEnd - DEMO_VIDEO.noteStart);
+  return Math.min(videoDemo.notes.length - 1, Math.floor(pct * videoDemo.notes.length));
+}
+
+function playDemoNote(note){
+  if(!note) return;
+  unlockAudio();
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const freq = midiToFreq(note.midi);
+  const osc = audioCtx.createOscillator();
+  const overtone = audioCtx.createOscillator();
+  const filter = audioCtx.createBiquadFilter();
+  const gain = audioCtx.createGain();
+  osc.type = "triangle";
+  overtone.type = "sine";
+  osc.frequency.setValueAtTime(freq, now);
+  overtone.frequency.setValueAtTime(freq * 2.01, now);
+  filter.type = "lowpass";
+  filter.frequency.setValueAtTime(note.root ? 2400 : 1900, now);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(note.root ? 0.22 : 0.16, now + 0.018);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.72);
+  osc.connect(filter);
+  overtone.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(now);
+  overtone.start(now);
+  osc.stop(now + 0.78);
+  overtone.stop(now + 0.78);
+}
+
+function midiToFreq(midi){ return 440 * Math.pow(2, (midi - 69) / 12); }
+
+function drawLessonDemoFrame(time){
+  const canvas = $("lessonDemoCanvas");
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const {weekNo,dayNo,day,bpm} = current();
+  const cue = videoDemo.cues[demoCueIndexAt(time)] || videoDemo.cues[0];
+  const activeIndex = activeDemoNoteIndexAt(time);
+  const activeNote = activeIndex >= 0 ? videoDemo.notes[activeIndex] : null;
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  const bg = ctx.createLinearGradient(0,0,w,h);
+  bg.addColorStop(0,"#07111f");
+  bg.addColorStop(.58,"#102a55");
+  bg.addColorStop(1,"#3b170b");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,w,h);
+
+  roundRect(ctx,44,36,1192,108,26,"rgba(15,23,42,.70)");
+  drawCanvasText(ctx,`Week ${weekNo} / Day ${dayNo} - ${day.root} ${day.type}`,72,70,34,900,"#fff","900");
+  drawCanvasText(ctx,`Position ${day.positions.join(", ")} | BPM ${bpm}`,72,110,22,760,"#bfdbfe","700");
+  drawCanvasText(ctx,cue ? cue.label : "DEMO",1040,72,22,160,"#facc15","900","right");
+  drawCanvasText(ctx,cue ? cue.text : day.focus,1040,108,19,160,"#e2e8f0","700","right");
+
+  const boardX = 82, boardY = 236, boardW = 1116, boardH = 294;
+  const nutX = boardX + 120;
+  const fretW = (boardW - 160) / 12;
+  const stringGap = boardH / 5;
+  roundRect(ctx,boardX,boardY,boardW,boardH,18,"#3b2417");
+  ctx.strokeStyle = "#8b5a2b"; ctx.lineWidth = 4; strokeRoundRect(ctx,boardX,boardY,boardW,boardH,18);
+
+  for(let f=0; f<=12; f++){
+    const x = nutX + f * fretW;
+    ctx.strokeStyle = f === 0 ? "rgba(255,244,214,.95)" : "rgba(245,222,179,.70)";
+    ctx.lineWidth = f === 0 ? 10 : 3;
+    ctx.beginPath(); ctx.moveTo(x, boardY + 18); ctx.lineTo(x, boardY + boardH - 18); ctx.stroke();
+    if(f < 12) drawCanvasText(ctx,String(f), f === 0 ? boardX + 54 : nutX + (f - .5) * fretW, boardY + boardH + 34, 16, 42, "#dbeafe", "800", "center");
+  }
+
+  PLAY_ORDER.forEach((label, i) => {
+    const y = boardY + i * stringGap;
+    ctx.strokeStyle = "rgba(229,231,235,.88)";
+    ctx.lineWidth = 7 - i;
+    ctx.beginPath(); ctx.moveTo(boardX + 24, y); ctx.lineTo(boardX + boardW - 24, y); ctx.stroke();
+    drawCanvasText(ctx,label,boardX - 34,y + 7,18,26,"#f8fafc","900","right");
+  });
+
+  const unique = new Map();
+  videoDemo.notes.forEach(n => unique.set(`${n.stringLabel}_${n.fret}`, n));
+  unique.forEach(note => drawCanvasNote(ctx, note, boardX, boardY, nutX, fretW, stringGap, false));
+  if(activeNote) drawCanvasNote(ctx, activeNote, boardX, boardY, nutX, fretW, stringGap, true);
+
+  const progress = Math.min(1, Math.max(0, time / DEMO_VIDEO.duration));
+  roundRect(ctx,84,616,1112,18,9,"rgba(226,232,240,.20)");
+  roundRect(ctx,84,616,1112 * progress,18,9,"#22c55e");
+  const noteText = activeNote ? `Now: ${activeNote.note} | string ${activeNote.stringLabel} fret ${activeNote.fret}` : "เตรียมฟังเสียงโน้ต";
+  drawCanvasText(ctx,noteText,86,666,22,640,activeNote && activeNote.root ? "#fecaca" : "#dbeafe","900");
+  drawCanvasText(ctx,"สีเหลือง = โน้ตที่กำลังเล่น | สีแดง = root note",1194,666,18,620,"#e2e8f0","700","right");
+}
+
+function drawCanvasNote(ctx, note, boardX, boardY, nutX, fretW, stringGap, active){
+  const x = note.fret === 0 ? boardX + 62 : nutX + (note.fret - .5) * fretW;
+  const y = boardY + note.stringIndex * stringGap;
+  if(active){
+    ctx.fillStyle = "rgba(250,204,21,.22)";
+    ctx.beginPath(); ctx.arc(x,y,50,0,Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle = active ? "#facc15" : note.root ? "#ef4444" : "#93c5fd";
+  ctx.beginPath(); ctx.arc(x,y,active ? 31 : 23,0,Math.PI*2); ctx.fill();
+  ctx.lineWidth = active ? 4 : 2;
+  ctx.strokeStyle = "rgba(255,255,255,.88)";
+  ctx.stroke();
+  drawCanvasText(ctx,note.note,x,y + 7,active ? 18 : 13,54,active ? "#111827" : "#0f172a","900","center");
+}
+
+function drawCanvasText(ctx,text,x,y,size,maxWidth,color="#fff",weight="700",align="left"){
+  ctx.fillStyle = color;
+  ctx.font = `${weight} ${size}px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif`;
+  ctx.textAlign = align;
+  ctx.textBaseline = "alphabetic";
+  ctx.fillText(text, x, y, maxWidth);
+}
+
+function roundRect(ctx,x,y,w,h,r,fill){
+  ctx.fillStyle = fill;
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); ctx.fill();
+}
+
+function strokeRoundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); ctx.stroke();
 }
 
 function startPlayer(){
