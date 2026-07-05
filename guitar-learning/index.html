@@ -27,6 +27,7 @@
       -webkit-text-size-adjust:100%;
       text-size-adjust:100%;
       scroll-padding-top:12px;
+      width:100%;
     }
     body{
       margin:0;
@@ -38,11 +39,14 @@
       color:var(--ink);
       line-height:1.55;
       min-height:100vh;
+      min-width:0;
+      width:100%;
       overflow-x:hidden;
     }
     button,input,select,textarea{max-width:100%}
     video,canvas{max-width:100%}
-    .app{max-width:1480px;margin:0 auto;padding:clamp(12px,2vw,24px);padding-left:max(clamp(12px,2vw,24px),env(safe-area-inset-left));padding-right:max(clamp(12px,2vw,24px),env(safe-area-inset-right))}
+    .app{width:100%;max-width:1480px;margin:0 auto;padding:clamp(12px,2vw,24px);padding-left:max(clamp(12px,2vw,24px),env(safe-area-inset-left));padding-right:max(clamp(12px,2vw,24px),env(safe-area-inset-right))}
+    .app > .hero,.app > .topbar,.app > .layout{width:100%;max-width:100%}
     .homeBtn{
       display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;padding:10px 14px;border-radius:999px;
       background:rgba(255,255,255,.92);border:1px solid rgba(226,232,240,.9);box-shadow:0 10px 28px rgba(15,23,42,.08);
@@ -68,6 +72,7 @@
     button:disabled{opacity:.45;cursor:not-allowed}
     .secondary{background:#111827}.ghost{background:#eef2ff;color:#1e3a8a}.danger{background:#fee2e2;color:#991b1b}.greenBtn{background:#16a34a}.orangeBtn{background:#ea580c}
     .layout{display:grid;grid-template-columns:minmax(0,1.48fr) minmax(360px,.72fr);gap:18px;align-items:start}
+    .layout > div,.layout aside{min-width:0;width:100%}
     @media(max-width:1120px){.layout{grid-template-columns:1fr} aside{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start} aside .card{margin-bottom:0} aside .card:last-child{grid-column:1/-1}}
     @media(max-width:760px){aside{display:block} aside .card{margin-bottom:16px}}
     .card{padding:18px;margin-bottom:16px;min-width:0}
@@ -139,13 +144,15 @@
     }
     @media(max-width:760px){
       body{background:var(--bg)}
-      .app{padding:10px;padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}
+      .app{width:100%;max-width:none;margin:0;padding:10px;padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}
       .homeBtn{margin-bottom:10px;padding:9px 12px}
       .hero{border-radius:20px;padding:16px}
       .hero:after{display:none}
       .hero h1{font-size:28px;line-height:1.16}
       .hero p{font-size:14px;line-height:1.55}
-      .topbar{grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+      .topbar{grid-template-columns:1fr;gap:10px;margin:12px 0}
+      .layout{display:block}
+      .videoStage{width:100%}
       .control,.card{border-radius:18px}
       .control{padding:10px}
       .card{padding:14px;margin-bottom:12px}
