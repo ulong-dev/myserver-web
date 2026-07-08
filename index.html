@@ -177,6 +177,35 @@
     .xo-cell.x { color: #ff5252; } .xo-cell.o { color: #448aff; } .xo-cell.win { background-color: #00E676; color: white; }
 
     /* Ebook iframe Container */
+    .ebook-toolbar {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 0 0 14px;
+    }
+    .ebook-book-btn {
+      font-family: "Kanit", sans-serif;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      padding: 9px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: .18s ease;
+    }
+    .ebook-book-btn:hover {
+      background: rgba(255,255,255,0.16);
+      transform: translateY(-1px);
+    }
+    .ebook-book-btn.active {
+      background: #f1c40f;
+      color: #1a252c;
+      border-color: #f1c40f;
+      font-weight: 700;
+    }
     .ebook-wrapper { width: 100%; height: 80vh; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
     @media (max-width: 1100px){ .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
@@ -226,7 +255,7 @@
         <a class="card" href="#" onclick="openEbook(event)" data-group="lab">
           <div class="thumb">📖</div>
           <div class="body">
-            <p class="title">Interactive Ebook</p><p class="desc">คลังหนังสืออ่านเพลินๆ สำหรับครอบครัว</p>
+            <p class="title">Interactive Ebook</p><p class="desc">คลังหนังสืออ่านเพลินๆ สำหรับครอบครัว เลือกอ่านได้หลายเล่ม</p>
             <div class="meta"><span class="tag">🧠 Lab</span><span class="go">Read →</span></div>
           </div>
         </a>
@@ -295,9 +324,24 @@
   <div id="ebookModal" class="modal-overlay">
     <div class="game-container" style="max-width: 1000px; padding: 20px;">
       <button class="close-btn" onclick="closeEbook()">✕</button>
-      <h2 style="margin-bottom: 15px;">Family Ebook</h2>
+      <h2 id="ebookTitle" style="margin-bottom: 12px;">Family Ebook</h2>
+
+      <div class="ebook-toolbar" aria-label="เลือกหนังสือ">
+        <button type="button" class="ebook-book-btn active" data-book="family" onclick="loadEbook('family')">📘 Family Ebook</button>
+        <button type="button" class="ebook-book-btn" data-book="kaen-buddhism" onclick="loadEbook('kaen-buddhism')">📙 แก่นพุทธศาสน์</button>
+      </div>
+
       <div class="ebook-wrapper">
-        <iframe src='https://online.pubhtml5.com/lzld/bvus/' seamless='seamless' scrolling='no' frameborder='0' allowtransparency='true' allowfullscreen='true' style='width:100%; height:100%;'></iframe>
+        <iframe
+          id="ebookFrame"
+          src="https://online.pubhtml5.com/lzld/bvus/"
+          seamless="seamless"
+          scrolling="no"
+          frameborder="0"
+          allowtransparency="true"
+          allowfullscreen="true"
+          style="width:100%; height:100%;">
+        </iframe>
       </div>
     </div>
   </div>
@@ -345,10 +389,35 @@
     function applyFilter(filter){ document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.dataset.filter === filter)); document.querySelectorAll("#projectGrid .card").forEach(card => card.style.display = (filter === "all" || card.dataset.group === filter) ? "flex" : "none"); } 
 
     // =========================================
-    // ระบบเปิด-ปิด Ebook Modal
+    // ระบบเปิด-ปิด Ebook Modal + เลือกหนังสือ
     // =========================================
-    function openEbook(e) {
+    const ebookBooks = {
+      family: {
+        title: 'Family Ebook',
+        src: 'https://online.pubhtml5.com/lzld/bvus/'
+      },
+      'kaen-buddhism': {
+        title: 'แก่นพุทธศาสน์',
+        src: 'https://online.pubhtml5.com/laxa/vmrg/'
+      }
+    };
+
+    function loadEbook(bookKey) {
+      const book = ebookBooks[bookKey] || ebookBooks.family;
+      const frame = document.getElementById('ebookFrame');
+      const title = document.getElementById('ebookTitle');
+
+      if (frame && frame.src !== book.src) frame.src = book.src;
+      if (title) title.textContent = book.title;
+
+      document.querySelectorAll('.ebook-book-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.book === bookKey);
+      });
+    }
+
+    function openEbook(e, bookKey = 'family') {
       e.preventDefault();
+      loadEbook(bookKey);
       document.getElementById('ebookModal').classList.add('show');
     }
 
