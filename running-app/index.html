@@ -1,324 +1,496 @@
 <!DOCTYPE html>
 <html lang="th" class="scroll-smooth">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AW2P Running Coach OS — Today</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = { 
+    tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            page: '#FCFBF9',       
-            card: '#FFFFFF',       
-            primary: '#33302E',    
-            muted: '#9E9892',      
-            accent: '#FC4C02',     // Strava Orange
-            borderLight: '#F3F0EC' 
+            page: '#FCFBF9',
+            card: '#FFFFFF',
+            primary: '#33302E',
+            muted: '#9E9892',
+            accent: '#FC4C02',
+            borderLight: '#F3F0EC'
           },
           fontFamily: {
             sans: ['Kanit', 'sans-serif'],
-            serif: ['Playfair Display', 'serif'],
+            serif: ['Playfair Display', 'serif']
           },
           boxShadow: {
-            'glow': '0 20px 40px -10px rgba(0,0,0,0.04)',
-            'glow-hover': '0 30px 60px -15px rgba(0,0,0,0.08)',
+            glow: '0 20px 40px -10px rgba(0,0,0,0.06)'
           }
         }
       }
     }
   </script>
-
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Kanit:wght@300;400;500;600;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
   <style>
-    body { font-family: 'Kanit', sans-serif; background-color: #FCFBF9; }
-    
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    
-    /* Custom Range Slider */
-    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #FC4C02; cursor: pointer; margin-top: -8px; box-shadow: 0 2px 6px rgba(252,76,2,0.4); }
-    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #E0E0E0; border-radius: 2px; }
-    .dark input[type=range]::-webkit-slider-runnable-track { background: #404040; }
+    body { font-family: 'Kanit', sans-serif; background-color:#FCFBF9; }
+    .glass { background: rgba(255,255,255,.86); backdrop-filter: blur(16px); }
+    .dark .glass { background: rgba(18,18,18,.86); }
+    .range-clean { accent-color:#FC4C02; }
+    .pulse-dot { animation: pulse 1.6s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.55; transform:scale(.86)} }
   </style>
 </head>
 
-<body class="bg-page text-primary dark:bg-[#121212] dark:text-gray-200 pb-24 transition-colors duration-500 selection:bg-accent/20">
-
-  <nav class="pt-8 pb-4 px-6 max-w-2xl mx-auto flex justify-between items-center z-50 sticky top-0 bg-page/80 dark:bg-[#121212]/80 backdrop-blur-md">
-    <div class="font-serif text-2xl font-semibold tracking-wide flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
-      ELITE <span class="text-muted font-light">LOG</span>
-    </div>
-    <div class="flex gap-2">
-      <a href="../index.html" title="กลับ Home" aria-label="กลับ Home" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-muted dark:text-gray-400">
-        <span class="material-icons-round text-xl">arrow_back</span>
-      </a>
-      <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-muted dark:text-gray-400">
-        <span class="material-icons-round text-xl" id="themeIcon">dark_mode</span>
-      </button>
-      <a href="dashboard.html" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-muted dark:text-gray-400">
-        <span class="material-icons-round text-xl">insert_chart_outlined</span>
-      </a>
+<body class="bg-page text-primary dark:bg-[#121212] dark:text-gray-200 min-h-screen transition-colors duration-500 pb-12">
+  <nav class="sticky top-0 z-50 glass border-b border-borderLight dark:border-[#2A2A2A]">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-3">
+      <div class="font-serif text-xl md:text-2xl font-semibold tracking-wide flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-accent inline-block pulse-dot"></span>
+        AW2P <span class="text-muted font-light">RUNNING COACH OS</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="../index.html" title="กลับ Home" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">arrow_back</span></a>
+        <button onclick="reloadToday()" title="Reload" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">sync</span></button>
+        <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round" id="themeIcon">dark_mode</span></button>
+      </div>
     </div>
   </nav>
 
-  <div class="max-w-2xl mx-auto px-6 mt-4">
-    <div class="bg-card dark:bg-[#1E1E1E] rounded-[32px] p-6 md:p-10 shadow-glow border border-borderLight dark:border-[#2A2A2A]">
-      <h4 class="text-xl font-semibold mb-8 text-primary dark:text-white text-center">Record Activity</h4>
-
-      <form id="runForm" onsubmit="handleFormSubmit(event, this)" class="space-y-6">
-        
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1">DATE</label>
-            <input type="date" name="date" id="dateInput" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3.5 outline-none focus:border-accent dark:focus:border-accent text-[14px] text-primary dark:text-gray-200 transition" required>
-          </div>
-          <div>
-            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1">TYPE</label>
-            <select name="type" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3.5 outline-none focus:border-accent dark:focus:border-accent text-[14px] text-primary dark:text-gray-200 transition appearance-none">
-              <option value="Easy">Run (Easy)</option>
-              <option value="Tempo">Run (Tempo)</option>
-              <option value="Interval">Workout</option>
-              <option value="Long">Long Run</option>
-              <option value="Race">Race</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3 pt-4">
-          <div class="h-[1px] bg-borderLight dark:bg-[#2A2A2A] flex-1"></div>
-          <span class="text-[10px] font-bold text-accent uppercase tracking-[0.15em]">Stats</span>
-          <div class="h-[1px] bg-borderLight dark:bg-[#2A2A2A] flex-1"></div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1">DIST (KM)</label>
-            <input type="number" step="0.01" name="distance" id="distInput" oninput="calculateAutoMetrics()" placeholder="0.00" class="w-full bg-white dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3.5 outline-none focus:border-accent dark:focus:border-accent text-center text-xl font-medium text-primary dark:text-white transition shadow-sm" required>
-          </div>
-          <div>
-            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1">DURATION</label>
-            <div class="flex gap-2 items-center">
-              <input type="number" id="hInput" oninput="calculateAutoMetrics()" placeholder="hr" min="0" class="w-full bg-white dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3.5 outline-none focus:border-accent dark:focus:border-accent text-center text-xl font-medium text-primary dark:text-white transition shadow-sm">
-              <span class="text-muted font-bold">:</span>
-              <input type="number" id="mInput" oninput="calculateAutoMetrics()" placeholder="min" min="0" class="w-full bg-white dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3.5 outline-none focus:border-accent dark:focus:border-accent text-center text-xl font-medium text-primary dark:text-white transition shadow-sm" required>
-            </div>
-            <input type="hidden" name="duration" id="totalDuration">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-3">
-          <div>
-            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1 text-center">HR AVG</label>
-            <input type="number" name="hr" placeholder="-" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-primary dark:text-gray-200 transition">
-          </div>
-          <div>
-            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1 text-center">POWER</label>
-            <input type="number" name="power" id="powerInput" placeholder="Auto" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-accent font-medium dark:text-accent transition">
-          </div>
-          <div>
-            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1 text-center">CADENCE</label>
-            <input type="number" name="cadence" id="cadenceInput" placeholder="Auto" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-accent font-medium dark:text-accent transition">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-3">
-          <div>
-            <label class="text-[9px] font-bold text-muted uppercase tracking-[0.05em] ml-1 block mb-1 text-center">VERT OSC(cm)</label>
-            <input type="number" step="0.1" name="vertOsc" placeholder="-" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-primary dark:text-gray-200 transition">
-          </div>
-          <div>
-            <label class="text-[9px] font-bold text-muted uppercase tracking-[0.05em] ml-1 block mb-1 text-center">GCT(ms)</label>
-            <input type="number" name="gct" placeholder="-" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-primary dark:text-gray-200 transition">
-          </div>
-          <div>
-            <label class="text-[9px] font-bold text-muted uppercase tracking-[0.05em] ml-1 block mb-1 text-center">STRIDE(m)</label>
-            <input type="number" step="0.01" name="strideLen" id="strideInput" oninput="calculateAutoMetrics()" placeholder="-" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-3 outline-none focus:border-accent dark:focus:border-accent text-center text-[15px] text-primary dark:text-gray-200 transition">
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3 pt-4">
-          <div class="h-[1px] bg-borderLight dark:bg-[#2A2A2A] flex-1"></div>
-          <span class="text-[10px] font-bold text-accent uppercase tracking-[0.15em]">Feeling</span>
-          <div class="h-[1px] bg-borderLight dark:bg-[#2A2A2A] flex-1"></div>
-        </div>
-
-        <div class="bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] p-5 rounded-2xl">
-          <div class="flex justify-between items-end mb-4">
-            <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em]">RPE (1-10)</label>
-            <span id="rpeVal" class="text-3xl font-serif text-accent leading-none">5</span>
-          </div>
-          <input type="range" min="1" max="10" step="1" name="rpe" value="5" oninput="document.getElementById('rpeVal').innerText=this.value">
-        </div>
-
+  <main class="max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-5 md:space-y-6">
+    <section class="rounded-[32px] p-5 md:p-8 shadow-glow overflow-hidden relative bg-gradient-to-br from-[#181511] via-[#2A2520] to-[#6B2C11] text-white">
+      <div class="absolute -right-16 -top-16 w-52 h-52 bg-accent/20 rounded-full blur-2xl"></div>
+      <div class="relative z-10 grid lg:grid-cols-[1fr_360px] gap-6 items-end">
         <div>
-          <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-2 block mb-1">NOTES</label>
-          <textarea name="notes" rows="2" class="w-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] rounded-2xl p-4 outline-none focus:border-accent dark:focus:border-accent text-[14px] text-primary dark:text-gray-200 transition resize-none placeholder-muted/50" placeholder="How did it feel?"></textarea>
+          <div class="text-[11px] font-bold tracking-[0.18em] text-orange-200 uppercase mb-2">Today’s Prescription</div>
+          <h1 class="font-serif text-4xl md:text-6xl leading-tight" id="heroTitle">Loading...</h1>
+          <p class="text-orange-100/90 mt-3 max-w-3xl" id="heroSub">กำลังโหลดแผนซ้อมวันนี้</p>
+          <div class="flex flex-wrap gap-2 mt-5">
+            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="phaseBadge">Phase</span>
+            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="distanceBadge">0 km</span>
+            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="rpeBadge">RPE -</span>
+            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="hrBadge">HR -</span>
+          </div>
+        </div>
+        <div class="bg-white/10 border border-white/15 rounded-[28px] p-5">
+          <div class="text-[10px] font-bold tracking-[0.16em] text-orange-100 uppercase">Readiness</div>
+          <div class="flex items-end gap-3 mt-2">
+            <div class="text-6xl font-black leading-none" id="readinessScore">-</div>
+            <div class="pb-2 text-orange-100">/100</div>
+          </div>
+          <div class="mt-3 text-sm leading-relaxed" id="readinessText">ยังไม่มีข้อมูล</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[24px] p-5 shadow-glow">
+        <div class="text-[10px] font-bold text-muted uppercase tracking-[0.14em]">Acute Load</div>
+        <div class="text-3xl font-black mt-2" id="acuteLoad">0</div>
+        <div class="text-xs text-muted mt-1">7-day</div>
+      </div>
+      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[24px] p-5 shadow-glow">
+        <div class="text-[10px] font-bold text-muted uppercase tracking-[0.14em]">Chronic Load</div>
+        <div class="text-3xl font-black mt-2" id="chronicLoad">0</div>
+        <div class="text-xs text-muted mt-1">42-day</div>
+      </div>
+      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[24px] p-5 shadow-glow">
+        <div class="text-[10px] font-bold text-muted uppercase tracking-[0.14em]">Form</div>
+        <div class="text-3xl font-black mt-2" id="formScore">0</div>
+        <div class="text-xs text-muted mt-1">Chronic - Acute</div>
+      </div>
+      <div class="bg-card dark:bg-[#1E1E1E] border border-accent rounded-[24px] p-5 shadow-glow">
+        <div class="text-[10px] font-bold text-accent uppercase tracking-[0.14em]">Risk</div>
+        <div class="text-2xl font-black mt-2 text-accent" id="riskText">-</div>
+        <div class="text-xs text-muted mt-1" id="loadComment">-</div>
+      </div>
+    </section>
+
+    <section class="grid lg:grid-cols-[1.15fr_.85fr] gap-5 md:gap-6">
+      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
+        <div class="flex items-start justify-between gap-3 mb-5">
+          <div>
+            <h2 class="text-xl font-semibold">Workout Structure</h2>
+            <p class="text-sm text-muted mt-1">ดู prescription ก่อนออกวิ่ง และคุม intensity ตามเป้า</p>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold" id="workoutTypeBadge">-</span>
         </div>
 
-        <button type="submit" id="saveBtn" class="w-full bg-accent text-white font-medium tracking-wide py-4 rounded-full shadow-lg shadow-accent/30 hover:shadow-accent/50 hover:-translate-y-0.5 transition-all text-[15px] mt-4">
-          SAVE ACTIVITY
-        </button>
-      </form>
+        <div class="grid md:grid-cols-3 gap-3 mb-5">
+          <div class="rounded-2xl bg-page dark:bg-[#121212] p-4 border border-borderLight dark:border-[#2A2A2A]">
+            <div class="text-[10px] text-muted font-bold uppercase">Warm-up</div>
+            <div class="font-medium mt-1" id="warmupText">-</div>
+          </div>
+          <div class="rounded-2xl bg-page dark:bg-[#121212] p-4 border border-borderLight dark:border-[#2A2A2A] md:col-span-1">
+            <div class="text-[10px] text-muted font-bold uppercase">Main Set</div>
+            <div class="font-semibold mt-1 text-accent" id="mainSetText">-</div>
+          </div>
+          <div class="rounded-2xl bg-page dark:bg-[#121212] p-4 border border-borderLight dark:border-[#2A2A2A]">
+            <div class="text-[10px] text-muted font-bold uppercase">Cool-down / Strength</div>
+            <div class="font-medium mt-1" id="cooldownText">-</div>
+          </div>
+        </div>
 
-      <div id="alertBox" class="mt-6 text-center text-sm font-medium py-3 rounded-2xl hidden" role="alert"></div>
-    </div>
+        <div class="rounded-[24px] border border-borderLight dark:border-[#2A2A2A] bg-page dark:bg-[#121212] p-5">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-accent text-white"><span class="material-icons-round">psychology</span></div>
+            <div>
+              <div class="font-semibold" id="recommendTitle">Recommendation</div>
+              <div class="text-sm text-muted mt-1 leading-relaxed" id="recommendMessage">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <div class="text-center mt-8 pb-8">
-      <a href="dashboard.html" class="text-accent text-[13px] font-bold tracking-wide hover:opacity-80 transition-opacity">
-        VIEW DASHBOARD <span class="ml-1">&rarr;</span>
-      </a>
-    </div>
-  </div>
+      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
+        <div class="flex items-start justify-between gap-3 mb-5">
+          <div>
+            <h2 class="text-xl font-semibold">Daily Readiness</h2>
+            <p class="text-sm text-muted mt-1">บันทึกความพร้อมวันนี้ก่อนซ้อม</p>
+          </div>
+          <span class="text-[10px] text-muted font-bold uppercase tracking-[0.12em]" id="readinessDate">Today</span>
+        </div>
+
+        <form id="readinessForm" class="space-y-4" onsubmit="saveReadiness(event)">
+          <div class="grid grid-cols-2 gap-3">
+            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Sleep Hours</span><input class="input" name="sleep_hours" type="number" step="0.1" value="7" /></label>
+            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Resting HR</span><input class="input" name="resting_hr" type="number" placeholder="55" /></label>
+          </div>
+          <RangeInput name="sleep_quality" label="Sleep Quality" value="7"></RangeInput>
+          <RangeInput name="fatigue" label="Fatigue" value="4"></RangeInput>
+          <RangeInput name="soreness" label="Soreness" value="3"></RangeInput>
+          <RangeInput name="stress" label="Stress" value="3"></RangeInput>
+          <RangeInput name="motivation" label="Motivation" value="7"></RangeInput>
+          <RangeInput name="pain_score" label="Pain Score" value="0"></RangeInput>
+
+          <button id="saveReadinessBtn" class="w-full bg-accent text-white rounded-full py-3.5 font-semibold hover:shadow-lg hover:shadow-accent/25 transition">บันทึก Readiness</button>
+          <div id="readinessSaveStatus" class="text-sm text-center hidden rounded-2xl py-2"></div>
+        </form>
+      </div>
+    </section>
+
+    <section class="grid lg:grid-cols-[.9fr_1.1fr] gap-5 md:gap-6">
+      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
+        <div class="flex items-start justify-between gap-3 mb-5">
+          <div>
+            <h2 class="text-xl font-semibold">Athlete Profile</h2>
+            <p class="text-sm text-muted mt-1">ตั้งค่าเป้าหมายเพื่อสร้างแผน 12 สัปดาห์</p>
+          </div>
+          <span class="material-icons-round text-muted">settings</span>
+        </div>
+
+        <form id="profileForm" class="space-y-3" onsubmit="saveProfile(event)">
+          <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Name</span><input class="input" name="name" id="profileName" value="Ulong" /></label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Goal Race</span><input class="input" name="goal_race" id="goalRace" value="Half Marathon" /></label>
+            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Goal Date</span><input class="input" name="goal_date" id="goalDate" type="date" /></label>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Distance</span><input class="input" name="goal_distance_km" id="goalDistance" type="number" step="0.0001" value="21.0975" /></label>
+            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Goal Min</span><input class="input" name="goal_time_min" id="goalTime" type="number" value="90" /></label>
+            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Weekly KM</span><input class="input" name="current_weekly_km" id="weeklyKm" type="number" value="30" /></label>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Max HR</span><input class="input" name="max_hr" id="maxHr" type="number" value="185" /></label>
+            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Rest HR</span><input class="input" name="resting_hr" id="restHr" type="number" value="55" /></label>
+            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Threshold HR</span><input class="input" name="threshold_hr" id="thresholdHr" type="number" value="168" /></label>
+          </div>
+          <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Injury Note</span><input class="input" name="injury_note" id="injuryNote" placeholder="เช่น เจ็บเข่าซ้าย / ITB / ไม่มี" /></label>
+          <div class="grid grid-cols-2 gap-3 pt-2">
+            <button class="bg-primary dark:bg-white dark:text-primary text-white rounded-full py-3 font-semibold">Save Profile</button>
+            <button type="button" onclick="generatePlan()" class="bg-accent text-white rounded-full py-3 font-semibold">Generate Plan</button>
+          </div>
+          <div id="profileSaveStatus" class="text-sm text-center hidden rounded-2xl py-2"></div>
+        </form>
+      </div>
+
+      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
+        <div class="flex items-start justify-between gap-3 mb-5">
+          <div>
+            <h2 class="text-xl font-semibold">Next 7 Days</h2>
+            <p class="text-sm text-muted mt-1">แผน 1 สัปดาห์ข้างหน้า</p>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-page dark:bg-[#121212] text-xs text-muted border border-borderLight dark:border-[#2A2A2A]">Sprint 1</span>
+        </div>
+        <div id="next7Box" class="space-y-3"></div>
+      </div>
+    </section>
+  </main>
+
+  <template id="rangeTemplate">
+    <label class="block range-block">
+      <div class="flex justify-between items-end mb-1">
+        <span class="text-[10px] font-bold text-muted uppercase ml-2 range-label">Label</span>
+        <span class="text-lg font-serif text-accent range-val">0</span>
+      </div>
+      <input class="range-clean w-full" type="range" min="0" max="10" step="1" name="" value="0" oninput="this.closest('.range-block').querySelector('.range-val').innerText=this.value" />
+    </label>
+  </template>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxQcd1Sqt1-b2gZ8pwWJhs1Ye1nWK7mV_qNWOiVEKReWJvOGY_VeCFk-l0YL-Wh0AyW/exec";
+    // 1) ใส่ Web App URL จาก Apps Script Deployment ตรงนี้
+    const API_URL = "https://script.google.com/macros/s/AKfycbw28UAw8r8T4V9bAiLRHnm12lB2Ow557TeQ8RUY2CI1KmqkPqKmoBvjJ3nfdcP4Cv0/exec";
 
     const html = document.documentElement;
-    function toggleTheme() {
-      const next = html.classList.contains('dark') ? 'light' : 'dark';
-      if (next === 'dark') { html.classList.add('dark'); } else { html.classList.remove('dark'); }
-      localStorage.setItem('elite_theme', next);
-      document.getElementById('themeIcon').innerText = next === 'dark' ? 'light_mode' : 'dark_mode';
-    }
-    
+    const todayDate = new Date().toISOString().slice(0, 10);
+    let currentToday = null;
+
+    document.querySelectorAll('RangeInput').forEach(el => {
+      const t = document.getElementById('rangeTemplate').content.cloneNode(true);
+      const label = el.getAttribute('label');
+      const name = el.getAttribute('name');
+      const value = el.getAttribute('value') || '0';
+      t.querySelector('.range-label').innerText = label;
+      t.querySelector('.range-val').innerText = value;
+      const input = t.querySelector('input');
+      input.name = name;
+      input.value = value;
+      el.replaceWith(t);
+    });
+
+    document.getElementById('readinessDate').innerText = todayDate;
+
     const saved = localStorage.getItem('elite_theme') || 'light';
     if (saved === 'dark' || (!localStorage.getItem('elite_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       html.classList.add('dark');
       document.getElementById('themeIcon').innerText = 'light_mode';
-    } else {
-      document.getElementById('themeIcon').innerText = 'dark_mode';
     }
 
-    document.getElementById('dateInput').valueAsDate = new Date();
+    window.addEventListener('load', reloadToday);
 
-    // ✅ ระบบคำนวณอัตโนมัติ 
-    function calculateAutoMetrics() {
-      const dist = parseFloat(document.getElementById('distInput').value) || 0;
-      const h = parseInt(document.getElementById('hInput').value) || 0;
-      const m = parseInt(document.getElementById('mInput').value) || 0;
-      const stride = parseFloat(document.getElementById('strideInput').value) || 0;
-      const totalMins = (h * 60) + m;
+    function toggleTheme() {
+      const next = html.classList.contains('dark') ? 'light' : 'dark';
+      html.classList.toggle('dark', next === 'dark');
+      localStorage.setItem('elite_theme', next);
+      document.getElementById('themeIcon').innerText = next === 'dark' ? 'light_mode' : 'dark_mode';
+    }
 
-      const cadenceInput = document.getElementById('cadenceInput');
-      const powerInput = document.getElementById('powerInput');
+    async function apiGet(action, params = {}) {
+      assertApiReady();
+      const url = new URL(API_URL);
+      url.searchParams.set('action', action);
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, v);
+      });
+      const res = await fetch(url.toString(), { method: 'GET' });
+      const data = await res.json();
+      if (!res.ok || data.status === 'error') throw new Error(data.message || `HTTP ${res.status}`);
+      return data;
+    }
 
-      // 1. คำนวณ Power อัตโนมัติ (ต้องการระยะทางและเวลา)
-      if (dist > 0 && totalMins > 0) {
-        const speedMs = (dist * 1000) / (totalMins * 60);
-        const estPower = Math.round(65 * speedMs); // ประเมิน Power อิงจากความเร็ว
-        
-        if (!powerInput.value || powerInput.dataset.auto === 'true') {
-          powerInput.value = estPower;
-          powerInput.dataset.auto = 'true';
-        }
-      } else if (powerInput.dataset.auto === 'true') {
-        powerInput.value = '';
-        delete powerInput.dataset.auto;
-      }
+    async function apiPost(action, payload = {}) {
+      assertApiReady();
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action, ...payload })
+      });
+      const data = await res.json();
+      if (!res.ok || data.status === 'error') throw new Error(data.message || `HTTP ${res.status}`);
+      return data;
+    }
 
-      // 2. คำนวณ Cadence อัตโนมัติ (ต้องการระยะทาง, เวลา, และ Stride)
-      if (dist > 0 && totalMins > 0 && stride > 0) {
-        const cadence = Math.round((dist * 1000) / (totalMins * stride));
-        
-        if (!cadenceInput.value || cadenceInput.dataset.auto === 'true') {
-          cadenceInput.value = cadence;
-          cadenceInput.dataset.auto = 'true';
-        }
-      } else if (cadenceInput.dataset.auto === 'true') {
-        cadenceInput.value = '';
-        delete cadenceInput.dataset.auto;
+    function assertApiReady() {
+      if (!API_URL || API_URL.includes('PUT_YOUR_APPS_SCRIPT')) {
+        throw new Error('ยังไม่ได้ตั้งค่า API_URL ใน today.html');
       }
     }
 
-    // เคลียร์สถานะ 'auto' ถ้าผู้ใช้จงใจแก้ไขตัวเลขเอง
-    document.addEventListener("DOMContentLoaded", function() {
-      const powerInput = document.getElementById('powerInput');
-      const cadenceInput = document.getElementById('cadenceInput');
-      if(powerInput) {
-        powerInput.addEventListener('input', function() { delete this.dataset.auto; });
-      }
-      if(cadenceInput) {
-        cadenceInput.addEventListener('input', function() { delete this.dataset.auto; });
-      }
-    });
-
-    async function handleFormSubmit(e, form) {
-      e.preventDefault();
-
-      const h = parseInt(document.getElementById('hInput').value, 10) || 0;
-      const m = parseInt(document.getElementById('mInput').value, 10) || 0;
-      document.getElementById('totalDuration').value = (h * 60) + m;
-
-      const btn = document.getElementById('saveBtn');
-      const box = document.getElementById('alertBox');
-
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> SAVING...';
-      btn.classList.add('opacity-70');
-      box.classList.add('hidden');
-      box.classList.remove('bg-green-50', 'text-green-600', 'bg-red-50', 'text-red-600', 'dark:bg-green-900/20', 'dark:bg-red-900/20');
-
+    async function reloadToday() {
       try {
-        const payload = formToObject(form);
-
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-
-        const text = await res.text();
-        let out;
-        try { out = JSON.parse(text); } catch { out = { status: "success", message: text }; }
-
-        if (!res.ok || out.status === "error") throw new Error(out.message || `HTTP ${res.status}`);
-
-        form.reset();
-        document.getElementById('dateInput').valueAsDate = new Date();
-        document.getElementById('rpeVal').innerText = "5";
-        document.getElementById('hInput').value = "";
-        document.getElementById('mInput').value = "";
-        
-        // ✅ เคลียร์สถานะ auto หลังกด save
-        delete document.getElementById('powerInput').dataset.auto;
-        delete document.getElementById('cadenceInput').dataset.auto;
-
-        box.classList.add('bg-green-50', 'text-green-600', 'dark:bg-green-900/20', 'dark:text-green-400');
-        box.innerText = out.message || "✅ Activity Saved!";
-        box.classList.remove('hidden');
-        setTimeout(() => box.classList.add('hidden'), 2500);
-
+        setLoading(true);
+        const data = await apiGet('getToday', { date: todayDate });
+        currentToday = data.today;
+        renderToday(data.today);
+        fillProfile(data.today.profile || {});
       } catch (err) {
-        box.classList.add('bg-red-50', 'text-red-600', 'dark:bg-red-900/20', 'dark:text-red-400');
-        box.innerText = `❌ ${err.message || "Failed to save"}`;
-        box.classList.remove('hidden');
+        renderError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function renderToday(today) {
+      const w = today.workout || {};
+      const r = today.readiness || {};
+      const load = today.load || {};
+      const rec = today.recommendation || {};
+
+      document.getElementById('heroTitle').innerText = w.title || 'No Workout';
+      document.getElementById('heroSub').innerText = w.purpose || '-';
+      document.getElementById('phaseBadge').innerText = `${w.phase || '-'} · Week ${w.week_no || '-'}`;
+      document.getElementById('distanceBadge').innerText = `${num(w.planned_distance_km)} km · ${num(w.planned_duration_min)} min`;
+      document.getElementById('rpeBadge').innerText = `RPE ${w.target_rpe || '-'}`;
+      document.getElementById('hrBadge').innerText = `HR ${w.target_hr_zone || '-'}`;
+      document.getElementById('readinessScore').innerText = Math.round(Number(r.readiness_score || 75));
+      document.getElementById('readinessText').innerText = r.recommendation || 'ยังไม่มีข้อมูล readiness วันนี้';
+
+      document.getElementById('acuteLoad').innerText = num(load.acute_load_7d);
+      document.getElementById('chronicLoad').innerText = num(load.chronic_load_42d);
+      document.getElementById('formScore').innerText = num(load.form);
+      document.getElementById('riskText').innerText = load.injury_risk || 'unknown';
+      document.getElementById('loadComment').innerText = load.comment || 'ยังไม่มีข้อมูล load';
+
+      document.getElementById('workoutTypeBadge').innerText = w.workout_type || '-';
+      document.getElementById('warmupText').innerText = w.warmup || '-';
+      document.getElementById('mainSetText').innerText = w.main_set || '-';
+      document.getElementById('cooldownText').innerText = [w.cooldown, w.strength].filter(Boolean).join(' · ') || '-';
+      document.getElementById('recommendTitle').innerText = rec.title || 'Recommendation';
+      document.getElementById('recommendMessage').innerText = rec.message || '-';
+
+      renderNext7(today.next7 || []);
+    }
+
+    function renderNext7(plan) {
+      const box = document.getElementById('next7Box');
+      if (!plan.length) {
+        box.innerHTML = '<div class="text-sm text-muted rounded-2xl p-4 bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A]">ยังไม่มีแผน กด Generate Plan ก่อน</div>';
+        return;
+      }
+      box.innerHTML = plan.map(item => {
+        const isToday = item.date === todayDate;
+        return `
+          <div class="rounded-2xl p-4 border ${isToday ? 'border-accent bg-accent/5' : 'border-borderLight dark:border-[#2A2A2A] bg-page dark:bg-[#121212]'}">
+            <div class="flex justify-between gap-3 items-start">
+              <div>
+                <div class="text-xs text-muted">${escapeHtml(formatThaiDate(item.date))} · ${escapeHtml(item.phase || '')}</div>
+                <div class="font-semibold mt-1">${escapeHtml(item.title || '-')}</div>
+                <div class="text-sm text-muted mt-1">${escapeHtml(item.main_set || '-')}</div>
+              </div>
+              <div class="text-right shrink-0">
+                <div class="font-black text-accent">${num(item.planned_distance_km)} km</div>
+                <div class="text-xs text-muted">RPE ${escapeHtml(String(item.target_rpe || '-'))}</div>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function saveReadiness(e) {
+      e.preventDefault();
+      const btn = document.getElementById('saveReadinessBtn');
+      const status = document.getElementById('readinessSaveStatus');
+      btn.disabled = true;
+      btn.innerText = 'กำลังบันทึก...';
+      try {
+        const readiness = formObj(e.target);
+        readiness.date = todayDate;
+        const out = await apiPost('saveReadiness', { readiness });
+        showStatus(status, out.message || 'บันทึกแล้ว', true);
+        await reloadToday();
+      } catch (err) {
+        showStatus(status, err.message, false);
       } finally {
         btn.disabled = false;
-        btn.innerText = 'SAVE ACTIVITY';
-        btn.classList.remove('opacity-70');
+        btn.innerText = 'บันทึก Readiness';
       }
     }
 
-    function formToObject(form) {
+    async function saveProfile(e) {
+      e.preventDefault();
+      const status = document.getElementById('profileSaveStatus');
+      try {
+        const profile = formObj(e.target);
+        const out = await apiPost('saveProfile', { profile });
+        showStatus(status, out.message || 'บันทึกแล้ว', true);
+        await reloadToday();
+      } catch (err) {
+        showStatus(status, err.message, false);
+      }
+    }
+
+    async function generatePlan() {
+      const status = document.getElementById('profileSaveStatus');
+      try {
+        const profile = formObj(document.getElementById('profileForm'));
+        await apiPost('saveProfile', { profile });
+        const out = await apiPost('generatePlan', { options: { clearExisting: true } });
+        showStatus(status, `${out.message} (${out.result.workouts} workouts)`, true);
+        await reloadToday();
+      } catch (err) {
+        showStatus(status, err.message, false);
+      }
+    }
+
+    function fillProfile(p) {
+      if (!p) return;
+      setVal('profileName', p.name);
+      setVal('goalRace', p.goal_race);
+      setVal('goalDate', p.goal_date);
+      setVal('goalDistance', p.goal_distance_km);
+      setVal('goalTime', p.goal_time_min);
+      setVal('weeklyKm', p.current_weekly_km);
+      setVal('maxHr', p.max_hr);
+      setVal('restHr', p.resting_hr);
+      setVal('thresholdHr', p.threshold_hr);
+      setVal('injuryNote', p.injury_note);
+    }
+
+    function setVal(id, value) {
+      const el = document.getElementById(id);
+      if (el && value !== undefined && value !== null && value !== '') el.value = value;
+    }
+
+    function formObj(form) {
       const fd = new FormData(form);
       const obj = Object.fromEntries(fd.entries());
-      const fields = ['distance', 'duration', 'hr', 'power', 'cadence', 'rpe', 'vertOsc', 'gct', 'strideLen'];
-      fields.forEach(f => { obj[f] = numOrBlank(obj[f]); });
+      Object.keys(obj).forEach(k => {
+        const v = obj[k];
+        if (v !== '' && !Number.isNaN(Number(v)) && ['sleep_hours','sleep_quality','resting_hr','hrv','fatigue','soreness','stress','motivation','pain_score','goal_distance_km','goal_time_min','current_weekly_km','max_hr','resting_hr','threshold_hr'].includes(k)) {
+          obj[k] = Number(v);
+        }
+      });
       return obj;
     }
 
-    function numOrBlank(v) {
-      if (v === "" || v === null || v === undefined) return "";
-      const n = Number(v);
-      return Number.isFinite(n) ? n : "";
+    function setLoading(isLoading) {
+      document.body.style.cursor = isLoading ? 'progress' : '';
+    }
+
+    function renderError(message) {
+      document.getElementById('heroTitle').innerText = 'Setup Required';
+      document.getElementById('heroSub').innerText = message;
+      document.getElementById('recommendTitle').innerText = 'ตรวจสอบการตั้งค่า';
+      document.getElementById('recommendMessage').innerText = 'ให้ Deploy Apps Script แล้วนำ Web App URL มาใส่ในตัวแปร API_URL ของไฟล์ today.html';
+    }
+
+    function showStatus(el, message, ok) {
+      el.className = `text-sm text-center rounded-2xl py-2 ${ok ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300' : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300'}`;
+      el.innerText = message;
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 3200);
+    }
+
+    function num(v) {
+      const n = Number(v || 0);
+      if (!Number.isFinite(n)) return '0';
+      return Math.abs(n % 1) > 0 ? n.toFixed(1) : String(n);
+    }
+
+    function formatThaiDate(s) {
+      try { return new Date(s + 'T00:00:00').toLocaleDateString('th-TH', { weekday:'short', day:'numeric', month:'short' }); }
+      catch { return s || '-'; }
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
   </script>
+
+  <style>
+    .input {
+      width:100%;
+      background:#FCFBF9;
+      border:1px solid #F3F0EC;
+      border-radius:16px;
+      padding:12px 14px;
+      outline:none;
+      color:#33302E;
+      min-height:46px;
+    }
+    .input:focus { border-color:#FC4C02; }
+    .dark .input { background:#121212; border-color:#2A2A2A; color:#e5e7eb; }
+  </style>
 </body>
 </html>
