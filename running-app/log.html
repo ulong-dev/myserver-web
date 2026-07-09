@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AW2P Running Coach OS — Post-run Log</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            page: '#FCFBF9', card: '#FFFFFF', primary: '#33302E', muted: '#9E9892', accent: '#FC4C02', borderLight: '#F3F0EC'
+          },
+          fontFamily: { sans: ['Kanit','sans-serif'], serif: ['Playfair Display','serif'] },
+          boxShadow: { glow: '0 20px 40px -10px rgba(0,0,0,0.06)' }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Kanit:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+  <style>
+    body{font-family:'Kanit',sans-serif;background-color:#FCFBF9}.glass{background:rgba(255,255,255,.86);backdrop-filter:blur(16px)}.dark .glass{background:rgba(18,18,18,.86)}
+    .input{width:100%;background:#FCFBF9;border:1px solid #F3F0EC;border-radius:16px;padding:12px 14px;outline:none;color:#33302E;min-height:46px}.input:focus{border-color:#FC4C02}.dark .input{background:#121212;border-color:#2A2A2A;color:#e5e7eb}
+    .range-clean{accent-color:#FC4C02}.pulse-dot{animation:pulse 1.6s infinite}@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.86)}}
+  </style>
+</head>
+<body class="bg-page text-primary dark:bg-[#121212] dark:text-gray-200 min-h-screen transition-colors duration-500 pb-12">
+  <nav class="sticky top-0 z-50 glass border-b border-borderLight dark:border-[#2A2A2A]">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-3">
+      <div class="font-serif text-xl md:text-2xl font-semibold tracking-wide flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-accent inline-block pulse-dot"></span>
+        AW2P <span class="text-muted font-light">POST-RUN LOG</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="index.html" title="Today" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">today</span></a>
+        <button onclick="reloadContext()" title="Reload" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">sync</span></button>
+        <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round" id="themeIcon">dark_mode</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-5 md:space-y-6">
+    <section class="rounded-[32px] p-5 md:p-8 shadow-glow overflow-hidden relative bg-gradient-to-br from-[#181511] via-[#2A2520] to-[#6B2C11] text-white">
+      <div class="absolute -right-16 -top-16 w-52 h-52 bg-accent/20 rounded-full blur-2xl"></div>
+      <div class="relative z-10 grid lg:grid-cols-[1fr_360px] gap-6 items-end">
+        <div>
+          <div class="text-[11px] font-bold tracking-[0.18em] text-orange-200 uppercase mb-2">Post-run Logging</div>
+          <h1 class="font-serif text-4xl md:text-6xl leading-tight" id="heroTitle">Loading...</h1>
+          <p class="text-orange-100/90 mt-3 max-w-3xl" id="heroSub">บันทึกผลจริงหลังวิ่ง แล้วให้ระบบเทียบกับ prescription</p>
+          <div class="flex flex-wrap gap-2 mt-5">
+            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="phaseBadge">Phase</span>
+            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="targetDistanceBadge">0 km</span>
+            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="targetRpeBadge">RPE -</span>
+            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="targetHrBadge">HR -</span>
+          </div>
+        </div>
+        <div class="bg-white/10 border border-white/15 rounded-[28px] p-5">
+          <div class="text-[10px] font-bold tracking-[0.16em] text-orange-100 uppercase">Live Estimate</div>
+          <div class="flex items-end gap-3 mt-2"><div class="text-5xl font-black leading-none" id="liveScore">-</div><div class="pb-2 text-orange-100">score</div></div>
+          <div class="mt-3 text-sm leading-relaxed" id="liveText">กรอกระยะและเวลาเพื่อประเมิน</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid lg:grid-cols-[.95fr_1.05fr] gap-5 md:gap-6">
+      <div class="space-y-5">
+        <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
+          <div class="flex items-start justify-between gap-3 mb-5">
+            <div><h2 class="text-xl font-semibold">Today Prescription</h2><p class="text-sm text-muted mt-1">ข้อมูลจาก planned_workouts วันนี้</p></div>
+            <span class="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold" id="workoutTypeBadge">-</span>
+          </div>
+          <div class="grid md:grid-cols-3 gap-3">
+            <div class="rounded-2xl bg-page dark:bg-[#121212] p-4 border border-borderLight dark:border-[#2A2A2A]"><div class="text-[10px] text-muted font-bold uppercase">Warm-up</div><div class="font-medium mt-1" id="warmupText">-</div></div>
+            <div class="rounded-2xl bg-page dark:bg-[#121212] p-4 border border-borderLight dark:border-[#2A2A2A]"><div class="text-[10px] text-muted font-bold uppercase">Main Set</div><div class="font-semibold mt-1 text-accent" id="mainSetText">-</div></div>
+            <div class="rounded-2xl bg-page dark:bg-[#121212] p-4 border border-borderLight dark:border-[#2A2A2A]"><div class="text-[10px] text-muted font-bold uppercase">Cool-down / Strength</div><div class="font-medium mt-1" id="cooldownText">-</div></div>
+          </div>
+        </div>
+
+        <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
+          <h2 class="text-xl font-semibold">Planned vs Actual</h2>
+          <p class="text-sm text-muted mt-1 mb-5">ระบบจะประเมิน compliance, load และ status หลังบันทึก</p>
+          <div class="grid grid-cols-2 gap-3">
+            <Metric label="Planned Distance" id="plannedDistance" value="-" />
+            <Metric label="Actual Distance" id="actualDistance" value="-" />
+            <Metric label="Planned Duration" id="plannedDuration" value="-" />
+            <Metric label="Actual Duration" id="actualDuration" value="-" />
+            <Metric label="Actual Pace" id="actualPace" value="-" />
+            <Metric label="Session Load" id="sessionLoad" value="-" />
+          </div>
+          <div class="mt-4 rounded-[24px] border border-borderLight dark:border-[#2A2A2A] bg-page dark:bg-[#121212] p-5">
+            <div class="font-semibold" id="analysisTitle">ยังไม่ประเมิน</div>
+            <div class="text-sm text-muted mt-1" id="analysisText">กรอกข้อมูลจริงเพื่อดูผลเทียบกับแผน</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
+        <div class="flex items-start justify-between gap-3 mb-5">
+          <div><h2 class="text-xl font-semibold">Log Result</h2><p class="text-sm text-muted mt-1">กรอกหลังซ้อมจาก Apple Watch / Strava / ความรู้สึกจริง</p></div>
+          <span class="text-[10px] text-muted font-bold uppercase tracking-[0.12em]" id="logDateText">Today</span>
+        </div>
+        <form id="activityForm" class="space-y-4" onsubmit="saveActivity(event)">
+          <input type="hidden" name="linked_workout_id" id="linkedWorkoutId" />
+          <div class="grid grid-cols-2 gap-3">
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Date</span><input class="input" type="date" name="date" id="dateInput" required /></label>
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Type</span><select class="input" name="type" id="typeInput"><option>Easy</option><option>Recovery</option><option>Steady</option><option>Threshold</option><option>Tempo</option><option>Interval</option><option>Hill / Technique</option><option>Long</option><option>Race</option><option>Rest</option></select></label>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Distance KM</span><input class="input text-xl font-semibold text-center" type="number" step="0.01" name="distance_km" id="distanceInput" placeholder="0.00" required oninput="recalcLive()" /></label>
+            <div><span class="text-[10px] font-bold text-muted uppercase ml-2 block mb-1">Duration</span><div class="grid grid-cols-[1fr_auto_1fr] gap-2 items-center"><input class="input text-xl font-semibold text-center" type="number" id="hourInput" min="0" placeholder="hr" oninput="recalcLive()" /><span class="text-muted font-bold">:</span><input class="input text-xl font-semibold text-center" type="number" id="minuteInput" min="0" placeholder="min" required oninput="recalcLive()" /></div></div>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Avg HR</span><input class="input text-center" type="number" name="avg_hr" id="avgHrInput" placeholder="-" /></label>
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Max HR</span><input class="input text-center" type="number" name="max_hr" placeholder="-" /></label>
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Cadence</span><input class="input text-center" type="number" name="cadence" placeholder="-" /></label>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Avg Power</span><input class="input text-center" type="number" name="avg_power" placeholder="-" /></label>
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Power Source</span><select class="input" name="power_source"><option value="">-</option><option value="device">Device</option><option value="estimated">Estimated</option><option value="manual">Manual</option></select></label>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">Vert Osc</span><input class="input text-center" type="number" step="0.1" name="vertical_osc_cm" placeholder="cm" /></label>
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">GCT</span><input class="input text-center" type="number" name="gct_ms" placeholder="ms" /></label>
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">Stride</span><input class="input text-center" type="number" step="0.01" name="stride_len_m" placeholder="m" /></label>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Elev Gain</span><input class="input text-center" type="number" name="elevation_gain" placeholder="m" /></label>
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">RPE</span><input class="input text-center" type="number" min="1" max="10" name="rpe" id="rpeInput" value="5" oninput="recalcLive()" /></label>
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Pain</span><input class="input text-center" type="number" min="0" max="10" name="pain_score" id="painInput" value="0" oninput="recalcLive()" /></label>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Sleep Quality</span><input class="input text-center" type="number" min="0" max="10" name="sleep_quality" id="sleepQualityInput" /></label>
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Soreness</span><input class="input text-center" type="number" min="0" max="10" name="soreness" id="sorenessInput" /></label>
+          </div>
+          <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Notes</span><textarea class="input min-h-[92px]" name="notes" placeholder="รู้สึกอย่างไร, อากาศร้อน, HR ลอย, เจ็บตรงไหน"></textarea></label>
+          <button id="saveBtn" class="w-full bg-accent text-white rounded-full py-4 font-semibold hover:shadow-lg hover:shadow-accent/25 transition">SAVE POST-RUN LOG</button>
+          <div id="saveStatus" class="text-sm text-center hidden rounded-2xl py-2"></div>
+        </form>
+      </div>
+    </section>
+
+    <section class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
+      <div class="flex items-start justify-between gap-3 mb-5"><div><h2 class="text-xl font-semibold">Recent Activities</h2><p class="text-sm text-muted mt-1">กิจกรรมล่าสุดจาก activity_log</p></div><span class="px-3 py-1 rounded-full bg-page dark:bg-[#121212] text-xs text-muted border border-borderLight dark:border-[#2A2A2A]">Sprint 2</span></div>
+      <div id="recentBox" class="grid md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+    </section>
+  </main>
+
+  <template id="metricTemplate"><div class="rounded-2xl bg-page dark:bg-[#121212] p-4 border border-borderLight dark:border-[#2A2A2A]"><div class="text-[10px] text-muted font-bold uppercase metric-label">Label</div><div class="font-black text-2xl mt-1 metric-value">-</div></div></template>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbw28UAw8r8T4V9bAiLRHnm12lB2Ow557TeQ8RUY2CI1KmqkPqKmoBvjJ3nfdcP4Cv0/exec";
+    const html = document.documentElement;
+    const todayDate = new Date().toISOString().slice(0,10);
+    let currentContext = null;
+
+    document.querySelectorAll('Metric').forEach(el=>{const t=document.getElementById('metricTemplate').content.cloneNode(true);t.querySelector('.metric-label').innerText=el.getAttribute('label');t.querySelector('.metric-value').id=el.getAttribute('id');t.querySelector('.metric-value').innerText=el.getAttribute('value')||'-';el.replaceWith(t);});
+
+    const saved = localStorage.getItem('elite_theme') || 'light';
+    if(saved==='dark'||(!localStorage.getItem('elite_theme')&&window.matchMedia('(prefers-color-scheme: dark)').matches)){html.classList.add('dark');document.getElementById('themeIcon').innerText='light_mode';}
+    window.addEventListener('load',()=>{document.getElementById('dateInput').value=todayDate;document.getElementById('logDateText').innerText=todayDate;reloadContext();});
+    document.getElementById('dateInput').addEventListener('change', reloadContext);
+
+    function toggleTheme(){const next=html.classList.contains('dark')?'light':'dark';html.classList.toggle('dark',next==='dark');localStorage.setItem('elite_theme',next);document.getElementById('themeIcon').innerText=next==='dark'?'light_mode':'dark_mode';}
+    function apiUrl(action,params={}){const u=new URL(API_URL);u.searchParams.set('action',action);Object.entries(params).forEach(([k,v])=>{if(v!==undefined&&v!==null&&v!=='')u.searchParams.set(k,v)});return u.toString();}
+    async function apiGet(action,params={}){const r=await fetch(apiUrl(action,params));const d=await r.json();if(!r.ok||d.status==='error')throw new Error(d.message||`HTTP ${r.status}`);return d;}
+    async function apiPost(action,payload={}){const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})});const d=await r.json();if(!r.ok||d.status==='error')throw new Error(d.message||`HTTP ${r.status}`);return d;}
+
+    async function reloadContext(){try{document.body.style.cursor='progress';const date=document.getElementById('dateInput').value||todayDate;const out=await apiGet('getLogContext',{date});currentContext=out.context;renderContext(out.context);recalcLive();}catch(err){showStatus(document.getElementById('saveStatus'),err.message,false)}finally{document.body.style.cursor='';}}
+
+    function renderContext(ctx){const w=ctx.workout||{};const r=ctx.readiness||{};document.getElementById('heroTitle').innerText=w.title||'No Workout';document.getElementById('heroSub').innerText=w.purpose||'-';document.getElementById('phaseBadge').innerText=`${w.phase||'-'} · Week ${w.week_no||'-'}`;document.getElementById('targetDistanceBadge').innerText=`Target ${num(w.planned_distance_km)} km · ${num(w.planned_duration_min)} min`;document.getElementById('targetRpeBadge').innerText=`RPE ${w.target_rpe||'-'}`;document.getElementById('targetHrBadge').innerText=`HR ${w.target_hr_zone||'-'}`;document.getElementById('workoutTypeBadge').innerText=w.workout_type||'-';document.getElementById('warmupText').innerText=w.warmup||'-';document.getElementById('mainSetText').innerText=w.main_set||'-';document.getElementById('cooldownText').innerText=[w.cooldown,w.strength].filter(Boolean).join(' · ')||'-';document.getElementById('plannedDistance').innerText=`${num(w.planned_distance_km)} km`;document.getElementById('plannedDuration').innerText=`${num(w.planned_duration_min)} min`;document.getElementById('linkedWorkoutId').value=w.workout_id||'';document.getElementById('typeInput').value=normalizeType(w.workout_type||'Easy');document.getElementById('rpeInput').value=w.target_rpe||5;document.getElementById('sleepQualityInput').value=r.sleep_quality||'';document.getElementById('sorenessInput').value=r.soreness||'';renderRecent(ctx.recent||[]);}
+    function normalizeType(t){const allowed=['Easy','Recovery','Steady','Threshold','Tempo','Interval','Hill / Technique','Long','Race','Rest'];return allowed.includes(t)?t:(String(t).includes('Hill')?'Hill / Technique':(String(t).includes('Long')?'Long':(String(t).includes('Rest')?'Rest':'Easy')))}
+
+    function recalcLive(){const w=(currentContext&&currentContext.workout)||{};const dist=Number(document.getElementById('distanceInput').value||0);const h=Number(document.getElementById('hourInput').value||0);const m=Number(document.getElementById('minuteInput').value||0);const duration=h*60+m;const rpe=Number(document.getElementById('rpeInput').value||0);const pain=Number(document.getElementById('painInput').value||0);const plannedDistance=Number(w.planned_distance_km||0);const plannedDuration=Number(w.planned_duration_min||0);const targetRpe=Number(w.target_rpe||0);const avgPace=dist>0&&duration>0?Math.round(duration*60/dist):0;const sessionLoad=duration*(rpe||3);document.getElementById('actualDistance').innerText=dist?`${dist.toFixed(2)} km`:'-';document.getElementById('actualDuration').innerText=duration?`${duration} min`:'-';document.getElementById('actualPace').innerText=avgPace?pace(avgPace):'-';document.getElementById('sessionLoad').innerText=sessionLoad?String(Math.round(sessionLoad)):'-';let score=100;if(plannedDistance>0&&dist>0)score-=Math.min(35,Math.abs((dist-plannedDistance)/plannedDistance*100)*1.1);if(plannedDuration>0&&duration>0)score-=Math.min(22,Math.abs((duration-plannedDuration)/plannedDuration*100)*.65);if(targetRpe&&rpe)score-=Math.min(22,Math.abs(rpe-targetRpe)*7);if(pain>=3)score-=Math.min(25,pain*4);if(!dist||!duration)score=0;score=Math.max(0,Math.round(score));document.getElementById('liveScore').innerText=score?score:'-';document.getElementById('liveText').innerText=score>=85?'ใกล้แผนมาก':score>=70?'อยู่ในกรอบยอมรับได้':score>=50?'ปรับจากแผนพอสมควร':'ข้อมูลยังไม่ครบหรือออกนอกแผน';document.getElementById('analysisTitle').innerText=score>=85?'On target':score>=70?'Acceptable':score>=50?'Modified':'Off plan / incomplete';document.getElementById('analysisText').innerText=buildLiveNote(dist,duration,plannedDistance,plannedDuration,rpe,targetRpe,pain);}
+    function buildLiveNote(dist,dur,pd,pdur,rpe,trpe,pain){const parts=[];if(pd>0&&dist>0)parts.push(`ระยะต่าง ${(((dist-pd)/pd)*100).toFixed(1)}%`);if(pdur>0&&dur>0)parts.push(`เวลาแตกต่าง ${(((dur-pdur)/pdur)*100).toFixed(1)}%`);if(trpe&&rpe)parts.push(`RPE ต่าง ${rpe-trpe}`);if(pain>=3)parts.push('Pain score สูง ควรเลี่ยงซ้อมหนักต่อ');return parts.join(' · ')||'กรอกระยะและเวลาเพื่อประเมิน';}
+
+    async function saveActivity(e){e.preventDefault();const btn=document.getElementById('saveBtn');const status=document.getElementById('saveStatus');btn.disabled=true;btn.innerText='SAVING...';try{const activity=formObj(e.target);const h=Number(document.getElementById('hourInput').value||0);const m=Number(document.getElementById('minuteInput').value||0);activity.duration_min=h*60+m;activity.workout_type=activity.type;const out=await apiPost('saveActivity',{activity});showStatus(status,`${out.message} · ${out.activity.post_run_status} · score ${out.activity.compliance_score}`,true);renderSavedAnalysis(out.activity,out.load);await reloadContext();}catch(err){showStatus(status,err.message,false)}finally{btn.disabled=false;btn.innerText='SAVE POST-RUN LOG';}}
+    function renderSavedAnalysis(a,load){document.getElementById('analysisTitle').innerText=`Saved: ${a.post_run_status} · Score ${a.compliance_score}`;document.getElementById('analysisText').innerText=a.analysis_note||'บันทึกแล้ว';document.getElementById('liveScore').innerText=a.compliance_score||'-';document.getElementById('liveText').innerText=load&&load.comment?load.comment:(a.analysis_note||'บันทึกแล้ว');}
+
+    function renderRecent(list){const box=document.getElementById('recentBox');if(!list.length){box.innerHTML='<div class="text-sm text-muted">ยังไม่มี activity_log</div>';return}box.innerHTML=list.map(a=>`<div class="rounded-2xl p-4 border border-borderLight dark:border-[#2A2A2A] bg-page dark:bg-[#121212]"><div class="text-xs text-muted">${escapeHtml(formatThaiDate(a.date))} · ${escapeHtml(a.type||'Run')}</div><div class="font-black text-accent mt-1">${num(a.distance_km)} km</div><div class="text-sm text-muted mt-1">${a.duration_min||0} min · RPE ${a.rpe||'-'}</div><div class="text-xs text-muted mt-1">${escapeHtml(a.post_run_status||'')}</div></div>`).join('')}
+    function formObj(form){const fd=new FormData(form);const obj=Object.fromEntries(fd.entries());['distance_km','duration_min','avg_hr','max_hr','avg_power','cadence','vertical_osc_cm','gct_ms','stride_len_m','elevation_gain','rpe','pain_score','sleep_quality','soreness'].forEach(k=>{if(obj[k]!==''&&obj[k]!==undefined)obj[k]=Number(obj[k])});return obj}
+    function showStatus(el,msg,ok){el.className=`text-sm text-center rounded-2xl py-2 ${ok?'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300':'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300'}`;el.innerText=msg;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),4200)}
+    function num(v){const n=Number(v||0);if(!Number.isFinite(n))return'0';return Math.abs(n%1)>0?n.toFixed(1):String(n)}
+    function pace(sec){sec=Math.round(Number(sec||0));const m=Math.floor(sec/60);const s=String(sec%60).padStart(2,'0');return `${m}:${s}/km`}
+    function formatThaiDate(s){try{return new Date(s+'T00:00:00').toLocaleDateString('th-TH',{weekday:'short',day:'numeric',month:'short'})}catch{return s||'-'}}
+    function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+  </script>
+</body>
+</html>
