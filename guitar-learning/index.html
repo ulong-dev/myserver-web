@@ -101,6 +101,20 @@
     .exercise{border-left:5px solid var(--primary);background:#f8fafc;border-radius:16px;padding:12px;margin-bottom:10px;overflow-wrap:anywhere}.exercise.orange{border-left-color:var(--orange)}.exercise.green{border-left-color:var(--green)}.exercise.red{border-left-color:var(--red)}
     .checklist{display:grid;gap:9px}.checkItem{display:flex;gap:10px;align-items:flex-start;padding:10px;background:#fafafa;border:1px solid var(--line);border-radius:14px}.checkItem input{width:auto;transform:scale(1.18);margin-top:5px}.localProgress{height:14px;background:#e5e7eb;border-radius:999px;overflow:hidden}.localFill{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#2563eb);transition:width .2s}
     .links{display:grid;gap:8px}.links a{text-decoration:none;background:#eff6ff;color:#1d4ed8;border-radius:14px;padding:10px 12px;font-weight:800;display:block;overflow-wrap:anywhere}.links a:hover{text-decoration:underline}
+    .tunerControls{display:grid;gap:8px;margin:10px 0 12px}
+    .tunerControls label{font-size:13px;color:var(--muted);font-weight:900}
+    .tunerControls select{margin-top:6px;background:#fff}
+    .tunerGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 12px}
+    .tunerNoteBtn{background:#f8fafc;color:#0f172a;border:1px solid var(--line);border-radius:16px;min-height:86px;padding:10px 8px;display:flex;flex-direction:column;gap:2px;box-shadow:none}
+    .tunerNoteBtn strong{font-size:22px;line-height:1}
+    .tunerNoteBtn small{font-size:12px;color:var(--muted);font-weight:800}
+    .tunerNoteBtn.active{background:#fef9c3;color:#854d0e;border-color:#facc15;box-shadow:0 0 0 4px rgba(250,204,21,.22)}
+    .tunerNoteBtn.active small{color:#854d0e}
+    .externalTunerBtn{display:flex;align-items:center;justify-content:center;gap:7px;background:#111827;color:#fff;text-decoration:none;border-radius:14px;padding:11px 12px;font-weight:900;margin-top:8px}
+    .externalTunerBtn:hover{background:#0f172a}
+    .tunerGuide{margin-top:10px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:14px;padding:10px;font-size:13px}
+    @media(max-width:520px){.tunerGrid{grid-template-columns:1fr 1fr}}
+    @media(max-width:430px){.tunerGrid{grid-template-columns:1fr}}
     textarea{min-height:120px;resize:vertical}.miniGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.miniGrid.singleAction{grid-template-columns:1fr}@media(max-width:520px){.miniGrid{grid-template-columns:1fr}}
     .videoDemoHead{align-items:flex-start;margin-bottom:12px}.videoDemoHead h2{margin-bottom:4px}.videoDemoHead code,.filePath{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#e5e7eb;color:#111827;border-radius:8px;padding:2px 6px;overflow-wrap:anywhere;word-break:break-word}
     .videoDemoGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:14px;align-items:start}
@@ -363,6 +377,22 @@
         <p class="small">หมายเหตุ: เหลือเฉพาะ metronome และเสียงโน้ตในเดโม ไม่มีเสียงพูดนำฝึก</p>
       </section>
 
+
+      <section class="card">
+        <h3>การตั้งสายกีตาร์</h3>
+        <p class="small" id="tuningDescription">เลือก tuning แล้วกดโน้ตเพื่อฟังเสียงอ้างอิง หรือเปิด Fender Online Tuner</p>
+        <div class="tunerControls">
+          <label>SELECT TUNING
+            <select id="tuningSelect"></select>
+          </label>
+        </div>
+        <div class="tunerGrid" id="tunerBox"></div>
+        <a class="externalTunerBtn" href="https://www.fender.com/online-guitar-tuner/electric-guitar-tuning/" target="_blank" rel="noopener">🎛️ เปิด Fender Electric Guitar Tuner</a>
+        <div class="tunerGuide" id="tunerGuide">
+          วิธีใช้สั้น ๆ: ตั้งจากสาย 6 ไปสาย 1 → ดีดสายเปล่า → หมุนลูกบิดจนเสียงตรงกับโน้ตอ้างอิง แล้วเช็กซ้ำอีกรอบหลังตั้งครบทุกสาย
+        </div>
+      </section>
+
       <section class="card">
         <div class="between"><h3>Checklist การฝึก</h3><span id="checkPercent" class="badge dark">0%</span></div>
         <div class="localProgress"><div class="localFill" id="localFill"></div></div>
@@ -439,6 +469,204 @@ const CHECK_ITEMS = [
   "จบ phrase ที่ root note ได้"
 ];
 
+
+const TUNINGS = {
+  standard: {
+    name:"Standard — E A D G B E",
+    short:"E A D G B E",
+    description:"มาตรฐานสายกีตาร์ไฟฟ้า ใช้กับบทเรียนส่วนใหญ่ในโปรแกรมนี้",
+    strings:[
+      {string:"6", label:"E ต่ำ", note:"E2", freq:82.41},
+      {string:"5", label:"A", note:"A2", freq:110.00},
+      {string:"4", label:"D", note:"D3", freq:146.83},
+      {string:"3", label:"G", note:"G3", freq:196.00},
+      {string:"2", label:"B", note:"B3", freq:246.94},
+      {string:"1", label:"E สูง", note:"E4", freq:329.63}
+    ]
+  },
+  openG: {
+    name:"Open G — D G D G B D",
+    short:"D G D G B D",
+    description:"ดีดสายเปล่าแล้วได้คอร์ด G เหมาะกับ slide, blues และ rhythm open chord",
+    strings:[
+      {string:"6", label:"D ต่ำ", note:"D2", freq:73.42},
+      {string:"5", label:"G", note:"G2", freq:98.00},
+      {string:"4", label:"D", note:"D3", freq:146.83},
+      {string:"3", label:"G", note:"G3", freq:196.00},
+      {string:"2", label:"B", note:"B3", freq:246.94},
+      {string:"1", label:"D สูง", note:"D4", freq:293.66}
+    ]
+  },
+  openD: {
+    name:"Open D — D A D F# A D",
+    short:"D A D F# A D",
+    description:"ดีดสายเปล่าแล้วได้คอร์ด D เหมาะกับ slide และ fingerstyle",
+    strings:[
+      {string:"6", label:"D ต่ำ", note:"D2", freq:73.42},
+      {string:"5", label:"A", note:"A2", freq:110.00},
+      {string:"4", label:"D", note:"D3", freq:146.83},
+      {string:"3", label:"F#", note:"F#3", freq:185.00},
+      {string:"2", label:"A", note:"A3", freq:220.00},
+      {string:"1", label:"D สูง", note:"D4", freq:293.66}
+    ]
+  },
+  openC: {
+    name:"Open C — C G C G C E",
+    short:"C G C G C E",
+    description:"ดีดสายเปล่าแล้วได้คอร์ด C โทนกว้าง หนา และมี resonance สูง",
+    strings:[
+      {string:"6", label:"C ต่ำ", note:"C2", freq:65.41},
+      {string:"5", label:"G", note:"G2", freq:98.00},
+      {string:"4", label:"C", note:"C3", freq:130.81},
+      {string:"3", label:"G", note:"G3", freq:196.00},
+      {string:"2", label:"C", note:"C4", freq:261.63},
+      {string:"1", label:"E สูง", note:"E4", freq:329.63}
+    ]
+  },
+  openA: {
+    name:"Open A — E A E A C# E",
+    short:"E A E A C# E",
+    description:"ดีดสายเปล่าแล้วได้คอร์ด A เหมาะกับ blues, slide และ open chord voicing",
+    strings:[
+      {string:"6", label:"E ต่ำ", note:"E2", freq:82.41},
+      {string:"5", label:"A", note:"A2", freq:110.00},
+      {string:"4", label:"E", note:"E3", freq:164.81},
+      {string:"3", label:"A", note:"A3", freq:220.00},
+      {string:"2", label:"C#", note:"C#4", freq:277.18},
+      {string:"1", label:"E สูง", note:"E4", freq:329.63}
+    ]
+  },
+  halfStepUp: {
+    name:"Half Step Up — F A# D# G# C F",
+    short:"F A# D# G# C F",
+    description:"เพิ่มทุกสายขึ้นครึ่งเสียง ใช้เมื่อเพลงหรือ backing track สูงกว่า standard ครึ่งเสียง",
+    strings:[
+      {string:"6", label:"F ต่ำ", note:"F2", freq:87.31},
+      {string:"5", label:"A#", note:"A#2", freq:116.54},
+      {string:"4", label:"D#", note:"D#3", freq:155.56},
+      {string:"3", label:"G#", note:"G#3", freq:207.65},
+      {string:"2", label:"C", note:"C4", freq:261.63},
+      {string:"1", label:"F สูง", note:"F4", freq:349.23}
+    ]
+  },
+  halfStepDown: {
+    name:"Half Step Down — Eb Ab Db Gb Bb Eb",
+    short:"Eb Ab Db Gb Bb Eb",
+    description:"ลดทุกสายลงครึ่งเสียง เสียงจะหนากว่าและร้อง/เล่นง่ายขึ้นในบางเพลง",
+    strings:[
+      {string:"6", label:"Eb ต่ำ", note:"Eb2", freq:77.78},
+      {string:"5", label:"Ab", note:"Ab2", freq:103.83},
+      {string:"4", label:"Db", note:"Db3", freq:138.59},
+      {string:"3", label:"Gb", note:"Gb3", freq:185.00},
+      {string:"2", label:"Bb", note:"Bb3", freq:233.08},
+      {string:"1", label:"Eb สูง", note:"Eb4", freq:311.13}
+    ]
+  },
+  fullStepDown: {
+    name:"Full Step Down — D G C F A D",
+    short:"D G C F A D",
+    description:"ลดทุกสายลงหนึ่งเสียงเต็ม ให้โทนต่ำ หนา เหมาะกับ rock/metal",
+    strings:[
+      {string:"6", label:"D ต่ำ", note:"D2", freq:73.42},
+      {string:"5", label:"G", note:"G2", freq:98.00},
+      {string:"4", label:"C", note:"C3", freq:130.81},
+      {string:"3", label:"F", note:"F3", freq:174.61},
+      {string:"2", label:"A", note:"A3", freq:220.00},
+      {string:"1", label:"D สูง", note:"D4", freq:293.66}
+    ]
+  },
+  dropD: {
+    name:"Drop D — D A D G B E",
+    short:"D A D G B E",
+    description:"ลดสาย 6 จาก E ลงเป็น D เหมาะกับ riff rock/metal และ power chord นิ้วเดียว",
+    strings:[
+      {string:"6", label:"D ต่ำ", note:"D2", freq:73.42},
+      {string:"5", label:"A", note:"A2", freq:110.00},
+      {string:"4", label:"D", note:"D3", freq:146.83},
+      {string:"3", label:"G", note:"G3", freq:196.00},
+      {string:"2", label:"B", note:"B3", freq:246.94},
+      {string:"1", label:"E สูง", note:"E4", freq:329.63}
+    ]
+  },
+  dropCSharpAlt: {
+    name:"Drop C# (Alt) — C# A D G B E",
+    short:"C# A D G B E",
+    description:"ลดเฉพาะสาย 6 ลงเป็น C# ส่วนสายอื่นคง standard ตาม preset ของ Fender",
+    strings:[
+      {string:"6", label:"C# ต่ำ", note:"C#2", freq:69.30},
+      {string:"5", label:"A", note:"A2", freq:110.00},
+      {string:"4", label:"D", note:"D3", freq:146.83},
+      {string:"3", label:"G", note:"G3", freq:196.00},
+      {string:"2", label:"B", note:"B3", freq:246.94},
+      {string:"1", label:"E สูง", note:"E4", freq:329.63}
+    ]
+  },
+  dropCSharp: {
+    name:"Drop C# — C# G# C# F# A# D#",
+    short:"C# G# C# F# A# D#",
+    description:"ลดทุกสายลงครึ่งเสียงจาก Drop D ให้โทนหนักขึ้น เหมาะกับ hard rock/metal",
+    strings:[
+      {string:"6", label:"C# ต่ำ", note:"C#2", freq:69.30},
+      {string:"5", label:"G#", note:"G#2", freq:103.83},
+      {string:"4", label:"C#", note:"C#3", freq:138.59},
+      {string:"3", label:"F#", note:"F#3", freq:185.00},
+      {string:"2", label:"A#", note:"A#3", freq:233.08},
+      {string:"1", label:"D# สูง", note:"D#4", freq:311.13}
+    ]
+  },
+  dropC: {
+    name:"Drop C — C A D G B E",
+    short:"C A D G B E",
+    description:"ลดเฉพาะสาย 6 ลงเป็น C ตาม preset บน Fender web tuner",
+    strings:[
+      {string:"6", label:"C ต่ำ", note:"C2", freq:65.41},
+      {string:"5", label:"A", note:"A2", freq:110.00},
+      {string:"4", label:"D", note:"D3", freq:146.83},
+      {string:"3", label:"G", note:"G3", freq:196.00},
+      {string:"2", label:"B", note:"B3", freq:246.94},
+      {string:"1", label:"E สูง", note:"E4", freq:329.63}
+    ]
+  },
+  dropB: {
+    name:"Drop B — B Gb B E Ab Db",
+    short:"B Gb B E Ab Db",
+    description:"ลดโทนลงหนักมาก เหมาะกับ metal/modern rock ต้องเช็กแรงตึงสายและ intonation",
+    strings:[
+      {string:"6", label:"B ต่ำ", note:"B1", freq:61.74},
+      {string:"5", label:"Gb", note:"Gb2", freq:92.50},
+      {string:"4", label:"B", note:"B2", freq:123.47},
+      {string:"3", label:"E", note:"E3", freq:164.81},
+      {string:"2", label:"Ab", note:"Ab3", freq:207.65},
+      {string:"1", label:"Db สูง", note:"Db4", freq:277.18}
+    ]
+  },
+  dropA: {
+    name:"Drop A — A E A D Gb B",
+    short:"A E A D Gb B",
+    description:"โทนต่ำมาก เหมาะกับ modern metal/extended low riff ควรใช้สายเบอร์เหมาะสม",
+    strings:[
+      {string:"6", label:"A ต่ำ", note:"A1", freq:55.00},
+      {string:"5", label:"E", note:"E2", freq:82.41},
+      {string:"4", label:"A", note:"A2", freq:110.00},
+      {string:"3", label:"D", note:"D3", freq:146.83},
+      {string:"2", label:"Gb", note:"Gb3", freq:185.00},
+      {string:"1", label:"B สูง", note:"B3", freq:246.94}
+    ]
+  },
+  dadgad: {
+    name:"DADGAD — D A D G A D",
+    short:"D A D G A D",
+    description:"โทนโปร่ง ลอย เหมาะกับ acoustic, folk และ chord voicing เปิดสาย",
+    strings:[
+      {string:"6", label:"D ต่ำ", note:"D2", freq:73.42},
+      {string:"5", label:"A", note:"A2", freq:110.00},
+      {string:"4", label:"D", note:"D3", freq:146.83},
+      {string:"3", label:"G", note:"G3", freq:196.00},
+      {string:"2", label:"A", note:"A3", freq:220.00},
+      {string:"1", label:"D สูง", note:"D4", freq:293.66}
+    ]
+  }
+};
 const SEGMENTS = [
   {id:"warm", label:"Warm up", full:300, demo:30},
   {id:"main", label:"Main scale drill", full:900, demo:90},
@@ -459,6 +687,11 @@ let videoDemo = {activeIndex:-1, noteIndex:-1, cues:[], notes:[], raf:null};
 let audioCtx = null;
 let metroTimer = null;
 let beatCount = 0;
+let tuningOsc = null;
+let tuningBodyOsc = null;
+let tuningGain = null;
+let tuningStopTimer = null;
+let activeTuningNote = null;
 
 const $ = id => document.getElementById(id);
 
@@ -469,7 +702,10 @@ function init(){
   for(let d=1; d<=CONFIG.daysPerWeek; d++) $("daySelect").appendChild(new Option("Day " + d, d));
   ["weekSelect","daySelect","modeSelect","bpmInput","metroOn"].forEach(id => $(id).addEventListener("change", () => { if(id === "bpmInput") saveBpm(); render(); }));
   $("metroOn").addEventListener("change", saveAudioSettings);
+  renderTuningOptions();
+  if($("tuningSelect")) $("tuningSelect").addEventListener("change", () => { saveSelectedTuning(); stopTuningNote(); renderTuner(); });
   loadAudioSettings();
+  renderTuner();
   initVideoDemo();
   goTo(1,1);
 }
@@ -709,6 +945,7 @@ function renderLinks(day,bpm){
     [`Metronome ${bpm} bpm`, googleUrl(`online metronome ${bpm} bpm`)],
     [`${day.root} ${day.type} scale lesson`, youtubeUrl(`${day.root} ${day.type} scale guitar lesson 5 positions rock metal`)],
     [`${day.root} ${day.type} backing track`, youtubeUrl(`${day.root} ${day.type} rock metal backing track guitar ${bpm} bpm`)],
+    ["Fender Online Guitar Tuner — Electric Guitar", "https://www.fender.com/online-guitar-tuner/electric-guitar-tuning/"],
     ["Alternate picking exercise", youtubeUrl("alternate picking scale exercise guitar rock metal")]
   ];
   $("linkBox").innerHTML = links.map(l => `<a href="${l[1]}" target="_blank" rel="noopener">${l[0]}</a>`).join("");
@@ -1087,6 +1324,7 @@ function strokeRoundRect(ctx,x,y,w,h,r){
 
 function startPlayer(){
   stopPlayer(false);
+  stopTuningNote();
   pauseDemoVideo();
   unlockAudio();
   player.running = true; player.paused = false; player.elapsed = 0; player.lastTick = performance.now();
@@ -1158,6 +1396,86 @@ function mainPhaseCue(phase){
 function setCue(label,text,hint){ $("cueLabel").textContent=label; $("cueText").textContent=text; $("cueHint").textContent=hint; }
 function saveAudioSettings(){ localStorage.setItem("guitar_metro_on", $("metroOn").value); }
 function loadAudioSettings(){ $("metroOn").value = localStorage.getItem("guitar_metro_on") || "1"; }
+
+function renderTuningOptions(){
+  const select = $("tuningSelect");
+  if(!select) return;
+  select.innerHTML = Object.entries(TUNINGS).map(([key, tuning]) => `<option value="${key}">${tuning.name}</option>`).join("");
+  select.value = localStorage.getItem("guitar_selected_tuning") || "standard";
+  if(!TUNINGS[select.value]) select.value = "standard";
+}
+
+function saveSelectedTuning(){
+  const select = $("tuningSelect");
+  if(select) localStorage.setItem("guitar_selected_tuning", select.value || "standard");
+}
+
+function currentTuning(){
+  const key = $("tuningSelect")?.value || localStorage.getItem("guitar_selected_tuning") || "standard";
+  return TUNINGS[key] || TUNINGS.standard;
+}
+
+function renderTuner(){
+  const box = $("tunerBox");
+  if(!box) return;
+  const tuning = currentTuning();
+  if($("tuningDescription")) $("tuningDescription").textContent = `SELECT TUNING: ${tuning.short} — ${tuning.description}`;
+  if($("tunerGuide")) $("tunerGuide").textContent = `วิธีใช้สั้น ๆ: เลือก ${tuning.short} → ตั้งจากสาย 6 ไปสาย 1 → ดีดสายเปล่า → หมุนลูกบิดจนเสียงตรงกับโน้ตอ้างอิง แล้วเช็กซ้ำอีกรอบหลังตั้งครบทุกสาย`;
+  box.innerHTML = tuning.strings.map(n => {
+    const displayNote = n.note.replace(/[0-9]/g, "");
+    return `
+      <button type="button" class="tunerNoteBtn" data-note="${n.note}" onclick="playTuningNote(${n.freq}, '${n.note}')">
+        <strong>${displayNote}</strong>
+        <small>สาย ${n.string} • ${n.label}</small>
+        <small>${n.note} • ${n.freq.toFixed(2)} Hz</small>
+      </button>
+    `;
+  }).join("");
+}
+
+function playTuningNote(freq, note){
+  unlockAudio();
+  if(!audioCtx) return;
+  stopTuningNote(false);
+  activeTuningNote = note;
+  document.querySelectorAll(".tunerNoteBtn").forEach(btn => btn.classList.toggle("active", btn.dataset.note === note));
+  const now = audioCtx.currentTime;
+  tuningOsc = audioCtx.createOscillator();
+  tuningBodyOsc = audioCtx.createOscillator();
+  tuningGain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  tuningOsc.type = "triangle";
+  tuningBodyOsc.type = "sine";
+  tuningOsc.frequency.setValueAtTime(freq, now);
+  tuningBodyOsc.frequency.setValueAtTime(freq * 2, now);
+  filter.type = "lowpass";
+  filter.frequency.setValueAtTime(1800, now);
+  tuningGain.gain.setValueAtTime(0.0001, now);
+  tuningGain.gain.exponentialRampToValueAtTime(0.22, now + 0.03);
+  tuningGain.gain.setValueAtTime(0.22, now + 2.0);
+  tuningGain.gain.exponentialRampToValueAtTime(0.0001, now + 2.45);
+  tuningOsc.connect(filter);
+  tuningBodyOsc.connect(filter);
+  filter.connect(tuningGain);
+  tuningGain.connect(audioCtx.destination);
+  tuningOsc.start(now);
+  tuningBodyOsc.start(now);
+  tuningOsc.stop(now + 2.5);
+  tuningBodyOsc.stop(now + 2.5);
+  tuningStopTimer = setTimeout(() => stopTuningNote(false), 2550);
+}
+
+function stopTuningNote(clearActive=true){
+  if(tuningStopTimer) clearTimeout(tuningStopTimer);
+  tuningStopTimer = null;
+  try{ if(tuningOsc) tuningOsc.stop(); }catch(e){}
+  try{ if(tuningBodyOsc) tuningBodyOsc.stop(); }catch(e){}
+  tuningOsc = null;
+  tuningBodyOsc = null;
+  tuningGain = null;
+  if(clearActive) activeTuningNote = null;
+  document.querySelectorAll(".tunerNoteBtn").forEach(btn => btn.classList.remove("active"));
+}
 
 function unlockAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if(audioCtx.state === "suspended") audioCtx.resume(); }
 function startMetronome(){ stopMetronome(); unlockAudio(); const {bpm}=current(); const interval = 60000 / bpm; beatCount = 0; metroTimer = setInterval(playClick, interval); playClick(); $("metroText").textContent = `Metronome: ${bpm} bpm`; }
