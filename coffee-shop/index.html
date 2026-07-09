@@ -801,7 +801,7 @@
     }
 
     .modal.modal-receipt {
-      max-width: 380px;
+      max-width: 520px;
       background: #FDF8F2;
       border: 1px solid var(--border-soft);
     }
@@ -857,13 +857,13 @@
 
     .promptpay-status {
       display: grid;
-      grid-template-columns: 124px 1fr;
-      gap: 10px;
+      grid-template-columns: 210px minmax(0, 1fr);
+      gap: 14px;
       align-items: center;
     }
 
     .promptpay-qr {
-      width: 124px;
+      width: 210px;
       aspect-ratio: 1;
       border: 1px solid var(--border-soft);
       border-radius: var(--radius-sm);
@@ -874,13 +874,16 @@
       justify-content: center;
       font-size: 12px;
       overflow: hidden;
+      padding: 8px;
+      flex: 0 0 auto;
     }
 
     .promptpay-qr img {
-      width: 100%;
-      height: 100%;
+      width: 100% !important;
+      height: 100% !important;
       object-fit: contain;
       display: block;
+      margin: 0 !important;
     }
 
     .promptpay-title {
@@ -1232,7 +1235,7 @@
       }
 
       .promptpay-qr {
-        width: min(220px, 100%);
+        width: min(280px, 100%);
         justify-self: center;
       }
     }
@@ -2252,7 +2255,7 @@ function renderProductGrid() {
       const qr = window.qrcode(0, "M");
       qr.addData(payload);
       qr.make();
-      promptPayQrEl.innerHTML = qr.createImgTag(5, 6);
+      promptPayQrEl.innerHTML = qr.createImgTag(8, 0);
       return true;
     } catch (err) {
       console.warn(err);
