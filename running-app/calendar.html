@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AW2P Running Coach OS — Calendar Export</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{
+      colors:{ page:'#FCFBF9', card:'#FFFFFF', primary:'#33302E', muted:'#9E9892', accent:'#FC4C02', borderLight:'#F3F0EC' },
+      fontFamily:{ sans:['Kanit','sans-serif'], serif:['Playfair Display','serif'] },
+      boxShadow:{ glow:'0 20px 40px -10px rgba(0,0,0,0.06)' }
+    } } }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Kanit:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <style>
+    body{font-family:'Kanit',sans-serif;background:#FCFBF9}.glass{background:rgba(255,255,255,.86);backdrop-filter:blur(16px)}.dark .glass{background:rgba(18,18,18,.86)}
+    .input{width:100%;background:#FCFBF9;border:1px solid #F3F0EC;border-radius:16px;padding:12px 14px;outline:none;color:#33302E;min-height:46px}.input:focus{border-color:#FC4C02}.dark .input{background:#121212;border-color:#2A2A2A;color:#e5e7eb}
+  </style>
+</head>
+<body class="bg-page text-primary dark:bg-[#121212] dark:text-gray-200 min-h-screen transition-colors duration-500 pb-12">
+  <nav class="sticky top-0 z-50 glass border-b border-borderLight dark:border-[#2A2A2A]">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-3">
+      <div class="font-serif text-xl md:text-2xl font-semibold tracking-wide flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-accent inline-block"></span>AW2P <span class="text-muted font-light">CALENDAR EXPORT</span></div>
+      <div class="flex items-center gap-2">
+        <a href="index.html" title="Today" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">today</span></a>
+        <a href="log.html" title="Post-run Log" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">edit_note</span></a>
+        <a href="dashboard.html" title="Dashboard" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">insert_chart_outlined</span></a>
+        <a href="tests.html" title="Fitness Test Lab" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">science</span></a>
+        <button onclick="reloadCalendar()" title="Reload" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">sync</span></button>
+        <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round" id="themeIcon">dark_mode</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-5 md:space-y-6">
+    <section class="rounded-[32px] p-5 md:p-8 shadow-glow overflow-hidden relative bg-gradient-to-br from-[#181511] via-[#2A2520] to-[#6B2C11] text-white">
+      <div class="absolute -right-16 -top-16 w-52 h-52 bg-accent/20 rounded-full blur-2xl"></div>
+      <div class="relative z-10 grid lg:grid-cols-[1fr_360px] gap-6 items-end">
+        <div>
+          <div class="text-[11px] font-bold tracking-[0.18em] text-orange-200 uppercase mb-2">Sprint 6 · Calendar + Workout Export</div>
+          <h1 class="font-serif text-4xl md:text-6xl leading-tight">Put the plan on your calendar.</h1>
+          <p class="text-orange-100/90 mt-3 max-w-3xl">ส่ง workout เข้า Google Calendar หรือ export เป็น .ics เพื่อนำเข้า Apple Calendar / Google Calendar ได้ทันที</p>
+        </div>
+        <div class="bg-white/10 border border-white/15 rounded-[28px] p-5">
+          <div class="text-[10px] font-bold tracking-[0.16em] text-orange-100 uppercase">Selected Range</div>
+          <div class="text-3xl font-black leading-tight mt-2" id="rangeTitle">-</div>
+          <div class="mt-3 text-sm text-orange-100" id="rangeHelp">กำลังโหลด</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid lg:grid-cols-[.85fr_1.15fr] gap-5 md:gap-6">
+      <div class="space-y-5 md:space-y-6">
+        <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
+          <div class="flex items-start justify-between gap-3 mb-5"><div><h2 class="text-xl font-semibold">Export Settings</h2><p class="text-sm text-muted mt-1">เลือกช่วงแผนซ้อมที่จะส่งออก</p></div><span class="material-icons-round text-accent">event</span></div>
+          <form id="calendarForm" class="space-y-4" onsubmit="event.preventDefault(); reloadCalendar();">
+            <div class="grid grid-cols-2 gap-3">
+              <label><span class="text-[10px] font-bold text-muted uppercase ml-2">From Date</span><input class="input" type="date" id="fromInput" required></label>
+              <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Days</span><select class="input" id="daysInput"><option value="7">7 days</option><option value="14">14 days</option><option value="21">21 days</option><option value="28">28 days</option></select></label>
+            </div>
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">Google Calendar ID</span><input class="input" id="calendarIdInput" placeholder="เว้นว่าง = Default Calendar"></label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex gap-3 items-start rounded-2xl bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] p-4 text-sm"><input id="includeRestInput" type="checkbox" class="mt-1 accent-[#FC4C02]"><span><strong>Include Rest</strong><br><span class="text-muted">รวมวันพักใน calendar</span></span></label>
+              <label class="flex gap-3 items-start rounded-2xl bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] p-4 text-sm"><input id="recreateInput" type="checkbox" class="mt-1 accent-[#FC4C02]"><span><strong>Recreate Existing</strong><br><span class="text-muted">ลบ event เดิมของ workout นั้นแล้วสร้างใหม่</span></span></label>
+            </div>
+            <button class="w-full bg-primary dark:bg-white dark:text-primary text-white rounded-full py-3.5 font-semibold">Reload Plan</button>
+          </form>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="downloadIcs()" class="rounded-[24px] bg-accent text-white p-5 text-left shadow-glow hover:shadow-lg transition"><span class="material-icons-round">download</span><div class="font-semibold mt-2">Export .ics</div><div class="text-sm text-white/80">Apple / Google Calendar</div></button>
+          <button onclick="createGoogleCalendarEvents()" class="rounded-[24px] bg-primary dark:bg-white dark:text-primary text-white p-5 text-left shadow-glow hover:shadow-lg transition"><span class="material-icons-round">event_available</span><div class="font-semibold mt-2">Add to Google</div><div class="text-sm opacity-80">สร้าง event จริง</div></button>
+          <button onclick="copyWeekPlan()" class="rounded-[24px] bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] p-5 text-left shadow-glow hover:shadow-lg transition"><span class="material-icons-round text-accent">content_copy</span><div class="font-semibold mt-2">Copy Week</div><div class="text-sm text-muted">ข้อความพร้อมส่ง</div></button>
+          <a href="dashboard.html" class="rounded-[24px] bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] p-5 text-left shadow-glow hover:shadow-lg transition"><span class="material-icons-round text-accent">insert_chart_outlined</span><div class="font-semibold mt-2">Dashboard</div><div class="text-sm text-muted">ดูภาพรวมโหลด</div></a>
+        </div>
+
+        <div id="statusBox" class="hidden text-sm rounded-2xl py-3 px-4"></div>
+      </div>
+
+      <div class="space-y-5 md:space-y-6">
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <KpiCard label="Total KM" id="kpiKm"></KpiCard>
+          <KpiCard label="Total Min" id="kpiMin"></KpiCard>
+          <KpiCard label="Quality" id="kpiQuality"></KpiCard>
+          <KpiCard label="Long Run" id="kpiLong"></KpiCard>
+        </section>
+        <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
+          <div class="flex items-start justify-between gap-3 mb-5"><div><h2 class="text-xl font-semibold">Workout Calendar Preview</h2><p class="text-sm text-muted mt-1">รายการที่จะ export หรือสร้างใน Google Calendar</p></div><span class="text-xs text-muted">Sprint 6</span></div>
+          <div id="workoutBox" class="space-y-3"></div>
+        </div>
+        <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
+          <div class="flex items-start justify-between gap-3 mb-5"><div><h2 class="text-xl font-semibold">Export Log</h2><p class="text-sm text-muted mt-1">ประวัติการ export / สร้าง event ล่าสุด</p></div><span class="material-icons-round text-muted">history</span></div>
+          <div id="logBox" class="space-y-3"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <template id="kpiTemplate"><div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[24px] p-5 shadow-glow"><div class="text-[10px] text-muted font-bold uppercase tracking-[0.14em] k-label">Label</div><div class="text-3xl font-black mt-2 k-value">-</div><div class="text-xs text-muted mt-1 k-sub">planned</div></div></template>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbw28UAw8r8T4V9bAiLRHnm12lB2Ow557TeQ8RUY2CI1KmqkPqKmoBvjJ3nfdcP4Cv0/exec";
+    const html = document.documentElement;
+    let currentContext = null;
+    document.querySelectorAll('KpiCard').forEach(el => { const t=document.getElementById('kpiTemplate').content.cloneNode(true); t.querySelector('.k-label').innerText=el.getAttribute('label'); t.querySelector('.k-value').id=el.getAttribute('id'); el.replaceWith(t); });
+    const saved = localStorage.getItem('elite_theme') || 'light';
+    if(saved === 'dark' || (!localStorage.getItem('elite_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)){ html.classList.add('dark'); document.getElementById('themeIcon').innerText='light_mode'; }
+    document.getElementById('fromInput').value = weekStart(new Date());
+    window.addEventListener('load', reloadCalendar);
+
+    function toggleTheme(){ const next=html.classList.contains('dark')?'light':'dark'; html.classList.toggle('dark',next==='dark'); localStorage.setItem('elite_theme',next); document.getElementById('themeIcon').innerText=next==='dark'?'light_mode':'dark_mode'; }
+    async function apiGet(action, params={}){ const url=new URL(API_URL); url.searchParams.set('action',action); Object.entries(params).forEach(([k,v])=>{ if(v!==undefined && v!==null && v!=='') url.searchParams.set(k,v); }); const res=await fetch(url); const data=await res.json(); if(!res.ok || data.status==='error') throw new Error(data.message || `HTTP ${res.status}`); return data; }
+    async function apiPost(action, payload={}){ const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})}); const data=await res.json(); if(!res.ok || data.status==='error') throw new Error(data.message || `HTTP ${res.status}`); return data; }
+
+    function formParams(){ return { from:document.getElementById('fromInput').value, days:document.getElementById('daysInput').value }; }
+    async function reloadCalendar(){ try{ setStatus('กำลังโหลดแผน...', true, true); document.body.style.cursor='progress'; const data=await apiGet('getCalendarContext', formParams()); currentContext=data.context; renderCalendar(data.context); setStatus('โหลดแผนสำเร็จ', true); }catch(err){ setStatus(err.message, false); }finally{ document.body.style.cursor=''; } }
+    function renderCalendar(ctx){ document.getElementById('rangeTitle').innerText = `${ctx.from} → ${ctx.to}`; document.getElementById('rangeHelp').innerText = `${ctx.days} days · ${ctx.summary.workout_count} workouts`; document.getElementById('kpiKm').innerText=ctx.summary.total_km; document.getElementById('kpiMin').innerText=ctx.summary.total_min; document.getElementById('kpiQuality').innerText=ctx.summary.quality_sessions; document.getElementById('kpiLong').innerText=ctx.summary.long_run_km; renderWorkouts(ctx.workouts||[]); renderLogs(ctx.export_logs||[]); }
+    function renderWorkouts(list){ const box=document.getElementById('workoutBox'); if(!list.length){ box.innerHTML='<div class="text-sm text-muted rounded-2xl p-4 bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A]">ไม่มี workout ในช่วงที่เลือก</div>'; return; } box.innerHTML=list.map(w=>`<div class="rounded-2xl p-4 border border-borderLight dark:border-[#2A2A2A] bg-page dark:bg-[#121212]"><div class="flex justify-between gap-3"><div><div class="text-xs text-muted">${escapeHtml(formatThaiDate(w.date))} · ${escapeHtml(w.start_time)}-${escapeHtml(w.end_time)} · ${escapeHtml(w.phase||'')}</div><div class="font-semibold mt-1">${escapeHtml(w.title||'-')}</div><div class="text-sm text-muted mt-1">${escapeHtml(w.main_set||'-')}</div><div class="text-xs text-muted mt-2">${escapeHtml(w.pace_label||'-')} · HR ${escapeHtml(w.target_hr_zone||'-')} · RPE ${escapeHtml(String(w.target_rpe||'-'))}</div></div><div class="text-right shrink-0"><div class="font-black text-accent">${escapeHtml(w.distance_label||'-')}</div><div class="text-xs text-muted">${escapeHtml(w.duration_label||'-')}</div></div></div></div>`).join(''); }
+    function renderLogs(list){ const box=document.getElementById('logBox'); if(!list.length){ box.innerHTML='<div class="text-sm text-muted">ยังไม่มีประวัติ export</div>'; return; } box.innerHTML=list.map(l=>`<div class="rounded-2xl p-4 bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A]"><div class="flex justify-between gap-3"><div><div class="font-semibold">${escapeHtml(l.mode||'-')} · ${escapeHtml(l.status||'-')}</div><div class="text-sm text-muted">${escapeHtml(l.from_date||'-')} → ${escapeHtml(l.to_date||'-')} · ${escapeHtml(String(l.event_count||0))} events</div><div class="text-xs text-muted mt-1">${escapeHtml(l.message||'')}</div></div><div class="text-xs text-muted shrink-0">${escapeHtml(l.created_at||'')}</div></div></div>`).join(''); }
+
+    async function downloadIcs(){ if(!currentContext) await reloadCalendar(); const filename=currentContext.ics_filename || 'aw2p-running-plan.ics'; const blob=new Blob([currentContext.ics_text],{type:'text/calendar;charset=utf-8'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); await apiPost('logCalendarExport',{options:{mode:'ics',from_date:currentContext.from,to_date:currentContext.to,days:currentContext.days,event_count:currentContext.workouts.length,ics_filename:filename,status:'success',message:'downloaded from browser'}}).catch(()=>{}); setStatus(`ดาวน์โหลด ${filename} แล้ว`, true); }
+    async function createGoogleCalendarEvents(){ try{ if(!confirm('สร้าง events ใน Google Calendar ตามช่วงที่เลือก?')) return; setStatus('กำลังสร้าง Google Calendar events...', true, true); const options={...formParams(),calendar_id:document.getElementById('calendarIdInput').value.trim(),include_rest:document.getElementById('includeRestInput').checked,recreate:document.getElementById('recreateInput').checked}; const out=await apiPost('createCalendarEvents',{options}); const r=out.result; setStatus(`สร้าง ${r.created.length} events · ข้าม ${r.skipped.length} · ลบเดิม ${r.deleted.length}`, true); await reloadCalendar(); }catch(err){ setStatus(err.message, false); } }
+    async function copyWeekPlan(){ if(!currentContext) await reloadCalendar(); try{ await navigator.clipboard.writeText(currentContext.copy_text || ''); setStatus('คัดลอกแผนรายสัปดาห์แล้ว', true); }catch(err){ setStatus('คัดลอกไม่ได้ใน browser นี้', false); } }
+    function setStatus(msg, ok=true, persist=false){ const box=document.getElementById('statusBox'); box.className=`text-sm rounded-2xl py-3 px-4 ${ok?'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300':'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300'}`; box.innerText=msg; box.classList.remove('hidden'); if(!persist) setTimeout(()=>box.classList.add('hidden'),3500); }
+    function weekStart(d){ const x=new Date(d); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x.toISOString().slice(0,10); }
+    function formatThaiDate(s){ try{return new Date(s+'T00:00:00').toLocaleDateString('th-TH',{weekday:'short',day:'numeric',month:'short'})}catch{return s||'-'} }
+    function escapeHtml(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  </script>
+</body>
+</html>
