@@ -143,7 +143,12 @@
             </div>
           </div>
         </div>
-        <a href="log.html" class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3.5 text-white font-semibold hover:shadow-lg hover:shadow-accent/25 transition"><span class="material-icons-round">edit_note</span> Log Result หลังซ้อม</a>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+          <a href="log.html" class="inline-flex items-center justify-center gap-2 rounded-full bg-accent py-3.5 text-white font-semibold hover:shadow-lg hover:shadow-accent/25 transition"><span class="material-icons-round">edit_note</span> Log Result หลังซ้อม</a>
+          <button type="button" onclick="adaptTomorrow()" class="inline-flex items-center justify-center gap-2 rounded-full bg-primary dark:bg-white dark:text-primary py-3.5 text-white font-semibold hover:opacity-90 transition"><span class="material-icons-round">auto_fix_high</span> Adapt Tomorrow</button>
+          <button type="button" onclick="adaptWeek()" class="inline-flex items-center justify-center gap-2 rounded-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] py-3.5 font-semibold hover:border-accent transition"><span class="material-icons-round text-accent">event_repeat</span> Adapt This Week</button>
+        </div>
+        <div id="adaptStatus" class="mt-3 text-sm text-center hidden rounded-2xl py-2"></div>
       </div>
 
       <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
@@ -214,7 +219,7 @@
             <h2 class="text-xl font-semibold">Next 7 Days</h2>
             <p class="text-sm text-muted mt-1">แผน 1 สัปดาห์ข้างหน้า</p>
           </div>
-          <span class="px-3 py-1 rounded-full bg-page dark:bg-[#121212] text-xs text-muted border border-borderLight dark:border-[#2A2A2A]">Sprint 2</span>
+          <span class="px-3 py-1 rounded-full bg-page dark:bg-[#121212] text-xs text-muted border border-borderLight dark:border-[#2A2A2A]">Sprint 4</span>
         </div>
         <div id="next7Box" class="space-y-3"></div>
       </div>
@@ -410,6 +415,32 @@
         await apiPost('saveProfile', { profile });
         const out = await apiPost('generatePlan', { options: { clearExisting: true } });
         showStatus(status, `${out.message} (${out.result.workouts} workouts)`, true);
+        await reloadToday();
+      } catch (err) {
+        showStatus(status, err.message, false);
+      }
+    }
+
+    async function adaptTomorrow() {
+      const status = document.getElementById('adaptStatus');
+      try {
+        const out = await apiPost('adaptTomorrow', { date: todayDate });
+        const changed = out.result?.changed_count ?? 0;
+        const severity = out.result?.severity || '-';
+        showStatus(status, `Adapt Tomorrow สำเร็จ: ปรับ ${changed} รายการ · severity ${severity}`, true);
+        await reloadToday();
+      } catch (err) {
+        showStatus(status, err.message, false);
+      }
+    }
+
+    async function adaptWeek() {
+      const status = document.getElementById('adaptStatus');
+      try {
+        const out = await apiPost('adaptWeek', { date: todayDate, days: 7 });
+        const changed = out.result?.changed_count ?? 0;
+        const severity = out.result?.severity || '-';
+        showStatus(status, `Adapt This Week สำเร็จ: ปรับ ${changed} รายการ · severity ${severity}`, true);
         await reloadToday();
       } catch (err) {
         showStatus(status, err.message, false);

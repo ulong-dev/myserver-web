@@ -41,6 +41,7 @@
         <a href="index.html" title="Today" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">today</span></a>
         <a href="log.html" title="Post-run Log" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">edit_note</span></a>
         <a href="../index.html" title="Home" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">arrow_back</span></a>
+        <button onclick="adaptWeekFromDashboard()" title="Adapt This Week" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">auto_fix_high</span></button>
         <button onclick="reloadDashboard()" title="Reload" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">sync</span></button>
         <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round" id="themeIcon">dark_mode</span></button>
       </div>
@@ -160,6 +161,8 @@
 
     function toggleTheme(){const next=html.classList.contains('dark')?'light':'dark';html.classList.toggle('dark',next==='dark');localStorage.setItem('elite_theme',next);document.getElementById('themeIcon').innerText=next==='dark'?'light_mode':'dark_mode';reloadDashboard();}
     async function apiGet(action, params={}){const u=new URL(API_URL);u.searchParams.set('action',action);Object.entries(params).forEach(([k,v])=>{if(v!==undefined&&v!==null&&v!=='')u.searchParams.set(k,v)});const r=await fetch(u.toString());const d=await r.json();if(!r.ok||d.status==='error')throw new Error(d.message||`HTTP ${r.status}`);return d;}
+    async function apiPost(action, payload={}){const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})});const d=await r.json();if(!r.ok||d.status==='error')throw new Error(d.message||`HTTP ${r.status}`);return d;}
+    async function adaptWeekFromDashboard(){try{document.body.style.cursor='progress';const out=await apiPost('adaptWeek',{date:new Date().toISOString().slice(0,10),days:7});alert(`Adapt This Week สำเร็จ: ปรับ ${out.result?.changed_count ?? 0} รายการ · severity ${out.result?.severity || '-'}`);await reloadDashboard();}catch(err){alert('Adapt ล้มเหลว: '+err.message)}finally{document.body.style.cursor='';}}
     async function reloadDashboard(){try{document.body.style.cursor='progress';const out=await apiGet('getDashboardSummary');renderDashboard(out.dashboard);}catch(err){renderError(err.message)}finally{document.body.style.cursor='';}}
 
     function renderDashboard(d){
