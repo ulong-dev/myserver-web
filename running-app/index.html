@@ -3,11 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="refresh" content="0; url=today.html" />
   <title>AW2P Running Coach OS — Today</title>
-  <script>
-    window.location.replace('today.html');
-  </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -55,6 +51,7 @@
         AW2P <span class="text-muted font-light">RUNNING COACH OS</span>
       </div>
       <div class="flex items-center gap-2">
+        <a href="dashboard.html" title="Coach Dashboard" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">insert_chart_outlined</span></a>
         <a href="log.html" title="Post-run Log" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">edit_note</span></a>
         <a href="../index.html" title="กลับ Home" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">arrow_back</span></a>
         <button onclick="reloadToday()" title="Reload" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">sync</span></button>
