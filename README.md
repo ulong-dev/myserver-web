@@ -12,6 +12,7 @@ myserver/
 ├─ guitar-learning/           # หน้าเรียนกีตาร์และฝึก scale
 ├─ library/                   # เว็บ library static
 ├─ running-app/               # เว็บ running app static
+├─ typing-trainer/            # โปรแกรมฝึกพิมพ์ไทย/อังกฤษ static
 └─ space-game/                # เกม static
 ```
 
