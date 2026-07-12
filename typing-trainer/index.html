@@ -391,6 +391,172 @@
       box-shadow: none;
     }
 
+    .hand-guide {
+      margin: 16px 0;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .hand-guide-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .hand-guide-head h2 {
+      margin-bottom: 4px;
+    }
+
+    .hand-guide-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .hand-stage {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .hand-figure {
+      position: relative;
+      min-height: 184px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(180deg, rgba(15, 118, 110, 0.08), transparent 60%),
+        var(--surface-soft);
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    .hand-label {
+      position: relative;
+      z-index: 2;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .finger-row {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+      align-items: end;
+      min-height: 106px;
+      margin-top: 8px;
+      padding-bottom: 34px;
+    }
+
+    .finger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 999px 999px 10px 10px;
+      background: var(--key);
+      color: var(--muted);
+      padding: 7px 3px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.2;
+      box-shadow: 0 3px 0 rgba(31, 41, 51, 0.08);
+      transition: 0.16s ease;
+    }
+
+    .finger[data-size="short"] { height: 66px; }
+    .finger[data-size="medium"] { height: 82px; }
+    .finger[data-size="long"] { height: 100px; }
+    .finger[data-size="thumb"] {
+      height: 54px;
+      align-self: end;
+      border-radius: 999px 999px 14px 14px;
+      transform: rotate(-16deg);
+    }
+
+    .hand-figure.right .finger[data-size="thumb"] {
+      transform: rotate(16deg);
+    }
+
+    .finger.active {
+      border-color: rgba(15, 118, 110, 0.45);
+      background: rgba(15, 118, 110, 0.13);
+      color: var(--accent-strong);
+    }
+
+    .finger.next {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+
+    .finger[data-size="thumb"].next {
+      transform: rotate(-16deg) translateY(2px);
+    }
+
+    .hand-figure.right .finger[data-size="thumb"].next {
+      transform: rotate(16deg) translateY(2px);
+    }
+
+    .palm {
+      position: absolute;
+      z-index: 0;
+      right: 18px;
+      bottom: 13px;
+      left: 18px;
+      height: 58px;
+      border: 1px solid var(--line);
+      border-radius: 42px 42px 18px 18px;
+      background: rgba(255, 255, 255, 0.48);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      pointer-events: none;
+    }
+
+    [data-theme="dark"] .palm {
+      background: rgba(16, 24, 23, 0.52);
+    }
+
+    .hand-key-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .hand-key {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--muted);
+      padding: 6px 9px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .hand-key.next {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
     .side-stack {
       display: grid;
       gap: 18px;
@@ -588,6 +754,8 @@
       .metric:last-child { border-bottom: 0; }
       .practice-head { flex-direction: column; }
       .target-text { min-height: 150px; }
+      .hand-guide-head { flex-direction: column; }
+      .hand-stage { grid-template-columns: 1fr; }
       .keyboard { display: none; }
     }
   </style>
@@ -664,6 +832,18 @@
           <button type="button" class="action-btn secondary" id="resetBtn">ล้างรอบนี้</button>
           <button type="button" class="action-btn warm" id="nextBtn">สุ่มข้อความ</button>
         </div>
+
+        <section class="hand-guide" aria-labelledby="handGuideTitle">
+          <div class="hand-guide-head">
+            <div>
+              <h2 id="handGuideTitle">ภาพวางมือ</h2>
+              <p id="handGuideText">วางนิ้วบนตำแหน่งเริ่มต้น แล้วสังเกตนิ้วที่ไฮไลต์ตามแบบฝึกหัด</p>
+            </div>
+            <span class="status-pill" id="handFocusBadge">Home Row</span>
+          </div>
+          <div class="hand-stage" id="handStage" aria-label="ตัวอย่างตำแหน่งนิ้ว"></div>
+          <div class="hand-key-strip" id="handKeyStrip" aria-label="แป้นที่ควรโฟกัส"></div>
+        </section>
 
         <div class="keyboard" id="keyboard" aria-label="แป้นพิมพ์"></div>
       </section>
@@ -794,6 +974,117 @@
       ]
     };
 
+    const fingerGroups = {
+      left: [
+        { id: "leftPinky", label: "ก้อย", size: "short" },
+        { id: "leftRing", label: "นาง", size: "medium" },
+        { id: "leftMiddle", label: "กลาง", size: "long" },
+        { id: "leftIndex", label: "ชี้", size: "medium" },
+        { id: "leftThumb", label: "โป้ง", size: "thumb" }
+      ],
+      right: [
+        { id: "rightThumb", label: "โป้ง", size: "thumb" },
+        { id: "rightIndex", label: "ชี้", size: "medium" },
+        { id: "rightMiddle", label: "กลาง", size: "long" },
+        { id: "rightRing", label: "นาง", size: "medium" },
+        { id: "rightPinky", label: "ก้อย", size: "short" }
+      ]
+    };
+
+    const fingerKeyGroups = {
+      en: {
+        leftPinky: ["1", "q", "a", "z"],
+        leftRing: ["2", "w", "s", "x"],
+        leftMiddle: ["3", "e", "d", "c"],
+        leftIndex: ["4", "5", "r", "t", "f", "g", "v", "b"],
+        leftThumb: [" "],
+        rightThumb: [" "],
+        rightIndex: ["6", "7", "y", "u", "h", "j", "n", "m"],
+        rightMiddle: ["8", "i", "k", ","],
+        rightRing: ["9", "o", "l", "."],
+        rightPinky: ["0", "-", "=", "p", "[", "]", ";", "'", "/"]
+      },
+      th: {
+        leftPinky: ["ๅ", "ๆ", "ฟ", "ผ"],
+        leftRing: ["/", "ไ", "ห", "ป"],
+        leftMiddle: ["-", "ำ", "ก", "แ"],
+        leftIndex: ["ภ", "ถ", "พ", "ะ", "ด", "เ", "อ", "ิ"],
+        leftThumb: [" "],
+        rightThumb: [" "],
+        rightIndex: ["ุ", "ึ", "ั", "ี", "้", "่", "ื", "ท"],
+        rightMiddle: ["ค", "ร", "า", "ม"],
+        rightRing: ["ต", "น", "ส", "ใ"],
+        rightPinky: ["จ", "ข", "ช", "ย", "บ", "ล", "ว", "ง", "ฝ"]
+      }
+    };
+
+    const handGuideData = {
+      th: {
+        home: {
+          focus: "Home Row",
+          text: "แบบฝึกนี้ให้วางนิ้วบน ฟ ห ก ด และ ่ า ส ว เป็นหลัก หลังแตะแป้นอื่นให้กลับมาที่แถวนี้เสมอ",
+          keys: ["ฟ", "ห", "ก", "ด", "่", "า", "ส", "ว"],
+          fingers: ["leftPinky", "leftRing", "leftMiddle", "leftIndex", "rightIndex", "rightMiddle", "rightRing", "rightPinky"]
+        },
+        words: {
+          focus: "คำสั้น",
+          text: "ฝึกคำสั้นให้ใช้ทุกนิ้ว แต่ยังต้องกลับมาวางมือที่ Home Row ทุกครั้งหลังจบคำ",
+          keys: ["ฟ", "ห", "ก", "ด", "่", "า", "ส", "ว", "space"],
+          fingers: ["leftPinky", "leftRing", "leftMiddle", "leftIndex", "leftThumb", "rightThumb", "rightIndex", "rightMiddle", "rightRing", "rightPinky"]
+        },
+        sentences: {
+          focus: "ประโยค",
+          text: "แบบประโยคให้มองข้อความล่วงหน้าเล็กน้อย นิ้วที่ไฮไลต์คือพื้นที่หลัก ส่วนสีเข้มคือแป้นถัดไป",
+          keys: ["ทุกนิ้ว", "space", "กลับ Home Row"],
+          fingers: ["leftPinky", "leftRing", "leftMiddle", "leftIndex", "leftThumb", "rightThumb", "rightIndex", "rightMiddle", "rightRing", "rightPinky"]
+        },
+        numbers: {
+          focus: "Number Reach",
+          text: "โหมดตัวเลขให้ยกนิ้วจาก Home Row ไปแถวบน แล้วกลับมาตำแหน่งเดิม อย่าทิ้งข้อมือลงบนโต๊ะ",
+          keys: ["ๅ", "/", "-", "ภ", "ถ", "ุ", "ึ", "ค", "ต", "จ"],
+          fingers: ["leftPinky", "leftRing", "leftMiddle", "leftIndex", "rightIndex", "rightMiddle", "rightRing", "rightPinky"]
+        },
+        daily: {
+          focus: "Daily",
+          text: "Daily Challenge ใช้ทุกนิ้วแบบสมดุล เน้นจังหวะคงที่และรักษาความถูกต้องให้เกิน 95%",
+          keys: ["ทุกนิ้ว", "space", "Accuracy 95%"],
+          fingers: ["leftPinky", "leftRing", "leftMiddle", "leftIndex", "leftThumb", "rightThumb", "rightIndex", "rightMiddle", "rightRing", "rightPinky"]
+        }
+      },
+      en: {
+        home: {
+          focus: "Home Row",
+          text: "Place your fingers on A S D F and J K L ;. Return to these anchors after every reach.",
+          keys: ["A", "S", "D", "F", "J", "K", "L", ";"],
+          fingers: ["leftPinky", "leftRing", "leftMiddle", "leftIndex", "rightIndex", "rightMiddle", "rightRing", "rightPinky"]
+        },
+        words: {
+          focus: "Short Words",
+          text: "Use every finger for short words, then reset to ASDF JKL; before the next word.",
+          keys: ["A", "S", "D", "F", "J", "K", "L", ";", "space"],
+          fingers: ["leftPinky", "leftRing", "leftMiddle", "leftIndex", "leftThumb", "rightThumb", "rightIndex", "rightMiddle", "rightRing", "rightPinky"]
+        },
+        sentences: {
+          focus: "Sentences",
+          text: "Read ahead, keep both hands relaxed, and use the highlighted finger for the next character.",
+          keys: ["all fingers", "space", "return home"],
+          fingers: ["leftPinky", "leftRing", "leftMiddle", "leftIndex", "leftThumb", "rightThumb", "rightIndex", "rightMiddle", "rightRing", "rightPinky"]
+        },
+        numbers: {
+          focus: "Number Reach",
+          text: "Reach upward from the home row for numbers, then drop each finger back to its home key.",
+          keys: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
+          fingers: ["leftPinky", "leftRing", "leftMiddle", "leftIndex", "rightIndex", "rightMiddle", "rightRing", "rightPinky"]
+        },
+        daily: {
+          focus: "Daily",
+          text: "Daily practice uses all fingers. Keep the rhythm even and protect accuracy before chasing speed.",
+          keys: ["all fingers", "space", "95% accuracy"],
+          fingers: ["leftPinky", "leftRing", "leftMiddle", "leftIndex", "leftThumb", "rightThumb", "rightIndex", "rightMiddle", "rightRing", "rightPinky"]
+        }
+      }
+    };
+
     const techniqueGuides = {
       th: [
         {
@@ -884,7 +1175,8 @@
       [
         "themeBtn", "sessionState", "targetText", "typingInput", "startBtn", "resetBtn", "nextBtn",
         "wpmValue", "cpmValue", "accuracyValue", "timeValue", "keyboard", "mistakeList",
-        "mistakeCount", "techniqueList", "techniqueMode", "historyList", "historyChart", "bestWpm", "bestWpmBadge", "avgAccuracyBadge"
+        "mistakeCount", "handStage", "handGuideText", "handFocusBadge", "handKeyStrip",
+        "techniqueList", "techniqueMode", "historyList", "historyChart", "bestWpm", "bestWpmBadge", "avgAccuracyBadge"
       ].forEach((id) => { els[id] = document.getElementById(id); });
     }
 
@@ -954,7 +1246,116 @@
       });
       els.timeValue.textContent = String(state.duration);
       renderKeyboard();
+      renderHandGuide();
       renderTechniqueGuide();
+    }
+
+    function renderHandGuide() {
+      const guide = handGuideData[state.mode][state.lesson] || handGuideData[state.mode].home;
+      const activeFingers = new Set(guide.fingers);
+      const nextKey = getNextKey();
+      const nextFingers = new Set(nextKey === " " ? ["leftThumb", "rightThumb"] : [fingerForKey(nextKey)].filter(Boolean));
+
+      nextFingers.forEach((finger) => activeFingers.add(finger));
+
+      els.handGuideText.textContent = guide.text;
+      els.handFocusBadge.textContent = nextKey ? `${guide.focus} · ${displayKey(nextKey)}` : guide.focus;
+      els.handStage.textContent = "";
+
+      renderHandFigure("left", "มือซ้าย", activeFingers, nextFingers);
+      renderHandFigure("right", "มือขวา", activeFingers, nextFingers);
+      renderHandKeys(guide.keys, nextKey);
+    }
+
+    function renderHandFigure(side, label, activeFingers, nextFingers) {
+      const figure = document.createElement("div");
+      figure.className = `hand-figure ${side}`;
+
+      const handLabel = document.createElement("div");
+      handLabel.className = "hand-label";
+      handLabel.textContent = label;
+
+      const row = document.createElement("div");
+      row.className = "finger-row";
+
+      fingerGroups[side].forEach((finger) => {
+        const fingerEl = document.createElement("div");
+        fingerEl.className = "finger";
+        fingerEl.dataset.size = finger.size;
+        fingerEl.textContent = finger.label;
+        fingerEl.title = fingerLabel(finger.id);
+
+        if (activeFingers.has(finger.id)) fingerEl.classList.add("active");
+        if (nextFingers.has(finger.id)) fingerEl.classList.add("next");
+
+        row.appendChild(fingerEl);
+      });
+
+      const palm = document.createElement("div");
+      palm.className = "palm";
+      palm.textContent = side === "left" ? "Left Hand" : "Right Hand";
+
+      figure.append(handLabel, row, palm);
+      els.handStage.appendChild(figure);
+    }
+
+    function renderHandKeys(keys, nextKey) {
+      els.handKeyStrip.textContent = "";
+
+      keys.forEach((key) => {
+        const keyEl = document.createElement("span");
+        keyEl.className = "hand-key";
+        keyEl.textContent = key;
+
+        if (guideKeyValue(key) === nextKey) {
+          keyEl.classList.add("next");
+        }
+
+        els.handKeyStrip.appendChild(keyEl);
+      });
+    }
+
+    function getNextKey() {
+      const targetUnits = toUnits(state.target);
+      const typedUnits = toUnits(els.typingInput.value);
+      return normalizeKey(targetUnits[typedUnits.length] || "");
+    }
+
+    function fingerForKey(key) {
+      if (!key) return "";
+      const groups = fingerKeyGroups[state.mode] || fingerKeyGroups.th;
+
+      for (const [finger, keys] of Object.entries(groups)) {
+        if (keys.map(normalizeKey).includes(key)) return finger;
+      }
+
+      return "";
+    }
+
+    function fingerLabel(fingerId) {
+      const labels = {
+        leftPinky: "ซ้ายก้อย",
+        leftRing: "ซ้ายนาง",
+        leftMiddle: "ซ้ายกลาง",
+        leftIndex: "ซ้ายชี้",
+        leftThumb: "ซ้ายนิ้วโป้ง",
+        rightThumb: "ขวานิ้วโป้ง",
+        rightIndex: "ขวาชี้",
+        rightMiddle: "ขวากลาง",
+        rightRing: "ขวานาง",
+        rightPinky: "ขวาก้อย"
+      };
+      return labels[fingerId] || fingerId;
+    }
+
+    function displayKey(key) {
+      if (key === " ") return "space";
+      return key;
+    }
+
+    function guideKeyValue(key) {
+      if (key === "space") return " ";
+      return normalizeKey(key);
     }
 
     function renderTechniqueGuide() {
@@ -1045,6 +1446,7 @@
       updateStats(0);
       renderMistakes({});
       renderKeyboard();
+      renderHandGuide();
     }
 
     function startSession() {
@@ -1076,6 +1478,7 @@
       updateStats(getElapsedSeconds(), stats);
       renderMistakes(stats.mistakes);
       renderKeyboard();
+      renderHandGuide();
 
       if (stats.typed >= toUnits(state.target).length && stats.typed > 0) {
         finishSession("complete");
