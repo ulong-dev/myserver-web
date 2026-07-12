@@ -460,6 +460,91 @@
       white-space: nowrap;
     }
 
+    .technique-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .technique-card {
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .technique-card:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .technique-title {
+      margin-bottom: 5px;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .technique-body {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .finger-map {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .finger-key {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface-soft);
+      padding: 7px 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .example-box {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
+    }
+
+    .example-text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .drill-btn {
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--accent-strong);
+      cursor: pointer;
+      padding: 6px 9px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .drill-btn:hover {
+      background: var(--accent);
+      color: white;
+    }
+
     .history-chart {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
@@ -592,6 +677,14 @@
           <div class="mistake-list" id="mistakeList"></div>
         </section>
 
+        <section class="panel" aria-labelledby="techniqueTitle">
+          <div class="panel-head">
+            <h2 id="techniqueTitle">เทคนิคสำคัญ</h2>
+            <div class="mini-value" id="techniqueMode">TH</div>
+          </div>
+          <div class="technique-list" id="techniqueList"></div>
+        </section>
+
         <section class="panel" aria-labelledby="historyTitle">
           <div class="panel-head">
             <h2 id="historyTitle">สถิติล่าสุด</h2>
@@ -701,6 +794,65 @@
       ]
     };
 
+    const techniqueGuides = {
+      th: [
+        {
+          title: "วางมือบน Home Row ให้จำตำแหน่งหลักก่อน",
+          body: "นิ้วซ้ายวางบน ฟ ห ก ด และนิ้วขวาวางบน ่ า ส ว โดยนิ้วชี้อยู่ที่ ด และ ่ เสมอ หลังพิมพ์ตัวอื่นให้กลับมาที่ตำแหน่งนี้",
+          keys: ["ซ้ายก้อย: ฟ", "ซ้ายนาง: ห", "ซ้ายกลาง: ก", "ซ้ายชี้: ด", "ขวาชี้: ่", "ขวากลาง: า", "ขวานาง: ส", "ขวาก้อย: ว"],
+          example: "ฟ ห ก ด ่ า ส ว ด ่ ก า ห ส ฟ ว"
+        },
+        {
+          title: "มองข้อความ ไม่มองคีย์บอร์ด",
+          body: "ให้สายตาอยู่ที่โจทย์หรือหน้าจอ ใช้แถบคีย์บอร์ดด้านล่างเป็นตัวช่วยช่วงแรก แล้วค่อยลดการพึ่งพาลง",
+          example: "วันนี้ฉันจะมองข้อความและปล่อยให้นิ้วจำแป้นเอง"
+        },
+        {
+          title: "ความถูกต้องมาก่อนความเร็ว",
+          body: "ถ้า Accuracy ต่ำกว่า 95% ให้ลดจังหวะลงหนึ่งระดับ เพราะการฝึกแบบผิดเร็วจะทำให้จำแพตเทิร์นผิดเร็วตามไปด้วย",
+          example: "ช้า ชัด แม่น ก่อนเร็ว"
+        },
+        {
+          title: "ซ้อมเป็นกลุ่มสั้น ๆ รอบละ 3-5 นาที",
+          body: "แบ่งฝึกเป็นรอบสั้นเพื่อรักษาความสดของนิ้ว พัก 20-30 วินาที แล้วเริ่มรอบใหม่พร้อมเป้าหมายเดียว เช่น ลดคำผิดหรือเพิ่มความนิ่ง",
+          example: "ฟหกด ่าสว ฟหกด ่าสว ฟหกด ่าสว"
+        },
+        {
+          title: "แก้ตัวที่พลาดด้วยการวนซ้อม 3 ตัวรอบข้าง",
+          body: "ถ้าพลาดตัวไหนบ่อย อย่าซ้อมตัวเดี่ยว ให้ซ้อมตัวก่อนหน้า ตัวที่พลาด และตัวถัดไป เพื่อให้มือจำจังหวะจริงของคำ",
+          example: "กา ดา าส กา ดา าส กา ดา าส"
+        }
+      ],
+      en: [
+        {
+          title: "Anchor on ASDF and JKL;",
+          body: "Place the left fingers on A S D F and the right fingers on J K L ;. Your index fingers live on F and J, then return there after each reach.",
+          keys: ["Left pinky: A", "Left ring: S", "Left middle: D", "Left index: F", "Right index: J", "Right middle: K", "Right ring: L", "Right pinky: ;"],
+          example: "asdf jkl; asdf jkl; fjdk sl;a"
+        },
+        {
+          title: "Eyes on the copy, not the keys",
+          body: "Read slightly ahead of your fingers. If you need help, glance at the on-screen keyboard, then return your eyes to the text.",
+          example: "Keep your eyes on the text and let your fingers learn the path."
+        },
+        {
+          title: "Accuracy is the speed multiplier",
+          body: "Aim for 95% accuracy before pushing WPM. Smooth correct typing usually becomes faster without forcing it.",
+          example: "slow clean smooth repeat"
+        },
+        {
+          title: "Use steady rhythm instead of bursts",
+          body: "Type like a metronome. Avoid rushing easy words and freezing on hard words; keep the pace even from start to finish.",
+          example: "focus rhythm focus rhythm steady hands"
+        },
+        {
+          title: "Repair mistakes with neighbor drills",
+          body: "When one letter causes misses, practice the letter with its neighbors so the finger learns the travel path, not just the key.",
+          example: "red fed led red fed led"
+        }
+      ]
+    };
+
     const state = {
       mode: "th",
       lesson: "home",
@@ -732,7 +884,7 @@
       [
         "themeBtn", "sessionState", "targetText", "typingInput", "startBtn", "resetBtn", "nextBtn",
         "wpmValue", "cpmValue", "accuracyValue", "timeValue", "keyboard", "mistakeList",
-        "mistakeCount", "historyList", "historyChart", "bestWpm", "bestWpmBadge", "avgAccuracyBadge"
+        "mistakeCount", "techniqueList", "techniqueMode", "historyList", "historyChart", "bestWpm", "bestWpmBadge", "avgAccuracyBadge"
       ].forEach((id) => { els[id] = document.getElementById(id); });
     }
 
@@ -802,6 +954,62 @@
       });
       els.timeValue.textContent = String(state.duration);
       renderKeyboard();
+      renderTechniqueGuide();
+    }
+
+    function renderTechniqueGuide() {
+      const guides = techniqueGuides[state.mode] || techniqueGuides.th;
+      els.techniqueMode.textContent = state.mode === "en" ? "EN" : "TH";
+      els.techniqueList.textContent = "";
+
+      guides.forEach((guide) => {
+        const card = document.createElement("article");
+        card.className = "technique-card";
+
+        const title = document.createElement("div");
+        title.className = "technique-title";
+        title.textContent = guide.title;
+
+        const body = document.createElement("p");
+        body.className = "technique-body";
+        body.textContent = guide.body;
+
+        card.append(title, body);
+
+        if (guide.keys) {
+          const map = document.createElement("div");
+          map.className = "finger-map";
+          guide.keys.forEach((key) => {
+            const keyEl = document.createElement("div");
+            keyEl.className = "finger-key";
+            keyEl.textContent = key;
+            map.appendChild(keyEl);
+          });
+          card.appendChild(map);
+        }
+
+        const example = document.createElement("div");
+        example.className = "example-box";
+
+        const exampleText = document.createElement("div");
+        exampleText.className = "example-text";
+        exampleText.textContent = guide.example;
+        exampleText.title = guide.example;
+
+        const drillButton = document.createElement("button");
+        drillButton.type = "button";
+        drillButton.className = "drill-btn";
+        drillButton.textContent = "ใช้ซ้อม";
+        drillButton.addEventListener("click", () => {
+          state.target = guide.example;
+          resetSession();
+          els.targetText.scrollIntoView({ behavior: "smooth", block: "center" });
+        });
+
+        example.append(exampleText, drillButton);
+        card.appendChild(example);
+        els.techniqueList.appendChild(card);
+      });
     }
 
     function chooseText() {
