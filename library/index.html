@@ -34,7 +34,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Sarabun:wght@300;400;500;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
@@ -51,9 +51,8 @@
     .star-input i:hover, .star-input i.active { color: #A68A79; }
     .ebook-mode-active { background-color: #33302E !important; color: white !important; border-color: #33302E !important; }
 
-    #interactive.viewport { position: relative; width: 100%; height: auto; overflow: hidden; text-align: center; border-radius: 16px; }
-    #interactive.viewport > canvas, #interactive.viewport > video { max-width: 100%; width: 100%; border-radius: 16px; }
-    canvas.drawingBuffer { position: absolute; top: 0; left: 0; }
+    #interactive.viewport { position: relative; width: 100%; min-height: 190px; overflow: hidden; text-align: center; border-radius: 16px; background: #111; }
+    #interactive.viewport video, #interactive.viewport img, #interactive.viewport canvas { max-width: 100%; width: 100%; border-radius: 16px; }
     #loading { pointer-events: none; }
     
     /* ซ่อน Scrollbar ให้ดูคลีน */
@@ -191,11 +190,13 @@
           <label class="text-[10px] font-bold text-accent uppercase tracking-[0.1em] mb-3 block"><i class="fas fa-barcode mr-1"></i> สแกน ISBN</label>
           <div class="flex gap-2 mb-2">
             <input type="text" id="isbnInput" inputmode="numeric" autocomplete="off" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); handleIsbnSearch(); }" class="flex-1 p-3 border border-borderLight dark:border-gray-700 rounded-xl bg-white dark:bg-[#252322] text-[13px] dark:text-gray-200 outline-none placeholder-muted focus:border-accent transition" placeholder="ISBN-10 หรือ ISBN-13...">
-            <button onclick="startQuagga()" type="button" class="bg-white dark:bg-[#252322] border border-borderLight dark:border-gray-700 hover:border-accent text-primary dark:text-gray-200 px-4 rounded-xl transition shadow-sm"><i class="fas fa-camera"></i></button>
+            <button onclick="startIsbnScanner()" type="button" aria-label="เปิดกล้องสแกน ISBN" title="เปิดกล้องสแกน ISBN" class="bg-white dark:bg-[#252322] border border-borderLight dark:border-gray-700 hover:border-accent text-primary dark:text-gray-200 px-4 rounded-xl transition shadow-sm"><i class="fas fa-camera"></i></button>
+            <button onclick="document.getElementById('isbnImageInput').click()" type="button" aria-label="ถ่ายรูปบาร์โค้ด ISBN" title="ถ่ายรูปบาร์โค้ด ISBN" class="bg-white dark:bg-[#252322] border border-borderLight dark:border-gray-700 hover:border-accent text-primary dark:text-gray-200 px-4 rounded-xl transition shadow-sm"><i class="fas fa-image"></i></button>
             <button onclick="handleIsbnSearch()" id="btnIsbn" type="button" class="bg-primary dark:bg-white text-white dark:text-primary px-5 rounded-xl transition shadow-sm text-[13px] font-medium">ค้นหา</button>
           </div>
+          <input id="isbnImageInput" type="file" accept="image/*" capture="environment" class="hidden" onchange="scanIsbnImage(event)">
           <div id="interactive" class="viewport hidden border border-borderLight mt-3"></div>
-          <div id="scanStatus" class="text-[11px] text-center text-muted mt-2 hidden">กำลังประมวลผลกล้อง...</div>
+          <div id="scanStatus" class="text-[11px] text-center text-muted mt-2 hidden">กำลังเตรียมกล้อง…</div>
         </div>
 
         <form id="bookForm" onsubmit="handleBookSubmit(event)" class="space-y-5">
@@ -775,7 +776,7 @@
 
     function openNoteModal() { document.getElementById('noteModal').classList.remove('hidden'); }
     function closeModals() {
-      if (isScanning) stopQuagga();
+      if (isScanning) void stopIsbnScanner();
       document.getElementById('noteModal').classList.add('hidden');
       document.getElementById('bookModal').classList.add('hidden');
       document.getElementById('statusModal').classList.add('hidden');
@@ -1038,36 +1039,123 @@
       finally { Swal.close(); btn.innerText = origin; btn.disabled = false; }
     }
 
-    var isScanning = false;
-    function startQuagga() {
-      const viewport = document.getElementById('interactive'); const status = document.getElementById('scanStatus');
-      if (isScanning) { stopQuagga(); return; }
-      status.textContent = 'กำลังประมวลผลกล้อง...';
-      viewport.classList.remove('hidden'); status.classList.remove('hidden'); isScanning = true;
-      Quagga.init({
-        inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#interactive'), constraints: { facingMode: "environment", width: 640, height: 480 } },
-        decoder: { readers: ["ean_reader"] }, locate: true
-      }, function(err) {
-        if (err) { Swal.fire({ icon:"error", title:"Camera Error", customClass: { popup: 'rounded-3xl' } }); stopQuagga(); return; }
-        Quagga.start();
-      });
-      if (typeof Quagga.offDetected === 'function') Quagga.offDetected(handleQuaggaDetected);
-      Quagga.onDetected(handleQuaggaDetected);
+    let isScanning = false;
+    let isbnScanner = null;
+    let isbnScanHandled = false;
+
+    function isbnFormats() {
+      if (!window.Html5QrcodeSupportedFormats) return undefined;
+      return [
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E
+      ];
     }
-    function handleQuaggaDetected(result) {
-      const code = normalizeIsbn(result?.codeResult?.code);
-      if (isValidIsbn(code)) {
-        document.getElementById('isbnInput').value = code;
-        stopQuagga();
-        if (navigator.vibrate) navigator.vibrate(200);
-        setTimeout(handleIsbnSearch, 400);
-      } else if (code) {
-        document.getElementById('scanStatus').textContent = `พบ ${code} แต่ยังไม่ใช่ ISBN ที่ถูกต้อง กำลังสแกนต่อ...`;
+
+    function setScanStatus(message) {
+      const status = document.getElementById('scanStatus');
+      status.textContent = message;
+      status.classList.remove('hidden');
+    }
+
+    function cameraErrorMessage(error) {
+      const name = error?.name || '';
+      if (name === 'NotAllowedError' || name === 'SecurityError') return 'ยังไม่ได้อนุญาตกล้อง ให้กด Allow ใน Safari แล้วลองใหม่ หรือใช้ปุ่มรูปภาพเพื่อถ่ายบาร์โค้ด';
+      if (name === 'NotFoundError') return 'ไม่พบกล้องบนอุปกรณ์นี้ ลองใช้ปุ่มรูปภาพเพื่อถ่ายบาร์โค้ด';
+      if (name === 'NotReadableError') return 'กล้องกำลังถูกใช้งานโดยแอปอื่น ปิดแอปที่ใช้กล้องแล้วลองใหม่';
+      return 'เปิดกล้องไม่สำเร็จ ลองใช้ปุ่มรูปภาพเพื่อถ่ายบาร์โค้ด';
+    }
+
+    async function startIsbnScanner() {
+      if (isScanning) { await stopIsbnScanner(); return; }
+      if (!window.Html5Qrcode) {
+        return Swal.fire({ icon: 'error', title: 'โหลดตัวสแกนไม่สำเร็จ', text: 'ตรวจอินเทอร์เน็ตแล้วลองใหม่ หรือใช้ปุ่มรูปภาพเพื่อถ่ายบาร์โค้ด', confirmButtonColor: '#33302E', customClass: { popup: 'rounded-3xl' } });
+      }
+      const viewport = document.getElementById('interactive');
+      viewport.innerHTML = '';
+      viewport.classList.remove('hidden');
+      isbnScanHandled = false;
+      isScanning = true;
+      setScanStatus('กำลังเปิดกล้องหลัง… จ่อ ISBN ให้อยู่ในกรอบและให้แสงพอ');
+      isbnScanner = new Html5Qrcode('interactive', { formatsToSupport: isbnFormats() });
+      const config = { fps: 12, qrbox: { width: 300, height: 150 }, aspectRatio: 1.777778, disableFlip: true };
+      const onSuccess = decodedText => handleScannedIsbn(decodedText);
+      const onFailure = () => {};
+      try {
+        await isbnScanner.start({ facingMode: { exact: 'environment' } }, config, onSuccess, onFailure);
+        setScanStatus('กำลังสแกน… จ่อบาร์โค้ด ISBN ให้อยู่ในกรอบ');
+      } catch (firstError) {
+        try {
+          await isbnScanner.start({ facingMode: 'environment' }, config, onSuccess, onFailure);
+          setScanStatus('กำลังสแกน… จ่อบาร์โค้ด ISBN ให้อยู่ในกรอบ');
+        } catch (secondError) {
+          await stopIsbnScanner();
+          Swal.fire({ icon: 'info', title: 'ใช้กล้องไม่ได้ตอนนี้', text: cameraErrorMessage(secondError || firstError), confirmButtonColor: '#33302E', customClass: { popup: 'rounded-3xl' } });
+        }
       }
     }
-    function stopQuagga() {
-      try { Quagga.stop(); } catch(e){}
-      document.getElementById('interactive').classList.add('hidden'); document.getElementById('scanStatus').classList.add('hidden'); isScanning = false;
+
+    async function handleScannedIsbn(value) {
+      const code = normalizeIsbn(value);
+      if (!isValidIsbn(code)) {
+        setScanStatus(`พบ ${code || 'บาร์โค้ด'} แต่ยังไม่ใช่ ISBN ลองขยับกล้องให้ชัดขึ้น`);
+        return;
+      }
+      if (isbnScanHandled) return;
+      isbnScanHandled = true;
+      document.getElementById('isbnInput').value = code;
+      if (navigator.vibrate) navigator.vibrate(160);
+      setScanStatus(`พบ ISBN ${code} แล้ว กำลังค้นหาหนังสือ…`);
+      await stopIsbnScanner({ keepStatus: true });
+      await handleIsbnSearch();
+    }
+
+    async function scanIsbnImage(event) {
+      const file = event.target.files?.[0];
+      event.target.value = '';
+      if (!file) return;
+      const viewport = document.getElementById('interactive');
+      viewport.innerHTML = '';
+      viewport.classList.remove('hidden');
+      setScanStatus('กำลังอ่านบาร์โค้ดจากภาพ…');
+      try {
+        let decodedText = '';
+        if ('BarcodeDetector' in window) {
+          const detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
+          const bitmap = await createImageBitmap(file);
+          const results = await detector.detect(bitmap);
+          bitmap.close?.();
+          decodedText = results[0]?.rawValue || '';
+        }
+        if (!decodedText && window.Html5Qrcode) {
+          const imageScanner = new Html5Qrcode('interactive', { formatsToSupport: isbnFormats() });
+          try {
+            decodedText = await imageScanner.scanFile(file, true);
+          } finally {
+            await imageScanner.clear().catch(() => {});
+          }
+        }
+        if (!decodedText) throw new Error('ไม่พบ ISBN ในภาพ');
+        await handleScannedIsbn(decodedText);
+      } catch (error) {
+        document.getElementById('interactive').classList.add('hidden');
+        document.getElementById('scanStatus').classList.add('hidden');
+        Swal.fire({ icon: 'info', title: 'อ่านบาร์โค้ดจากภาพไม่ได้', text: 'ลองถ่ายให้เห็นเฉพาะบาร์โค้ดชัด ๆ ไม่มีเงาหรือแสงสะท้อน แล้วลองอีกครั้ง', confirmButtonColor: '#33302E', customClass: { popup: 'rounded-3xl' } });
+      }
+    }
+
+    async function stopIsbnScanner(options = {}) {
+      const scanner = isbnScanner;
+      isbnScanner = null;
+      isScanning = false;
+      if (scanner) {
+        try { await scanner.stop(); } catch {}
+        try { await scanner.clear(); } catch {}
+      }
+      document.getElementById('interactive').innerHTML = '';
+      document.getElementById('interactive').classList.add('hidden');
+      if (!options.keepStatus) document.getElementById('scanStatus').classList.add('hidden');
     }
   </script>
 </body>
