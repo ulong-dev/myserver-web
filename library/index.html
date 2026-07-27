@@ -210,7 +210,7 @@
 
           <div>
             <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">รูปปก (URL)</label>
-            <input type="url" name="coverUrl" id="inputCover" oninput="updateCoverPreview()" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none placeholder-borderLight focus:border-accent transition" placeholder="https://...">
+            <input type="text" name="coverUrl" id="inputCover" oninput="updateCoverPreview()" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none placeholder-borderLight focus:border-accent transition" placeholder="https://... หรือ /library/covers/...">
             <div id="coverPreview" class="hidden mt-3 min-h-32 rounded-2xl border border-borderLight dark:border-gray-700 bg-page dark:bg-[#1C1A19] p-3 items-center justify-center">
               <img id="coverPreviewImage" class="hidden max-h-48 max-w-full rounded-xl object-contain shadow-sm" alt="ตัวอย่างรูปปก">
               <div id="coverPreviewError" class="hidden text-center text-[11px] text-muted py-8">
@@ -359,11 +359,26 @@
 
     function parseHttpsImageUrl(value) {
       try {
-        const url = new URL(String(value || ''));
+        const raw = String(value || '').trim();
+        if (!raw) return '';
+        const isLocalPath = raw.startsWith('/') && !raw.startsWith('//');
+        const url = isLocalPath ? new URL(raw, window.location.origin) : new URL(raw);
+        if (isLocalPath) return url.href;
         return url.protocol === 'https:' ? url.href : '';
       } catch (error) {
         return '';
       }
+    }
+
+    const LOCAL_BOOK_COVERS = Object.freeze({
+      'วะ: ศิลปะแห่งการรักษาสมดุลชีวิต': '/library/covers/9786160854264.jpg'
+    });
+
+    function resolveBookCoverUrl(url, title = '') {
+      const normalizedTitle = String(title || '').trim();
+      if (LOCAL_BOOK_COVERS[normalizedTitle]) return LOCAL_BOOK_COVERS[normalizedTitle];
+      if (String(url || '').includes('id=zFmY0QEACAAJ')) return LOCAL_BOOK_COVERS['วะ: ศิลปะแห่งการรักษาสมดุลชีวิต'];
+      return url || '';
     }
 
     function safeImageUrl(value) {
@@ -525,11 +540,22 @@
       document.getElementById("statWishlist").innerText = wishlistCount;
     }
 
-    function renderImageOrIcon(url) {
-      const safeUrl = safeImageUrl(url);
+    function renderGeneratedCover(title, author = '') {
+      const displayTitle = String(title || 'Untitled').trim() || 'Untitled';
+      const displayAuthor = String(author || '').trim();
+      return `<div class="w-full h-full bg-gradient-to-br from-[#D8C0AD] via-[#B8957B] to-[#765B4A] text-white flex flex-col justify-between p-3 overflow-hidden" role="img" aria-label="ปกสำรองสำหรับ ${escapeHtml(displayTitle)}">
+        <span class="text-[7px] font-bold tracking-[0.22em] opacity-75">MY LIBRARY</span>
+        <span class="font-serif text-[12px] leading-tight line-clamp-4 drop-shadow-sm">${escapeHtml(displayTitle)}</span>
+        <span class="text-[7px] leading-tight line-clamp-2 opacity-80">${escapeHtml(displayAuthor || 'ไม่ระบุผู้แต่ง')}</span>
+      </div>`;
+    }
+
+    function renderImageOrIcon(url, title = '', author = '') {
+      const safeUrl = safeImageUrl(resolveBookCoverUrl(url, title));
+      const fallback = renderGeneratedCover(title, author);
       return safeUrl
-        ? `<img src="${safeUrl}" loading="lazy" onerror="handleCoverImageError(this)" class="w-full h-full object-cover" alt="รูปปกหนังสือ"><div class="hidden w-full h-full bg-page dark:bg-[#1C1A19] flex items-center justify-center text-borderLight dark:text-gray-800"><i class="fas fa-book text-4xl"></i></div>`
-        : `<div class="w-full h-full bg-page dark:bg-[#1C1A19] flex items-center justify-center text-borderLight dark:text-gray-800"><i class="fas fa-book text-4xl"></i></div>`;
+        ? `<img src="${safeUrl}" loading="lazy" onerror="handleCoverImageError(this)" class="w-full h-full object-cover" alt="รูปปก ${escapeHtml(title || 'หนังสือ')}"><div class="hidden w-full h-full">${fallback}</div>`
+        : fallback;
     }
 
     function displayHomePage(books) {
@@ -548,7 +574,7 @@
       let html = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">`;
 
       books.forEach(book => {
-        const imgHtml = renderImageOrIcon(book.coverUrl);
+        const imgHtml = renderImageOrIcon(book.coverUrl, book.title || book.bookTitle, book.author);
         const starsHtml = renderStars(book.rating || 0);
         const safeBookId = safeInlineJsString(book.id);
         const ebookIcon = (book.isEbook === 'TRUE' || book.isEbook === true) ? '<i class="fas fa-tablet-alt ml-1 opacity-50"></i>' : '';
@@ -602,9 +628,8 @@
       data.forEach(item => {
         if (item.type === 'book') {
           bookCache[item.id] = item;
-          const safeCoverUrl = safeImageUrl(item.coverUrl);
           const safeItemId = safeInlineJsString(item.id);
-          const listImg = safeCoverUrl ? `<div class="h-24 w-16 rounded-xl overflow-hidden shadow-sm"><img src="${safeCoverUrl}" loading="lazy" onerror="handleCoverImageError(this)" class="h-full w-full object-cover" alt="รูปปกหนังสือ"><div class="hidden h-full w-full bg-page dark:bg-[#1C1A19] border border-borderLight dark:border-gray-800 flex items-center justify-center text-borderLight dark:text-gray-700"><i class="fas fa-book"></i></div></div>` : `<div class="h-24 w-16 bg-page dark:bg-[#1C1A19] rounded-xl border border-borderLight dark:border-gray-800 flex justify-center items-center text-borderLight dark:text-gray-700"><i class="fas fa-book"></i></div>`;
+          const listImg = `<div class="h-24 w-16 rounded-xl overflow-hidden shadow-sm">${renderImageOrIcon(item.coverUrl, item.bookTitle || item.title, item.author)}</div>`;
           const starsHtml = renderStars(item.rating || 0);
           const ebookIcon = (item.isEbook === 'TRUE' || item.isEbook === true) ? '<span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-primary dark:text-gray-300 rounded-md ml-2"><i class="fas fa-tablet-alt"></i> EBOOK</span>' : '';
           
@@ -759,7 +784,7 @@
         document.getElementById('bookMode').value = 'edit';
         document.getElementById('editBookId').value = bookId;
         document.getElementById('inputTitle').value = book.title || book.bookTitle || "";
-        document.getElementById('inputCover').value = book.coverUrl || "";
+        document.getElementById('inputCover').value = resolveBookCoverUrl(book.coverUrl, book.title || book.bookTitle) || "";
         document.getElementById('inputAuthor').value = book.author || "";
         document.getElementById('inputPages').value = book.pages || "";
         document.getElementById('inputCategory').value = book.category || "General";

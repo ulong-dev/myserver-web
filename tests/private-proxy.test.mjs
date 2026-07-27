@@ -5,7 +5,7 @@ import test from 'node:test';
 
 import { ProxyError, createSignedUpstreamRequest, testing } from '../cloudflare/lib/proxy.js';
 import { createPrivateApiForwardRequest } from '../functions/_middleware.js';
-import { parseGoogleBooksFeed } from '../functions/api/isbn.js';
+import { applyKnownCover, parseGoogleBooksFeed } from '../functions/api/isbn.js';
 
 globalThis.crypto ||= webcrypto;
 
@@ -113,6 +113,13 @@ test('Google Books Feed fallback parses Thai ISBN metadata', () => {
     source: 'Google Books Feed'
   });
   assert.deepEqual(parseGoogleBooksFeed('<feed></feed>'), { found: false });
+});
+
+test('known Thai ISBN uses a locally hosted cover', () => {
+  assert.equal(applyKnownCover('978-616-08-5426-4', {
+    found: true,
+    coverUrl: 'https://books.google.com/placeholder'
+  }).coverUrl, '/library/covers/9786160854264.jpg');
 });
 
 test('Apps Script verifier accepts a signed form body and rejects tampering', async () => {

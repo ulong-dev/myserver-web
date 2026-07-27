@@ -62,6 +62,18 @@ export function parseGoogleBooksFeed(xml) {
   };
 }
 
+const LOCAL_COVERS_BY_ISBN = Object.freeze({
+  '9786160854264': '/library/covers/9786160854264.jpg'
+});
+
+export function applyKnownCover(isbn, book) {
+  if (!book?.found) return book;
+  return {
+    ...book,
+    coverUrl: LOCAL_COVERS_BY_ISBN[normalizeIsbn(isbn)] || book.coverUrl || ''
+  };
+}
+
 function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -86,7 +98,8 @@ export async function onRequestGet(context) {
       redirect: 'follow'
     });
     if (!response.ok) return jsonResponse({ status: 'error', ok: false, message: 'Book lookup unavailable' }, 502);
-    return jsonResponse({ status: 'success', ok: true, data: parseGoogleBooksFeed(await response.text()) });
+    const book = parseGoogleBooksFeed(await response.text());
+    return jsonResponse({ status: 'success', ok: true, data: applyKnownCover(isbn, book) });
   } catch {
     return jsonResponse({ status: 'error', ok: false, message: 'Book lookup unavailable' }, 502);
   }
