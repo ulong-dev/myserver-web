@@ -2,7 +2,7 @@
 <html class="scroll-smooth">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -39,14 +39,17 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
-    body { font-family: 'Sarabun', sans-serif; background-color: #FCFBF9; }
+    body { font-family: 'Sarabun', sans-serif; background-color: #FCFBF9; overflow-x: hidden; }
     .loader { border-top-color: #A68A79; animation: spinner 1s linear infinite; }
     @keyframes spinner { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
     .modal-enter { animation: fadein 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes fadein { from { opacity: 0; transform: scale(0.95) translateY(10px);} to { opacity: 1; transform: scale(1) translateY(0);} }
     
-    .action-btn { opacity: 0; transform: scale(0.9); transition: all 0.2s; }
-    .shelf-card:hover .action-btn, .book-row:hover .action-btn { opacity: 1; transform: scale(1); }
+    .action-btn { opacity: 1; transform: scale(1); transition: all 0.2s; }
+    @media (hover: hover) and (pointer: fine) {
+      .action-btn { opacity: 0; transform: scale(0.9); }
+      .shelf-card:hover .action-btn, .book-row:hover .action-btn { opacity: 1; transform: scale(1); }
+    }
     
     .star-input i { cursor: pointer; transition: color 0.2s; }
     .star-input i:hover, .star-input i.active { color: #A68A79; }
@@ -59,23 +62,45 @@
     /* ซ่อน Scrollbar ให้ดูคลีน */
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+    img, video, canvas, input, select, textarea { max-width: 100%; }
+
+    @media (max-width: 640px) {
+      .library-header { padding-top: calc(env(safe-area-inset-top) + 5.5rem); }
+      .library-top-left { top: calc(env(safe-area-inset-top) + 1rem); left: 1rem; }
+      .library-top-actions { top: calc(env(safe-area-inset-top) + 1rem); right: 1rem; gap: .375rem; }
+      .add-book-label { display: none; }
+      .library-stats { gap: .5rem; margin-top: 2rem; }
+      .library-stats button { padding: .45rem .75rem; }
+      .library-search { padding-left: 1rem; padding-right: 1rem; }
+      .library-results { padding-left: 1rem; padding-right: 1rem; }
+      .library-fab { right: 1rem; bottom: calc(env(safe-area-inset-bottom) + 1rem); width: 3.25rem; height: 3.25rem; }
+      .library-modal { align-items: flex-end; padding: .75rem; }
+      .library-modal-card { max-height: calc(100dvh - 1.5rem); }
+      .library-modal-head { padding: 1.5rem 1.25rem .75rem; }
+      .library-modal-body { padding-left: 1.25rem; padding-right: 1.25rem; padding-bottom: 1.5rem; }
+      .isbn-actions { display: grid; grid-template-columns: minmax(0, 1fr) 2.75rem 2.75rem; gap: .5rem; }
+      .isbn-actions .isbn-search { grid-column: 1 / -1; min-height: 2.75rem; }
+      .mobile-form-pair { flex-direction: column; gap: 1rem; }
+      .mobile-form-pair > * { width: 100%; }
+    }
   </style>
 </head>
 
 <body class="bg-page text-primary dark:bg-[#1C1A19] dark:text-gray-200 pb-24 transition-colors duration-500">
 
-  <div class="max-w-4xl mx-auto min-h-screen relative transition-colors duration-300">
+  <div class="max-w-4xl mx-auto min-h-screen relative transition-colors duration-300 overflow-x-hidden">
 
-    <div class="pt-20 pb-12 px-6 text-center relative">
-      <a href="../index.html" class="absolute top-6 left-6 bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/40 px-4 py-2 rounded-full text-[13px] backdrop-blur-md transition-all text-primary dark:text-gray-300 border border-borderLight dark:border-gray-800 shadow-sm font-medium flex items-center gap-2">
+    <div class="library-header pt-20 pb-12 px-4 sm:px-6 text-center relative">
+      <a href="../index.html" class="library-top-left absolute top-6 left-6 bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/40 px-3 sm:px-4 py-2 rounded-full text-[13px] backdrop-blur-md transition-all text-primary dark:text-gray-300 border border-borderLight dark:border-gray-800 shadow-sm font-medium flex items-center gap-2">
         <i class="fas fa-arrow-left text-[11px]"></i> Home
       </a>
-      <div class="absolute top-6 right-6 flex gap-2">
+      <div class="library-top-actions absolute top-6 right-6 flex gap-2">
         <button onclick="openBookModal('wishlist')" aria-label="เพิ่มหนังสือที่อยากได้" title="เพิ่มหนังสือที่อยากได้" class="bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/40 w-[38px] h-[38px] rounded-full backdrop-blur-md transition-all flex items-center justify-center border border-borderLight dark:border-gray-800 shadow-sm text-accent">
           <i class="fas fa-cart-plus text-sm"></i>
         </button>
         <button onclick="openBookModal('create')" class="bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/40 px-5 py-2 rounded-full text-[13px] backdrop-blur-md transition-all text-primary dark:text-gray-300 border border-borderLight dark:border-gray-800 shadow-sm font-medium">
-          <i class="fas fa-plus mr-1"></i> Add Book
+          <i class="fas fa-plus sm:mr-1"></i><span class="add-book-label">Add Book</span>
         </button>
         <button onclick="toggleDarkMode()" class="bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/40 w-[38px] h-[38px] rounded-full backdrop-blur-md transition-all flex items-center justify-center border border-borderLight dark:border-gray-800 shadow-sm text-primary dark:text-gray-300">
           <i id="themeIcon" class="fas fa-moon text-sm"></i>
@@ -86,13 +111,13 @@
         <div class="text-[10px] font-bold tracking-[0.25em] text-accent uppercase mb-4 flex items-center gap-2">
           <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span> Library Lab
         </div>
-        <h1 class="text-4xl md:text-5xl font-serif text-primary dark:text-white mb-3 group-hover:opacity-80 transition-opacity">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-serif text-primary dark:text-white mb-3 group-hover:opacity-80 transition-opacity">
           My Personal Library.
         </h1>
         <p class="text-muted text-[13px] font-light tracking-wide">คลังปัญญาส่วนตัว ยิ่งอ่านยิ่งโง่ 😎</p>
       </div>
 
-      <div class="flex flex-wrap justify-center gap-3 mt-10">
+      <div class="library-stats flex flex-wrap justify-center gap-3 mt-10">
         <button onclick="showBookList('all')" class="bg-white dark:bg-[#252322] px-5 py-2 rounded-full shadow-sm border border-borderLight dark:border-gray-800 text-[12px] font-medium text-primary dark:text-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2">
           <span class="text-muted font-light">ในคลัง</span> <span id="statTotal" class="font-bold">0</span>
         </button>
@@ -109,7 +134,7 @@
       </div>
     </div>
 
-    <div class="px-6 mb-10 flex flex-col md:flex-row gap-3 justify-center items-center z-10 relative">
+    <div class="library-search px-4 sm:px-6 mb-8 sm:mb-10 flex flex-col md:flex-row gap-3 justify-center items-center z-10 relative">
       <button id="btnEbookMode" onclick="toggleEbookMode()" class="bg-white dark:bg-[#252322] text-primary dark:text-gray-300 border border-borderLight dark:border-gray-800 px-6 py-3 rounded-full text-[13px] font-medium shadow-sm flex items-center gap-2 transition-all hover:shadow-md shrink-0">
         <i class="fas fa-tablet-alt text-muted"></i> eBook Mode
       </button>
@@ -138,23 +163,23 @@
       <div class="loader ease-linear rounded-full border-2 border-t-2 border-borderLight h-10 w-10"></div>
     </div>
     
-    <div id="resultsArea" class="px-6 space-y-6 pb-20"></div>
+    <div id="resultsArea" class="library-results px-4 sm:px-6 space-y-6 pb-20"></div>
   </div>
 
-  <div class="fixed bottom-8 right-8 w-14 h-14 bg-primary dark:bg-white text-white dark:text-primary rounded-full flex items-center justify-center shadow-glow cursor-pointer hover:scale-105 transition-transform z-40" onclick="openNoteModal()">
+  <div class="library-fab fixed bottom-8 right-8 w-14 h-14 bg-primary dark:bg-white text-white dark:text-primary rounded-full flex items-center justify-center shadow-glow cursor-pointer hover:scale-105 transition-transform z-40" onclick="openNoteModal()">
     <i class="fas fa-pen"></i>
   </div>
 
-  <div id="noteModal" class="fixed inset-0 bg-white/80 dark:bg-[#1C1A19]/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#252322] w-full max-w-md rounded-[24px] shadow-glow-hover modal-enter overflow-hidden border border-borderLight dark:border-gray-800 relative">
+  <div id="noteModal" class="library-modal fixed inset-0 bg-white/80 dark:bg-[#1C1A19]/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+    <div class="library-modal-card bg-white dark:bg-[#252322] w-full max-w-md rounded-[24px] shadow-glow-hover modal-enter overflow-y-auto border border-borderLight dark:border-gray-800 relative scrollbar-hide">
       <button onclick="closeModals()" class="absolute top-5 right-5 text-muted hover:text-primary dark:hover:text-white transition w-8 h-8 flex items-center justify-center rounded-full bg-page dark:bg-[#1C1A19]"><i class="fas fa-times"></i></button>
       
-      <div class="pt-8 px-8 pb-4">
+      <div class="library-modal-head pt-8 px-8 pb-4">
         <h3 class="font-serif text-2xl text-primary dark:text-white mb-1">Take a Note</h3>
         <p class="text-[12px] text-muted font-light">บันทึกไอเดียที่ได้จากการอ่าน</p>
       </div>
       
-      <form id="noteForm" onsubmit="handleNoteSubmit(event)" class="p-8 pt-2 space-y-5">
+      <form id="noteForm" onsubmit="handleNoteSubmit(event)" class="library-modal-body p-8 pt-2 space-y-5">
         <div>
           <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">หนังสือ</label>
           <select id="bookSelect" name="bookId" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-page dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition" required></select>
@@ -176,24 +201,24 @@
     </div>
   </div>
 
-  <div id="bookModal" class="fixed inset-0 bg-white/80 dark:bg-[#1C1A19]/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#252322] w-full max-w-md rounded-[24px] shadow-glow-hover modal-enter overflow-hidden max-h-[90vh] overflow-y-auto border border-borderLight dark:border-gray-800 relative scrollbar-hide">
+  <div id="bookModal" class="library-modal fixed inset-0 bg-white/80 dark:bg-[#1C1A19]/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+    <div class="library-modal-card bg-white dark:bg-[#252322] w-full max-w-md rounded-[24px] shadow-glow-hover modal-enter overflow-hidden max-h-[90vh] overflow-y-auto border border-borderLight dark:border-gray-800 relative scrollbar-hide">
       
       <button onclick="closeModals()" class="absolute top-5 right-5 z-20 text-muted hover:text-primary dark:hover:text-white transition w-8 h-8 flex items-center justify-center rounded-full bg-page dark:bg-[#1C1A19]"><i class="fas fa-times"></i></button>
 
-      <div class="pt-8 px-8 pb-4 sticky top-0 bg-white dark:bg-[#252322] z-10">
+      <div class="library-modal-head pt-8 px-8 pb-4 sticky top-0 bg-white dark:bg-[#252322] z-10">
         <h3 class="font-serif text-2xl text-primary dark:text-white mb-1" id="bookModalTitle">Add Book</h3>
         <p class="text-[12px] text-muted font-light" id="bookModalSubtitle">เพิ่มเล่มใหม่เข้าคลัง</p>
       </div>
       
-      <div class="px-8 pb-8 space-y-6">
+      <div class="library-modal-body px-8 pb-8 space-y-6">
         <div id="isbnSection" class="bg-page dark:bg-[#1C1A19] p-5 rounded-[20px] border border-borderLight dark:border-gray-800">
           <label class="text-[10px] font-bold text-accent uppercase tracking-[0.1em] mb-3 block"><i class="fas fa-barcode mr-1"></i> สแกน ISBN</label>
-          <div class="flex gap-2 mb-2">
-            <input type="text" id="isbnInput" inputmode="numeric" autocomplete="off" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); handleIsbnSearch(); }" class="flex-1 p-3 border border-borderLight dark:border-gray-700 rounded-xl bg-white dark:bg-[#252322] text-[13px] dark:text-gray-200 outline-none placeholder-muted focus:border-accent transition" placeholder="ISBN-10 หรือ ISBN-13...">
+          <div class="isbn-actions flex gap-2 mb-2">
+            <input type="text" id="isbnInput" inputmode="numeric" autocomplete="off" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); handleIsbnSearch(); }" class="flex-1 min-w-0 p-3 border border-borderLight dark:border-gray-700 rounded-xl bg-white dark:bg-[#252322] text-[13px] dark:text-gray-200 outline-none placeholder-muted focus:border-accent transition" placeholder="ISBN-10 หรือ ISBN-13...">
             <button onclick="openIsbnCamera()" type="button" aria-label="ถ่ายบาร์โค้ด ISBN" title="ถ่ายบาร์โค้ด ISBN" class="bg-white dark:bg-[#252322] border border-borderLight dark:border-gray-700 hover:border-accent text-primary dark:text-gray-200 px-4 rounded-xl transition shadow-sm"><i class="fas fa-camera"></i></button>
             <button onclick="document.getElementById('isbnImageInput').click()" type="button" aria-label="เลือกรูปบาร์โค้ด ISBN" title="เลือกรูปบาร์โค้ด ISBN" class="bg-white dark:bg-[#252322] border border-borderLight dark:border-gray-700 hover:border-accent text-primary dark:text-gray-200 px-4 rounded-xl transition shadow-sm"><i class="fas fa-images"></i></button>
-            <button onclick="handleIsbnSearch()" id="btnIsbn" type="button" class="bg-primary dark:bg-white text-white dark:text-primary px-5 rounded-xl transition shadow-sm text-[13px] font-medium">ค้นหา</button>
+            <button onclick="handleIsbnSearch()" id="btnIsbn" type="button" class="isbn-search bg-primary dark:bg-white text-white dark:text-primary px-5 rounded-xl transition shadow-sm text-[13px] font-medium">ค้นหา</button>
           </div>
           <input id="isbnCameraInput" type="file" accept="image/*" capture="environment" class="hidden" onchange="scanIsbnImage(event)">
           <input id="isbnImageInput" type="file" accept="image/*" class="hidden" onchange="scanIsbnImage(event)">
@@ -231,7 +256,7 @@
             </label>
           </div>
 
-          <div class="flex gap-4">
+          <div class="mobile-form-pair flex gap-4">
             <div class="flex-1">
               <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">ความชอบ</label>
               <div class="flex gap-1.5 text-lg mt-3 text-borderLight dark:text-gray-700 star-input" id="starInputGroup">
@@ -261,7 +286,7 @@
             <input type="text" name="author" id="inputAuthor" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition">
           </div>
 
-          <div class="flex space-x-4">
+          <div class="mobile-form-pair flex gap-4">
             <div class="flex-1">
               <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">จำนวนหน้า</label>
               <input type="number" name="pages" id="inputPages" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none focus:border-accent transition">
@@ -283,18 +308,18 @@
     </div>
   </div>
 
-  <div id="statusModal" class="fixed inset-0 bg-white/80 dark:bg-[#1C1A19]/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#252322] w-full max-w-sm rounded-[24px] shadow-glow-hover modal-enter overflow-hidden border border-borderLight dark:border-gray-800 relative">
+  <div id="statusModal" class="library-modal fixed inset-0 bg-white/80 dark:bg-[#1C1A19]/90 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
+    <div class="library-modal-card bg-white dark:bg-[#252322] w-full max-w-sm rounded-[24px] shadow-glow-hover modal-enter overflow-y-auto border border-borderLight dark:border-gray-800 relative scrollbar-hide">
       <button onclick="closeModals()" class="absolute top-5 right-5 text-muted hover:text-primary dark:hover:text-white transition w-8 h-8 flex items-center justify-center rounded-full bg-page dark:bg-[#1C1A19]"><i class="fas fa-times"></i></button>
       
-      <div class="pt-8 px-8 pb-4 text-center">
+      <div class="library-modal-head pt-8 px-8 pb-4 text-center">
         <div class="w-12 h-12 bg-page dark:bg-[#1C1A19] rounded-full flex items-center justify-center mx-auto mb-4 border border-borderLight dark:border-gray-800">
           <i class="fas fa-sync-alt text-muted text-lg"></i>
         </div>
         <h3 class="font-serif text-2xl text-primary dark:text-white mb-1">Update Status</h3>
       </div>
 
-      <form id="statusForm" onsubmit="handleStatusSubmit(event)" class="px-8 pb-8 space-y-5 text-left">
+      <form id="statusForm" onsubmit="handleStatusSubmit(event)" class="library-modal-body px-8 pb-8 space-y-5 text-left">
         <input type="hidden" name="rating" id="inputRatingStatus" value="0">
 
         <div>
