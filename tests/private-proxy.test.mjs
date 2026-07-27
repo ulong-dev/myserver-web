@@ -5,6 +5,7 @@ import test from 'node:test';
 
 import { ProxyError, createSignedUpstreamRequest, testing } from '../cloudflare/lib/proxy.js';
 import { createPrivateApiForwardRequest } from '../functions/_middleware.js';
+import { parseGoogleBooksFeed } from '../functions/api/isbn.js';
 
 globalThis.crypto ||= webcrypto;
 
@@ -74,6 +75,10 @@ test('preview API forwarding is restricted to the production Pages origin', asyn
     new Request('https://private.myserver-private.pages.dev/library/'),
     'https://myserver-private.pages.dev'
   ), null);
+  assert.equal(createPrivateApiForwardRequest(
+    new Request('https://private.myserver-private.pages.dev/api/isbn?isbn=9786160854264'),
+    'https://myserver-private.pages.dev'
+  ), null);
   assert.throws(
     () => createPrivateApiForwardRequest(request, 'https://attacker.example'),
     error => error.status === 503
@@ -85,6 +90,29 @@ test('preview API forwarding is restricted to the production Pages origin', asyn
     ),
     error => error.status === 503
   );
+});
+
+test('Google Books Feed fallback parses Thai ISBN metadata', () => {
+  const feed = `<?xml version="1.0" encoding="UTF-8"?>
+    <feed xmlns:dc="http://purl.org/dc/terms">
+      <entry>
+        <dc:creator>คากิ โอกูมูระ</dc:creator>
+        <dc:format>0 pages</dc:format>
+        <dc:identifier>zFmY0QEACAAJ</dc:identifier>
+        <dc:identifier>ISBN:9786160854264</dc:identifier>
+        <dc:title>วะ</dc:title>
+        <dc:title>ศิลปะแห่งการรักษาสมดุลชีวิต</dc:title>
+      </entry>
+    </feed>`;
+  assert.deepEqual(parseGoogleBooksFeed(feed), {
+    found: true,
+    title: 'วะ: ศิลปะแห่งการรักษาสมดุลชีวิต',
+    author: 'คากิ โอกูมูระ',
+    pages: '',
+    coverUrl: 'https://books.google.com/books/content?id=zFmY0QEACAAJ&printsec=frontcover&img=1&zoom=1',
+    source: 'Google Books Feed'
+  });
+  assert.deepEqual(parseGoogleBooksFeed('<feed></feed>'), { found: false });
 });
 
 test('Apps Script verifier accepts a signed form body and rejects tampering', async () => {

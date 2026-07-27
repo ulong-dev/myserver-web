@@ -810,6 +810,20 @@
       };
     }
 
+    async function lookupBookOnGoogleFeed(isbn) {
+      const url = new URL('/api/isbn', window.location.origin);
+      url.searchParams.set('isbn', isbn);
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        cache: 'no-store'
+      });
+      if (!response.ok) throw new Error(`Google Books Feed HTTP ${response.status}`);
+      const payload = await response.json();
+      if (!payload.ok) throw new Error(payload.message || 'Google Books Feed error');
+      return payload.data || { found: false };
+    }
+
     async function lookupBookByIsbn(isbn) {
       try {
         const primary = await apiPost("fetchBookByIsbn", { isbn });
@@ -817,7 +831,13 @@
       } catch (error) {
         // ใช้แหล่งสำรองเมื่อ Google Books/API เดิมติดโควตาหรือใช้งานไม่ได้
       }
-      return lookupBookOnOpenLibrary(isbn);
+      try {
+        const openLibrary = await lookupBookOnOpenLibrary(isbn);
+        if (openLibrary.found) return openLibrary;
+      } catch (error) {
+        // ใช้ Google Books Feed เมื่อ Open Library ไม่มีรายการหรือขัดข้อง
+      }
+      return lookupBookOnGoogleFeed(isbn);
     }
 
     async function handleIsbnSearch() {
@@ -835,7 +855,7 @@
         });
       }
       const original = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
-      swalLoading({ title: 'กำลังค้นหา ISBN...', html: 'ตรวจ Library API และ Open Library' });
+      swalLoading({ title: 'กำลังค้นหา ISBN...', html: 'ตรวจ Library API, Open Library และ Google Books Feed' });
       try {
         const data = await lookupBookByIsbn(isbn);
         if (data.found) {

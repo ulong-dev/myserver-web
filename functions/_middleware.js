@@ -7,6 +7,7 @@ export function createPrivateApiForwardRequest(request, configuredOrigin) {
 
   const source = new URL(request.url);
   if (!source.pathname.startsWith('/api/')) return null;
+  if (source.pathname === '/api/isbn') return null;
 
   let origin;
   try {
