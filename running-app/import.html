@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="th" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>AW2P — วิเคราะห์ภาพการวิ่ง</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config={darkMode:'class',theme:{extend:{colors:{page:'#FCFBF9',card:'#FFFFFF',primary:'#33302E',muted:'#8F8983',accent:'#FC4C02',borderLight:'#EEE9E3'},fontFamily:{sans:['Kanit','sans-serif'],serif:['Playfair Display','serif']},boxShadow:{glow:'0 20px 50px -16px rgba(0,0,0,.16)'}}}}
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.min.js"></script>
+  <style>
+    body{font-family:'Kanit',sans-serif}.safe-bottom{padding-bottom:max(1.5rem,env(safe-area-inset-bottom))}.upload-dash{background-image:url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='28' ry='28' stroke='%23FC4C02' stroke-width='2' stroke-dasharray='8%2c 12' stroke-dashoffset='0' stroke-linecap='round'/%3e%3c/svg%3e")}.dark .upload-dash{background-image:url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='28' ry='28' stroke='%23FC7040' stroke-width='2' stroke-dasharray='8%2c 12' stroke-dashoffset='0' stroke-linecap='round'/%3e%3c/svg%3e")}.input{width:100%;min-height:48px;border:1px solid #EEE9E3;border-radius:16px;padding:12px 14px;background:#FCFBF9;color:#33302E;outline:none}.input:focus{border-color:#FC4C02;box-shadow:0 0 0 3px rgba(252,76,2,.1)}.dark .input{background:#121212;border-color:#303030;color:#eee}
+  </style>
+</head>
+<body class="bg-page text-primary dark:bg-[#101010] dark:text-gray-100 min-h-screen safe-bottom">
+  <nav class="sticky top-0 z-40 border-b border-borderLight dark:border-[#292929] bg-page/90 dark:bg-[#101010]/90 backdrop-blur-xl">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="index.html" class="w-11 h-11 rounded-full border border-borderLight dark:border-[#303030] flex items-center justify-center" aria-label="กลับหน้า Running"><span class="material-icons-round">arrow_back</span></a>
+      <div class="text-center"><div class="font-semibold">วิเคราะห์ภาพการวิ่ง</div><div class="text-[10px] text-muted">PRIVATE · ON-DEVICE OCR</div></div>
+      <button id="themeButton" class="w-11 h-11 rounded-full border border-borderLight dark:border-[#303030] flex items-center justify-center" aria-label="เปลี่ยนธีม"><span class="material-icons-round" id="themeIcon">dark_mode</span></button>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-4 py-6 md:py-10 space-y-6">
+    <section class="rounded-[32px] overflow-hidden bg-gradient-to-br from-[#151310] via-[#29221D] to-[#8E3211] text-white p-6 md:p-10 shadow-glow relative">
+      <div class="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-accent/30 blur-3xl"></div>
+      <div class="relative max-w-2xl">
+        <div class="text-[11px] font-bold tracking-[.18em] text-orange-200 uppercase">Screenshot to insight</div>
+        <h1 class="font-serif text-4xl md:text-6xl mt-3 leading-tight">อัปโหลด แล้วอ่านให้เลย</h1>
+        <p class="text-orange-100/85 mt-4 font-light">เลือกภาพหน้าสรุป, Heart Rate, Splits และ Workout Details พร้อมกัน ระบบจะรวมเป็นการวิ่งหนึ่งครั้ง วิเคราะห์ และเตรียมข้อมูลให้ตรวจบันทึก</p>
+        <div class="mt-5 inline-flex items-center gap-2 text-xs bg-white/10 border border-white/10 rounded-full px-4 py-2"><span class="material-icons-round text-base">shield</span> ภาพประมวลผลในเครื่องและไม่ถูกอัปโหลดขึ้นเซิร์ฟเวอร์</div>
+      </div>
+    </section>
+
+    <section id="uploadSection" class="bg-card dark:bg-[#1B1B1B] rounded-[32px] p-4 md:p-7 border border-borderLight dark:border-[#292929] shadow-glow">
+      <label for="imageInput" class="upload-dash min-h-[230px] rounded-[28px] flex flex-col items-center justify-center text-center p-7 cursor-pointer active:scale-[.99] transition">
+        <span class="w-16 h-16 rounded-full bg-accent text-white flex items-center justify-center shadow-lg shadow-accent/20"><span class="material-icons-round text-3xl">add_photo_alternate</span></span>
+        <span class="font-semibold text-xl mt-5">เลือกภาพจากมือถือ</span>
+        <span class="text-sm text-muted mt-2 max-w-md">เลือกได้หลายภาพพร้อมกัน · PNG, JPG หรือภาพหน้าจอจาก Apple Fitness</span>
+        <span class="mt-4 text-xs font-semibold text-accent">แนะนำ 3–5 ภาพเพื่อข้อมูลครบที่สุด</span>
+      </label>
+      <input id="imageInput" type="file" accept="image/*" multiple class="sr-only">
+
+      <div id="previewArea" class="hidden mt-5">
+        <div class="flex justify-between items-center mb-3"><div class="font-semibold" id="fileCount">0 ภาพ</div><button id="clearButton" class="text-sm text-muted hover:text-accent">ล้างภาพ</button></div>
+        <div id="previewGrid" class="grid grid-cols-3 sm:grid-cols-5 gap-2"></div>
+        <button id="analyzeButton" class="mt-5 w-full min-h-14 rounded-full bg-accent text-white font-semibold text-lg flex items-center justify-center gap-2 shadow-lg shadow-accent/20 disabled:opacity-50"><span class="material-icons-round">document_scanner</span> อ่านและวิเคราะห์ภาพ</button>
+      </div>
+
+      <div id="progressArea" class="hidden mt-6 rounded-[24px] bg-page dark:bg-[#121212] border border-borderLight dark:border-[#303030] p-5">
+        <div class="flex justify-between text-sm"><span id="progressText">กำลังเตรียม OCR…</span><span id="progressPercent" class="font-bold text-accent">0%</span></div>
+        <div class="h-2 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden mt-3"><div id="progressBar" class="h-full bg-accent rounded-full transition-all duration-300" style="width:0%"></div></div>
+        <p class="text-xs text-muted mt-3">ครั้งแรกอาจใช้เวลาสักครู่เพื่อโหลดระบบอ่านภาษาอังกฤษ หลังจากนั้นเบราว์เซอร์จะใช้ไฟล์ที่ cache ไว้</p>
+      </div>
+      <div id="errorBox" class="hidden mt-5 rounded-2xl bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 p-4 text-sm"></div>
+    </section>
+
+    <section id="resultSection" class="hidden space-y-6">
+      <div class="bg-card dark:bg-[#1B1B1B] rounded-[32px] p-5 md:p-7 border border-borderLight dark:border-[#292929] shadow-glow">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div><div class="text-[10px] font-bold tracking-[.15em] text-accent uppercase">OCR result</div><h2 id="resultHeadline" class="text-2xl font-semibold mt-1">อ่านข้อมูลแล้ว</h2><p id="resultSubline" class="text-sm text-muted mt-1"></p></div>
+          <div class="flex items-center gap-3"><div class="text-right"><div class="text-[10px] text-muted uppercase">ความครบถ้วน</div><div id="confidenceText" class="text-3xl font-black text-accent">0%</div></div><span class="material-icons-round text-4xl text-green-500">verified</span></div>
+        </div>
+        <div id="metricGrid" class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6"></div>
+      </div>
+
+      <div class="grid lg:grid-cols-[1.1fr_.9fr] gap-6">
+        <section class="bg-card dark:bg-[#1B1B1B] rounded-[32px] p-5 md:p-7 border border-borderLight dark:border-[#292929] shadow-glow">
+          <div class="flex items-center gap-3"><span class="w-11 h-11 rounded-full bg-accent/10 text-accent flex items-center justify-center"><span class="material-icons-round">insights</span></span><div><h2 class="text-xl font-semibold">บทวิเคราะห์</h2><p class="text-xs text-muted">วิเคราะห์จากตัวเลขในภาพและแผนของวันนั้น</p></div></div>
+          <div id="insightList" class="space-y-3 mt-5"></div>
+          <div id="warningList" class="space-y-3 mt-3"></div>
+          <p class="text-[11px] text-muted mt-5 border-t border-borderLight dark:border-[#303030] pt-4">ใช้เพื่อติดตามการซ้อม ไม่ใช่การวินิจฉัยทางการแพทย์ หากมีอาการเจ็บ หน้าอกผิดปกติ หรือเวียนศีรษะควรหยุดและปรึกษาผู้เชี่ยวชาญ</p>
+        </section>
+
+        <section class="bg-card dark:bg-[#1B1B1B] rounded-[32px] p-5 md:p-7 border border-borderLight dark:border-[#292929] shadow-glow">
+          <h2 class="text-xl font-semibold">รายละเอียดที่อ่านได้</h2>
+          <div class="mt-5"><div class="text-xs font-semibold text-muted uppercase">Heart-rate zones</div><div id="zoneList" class="space-y-2 mt-2"></div></div>
+          <div class="mt-6"><div class="text-xs font-semibold text-muted uppercase">Kilometer splits</div><div id="splitList" class="mt-2 overflow-x-auto"></div></div>
+        </section>
+      </div>
+
+      <section class="bg-card dark:bg-[#1B1B1B] rounded-[32px] p-5 md:p-7 border border-borderLight dark:border-[#292929] shadow-glow">
+        <div class="flex items-start justify-between gap-3"><div><h2 class="text-xl font-semibold">ตรวจแล้วบันทึก</h2><p class="text-sm text-muted mt-1">แก้ตัวเลขที่ OCR อ่านคลาดเคลื่อนได้ก่อนบันทึก</p></div><span class="material-icons-round text-accent">edit_note</span></div>
+        <form id="reviewForm" class="mt-6 space-y-4">
+          <input type="hidden" id="linkedWorkoutId" name="linked_workout_id">
+          <div class="grid sm:grid-cols-2 gap-3">
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">วันที่</span><input class="input" id="dateInput" name="date" type="date" required></label>
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">ประเภท</span><select class="input" id="typeInput" name="type"><option>Easy</option><option>Recovery</option><option>Steady</option><option>Threshold</option><option>Tempo</option><option>Interval</option><option>Hill / Technique</option><option>Long</option><option>Race</option></select></label>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">ระยะ (KM)</span><input class="input text-center text-lg font-semibold" id="distanceInput" name="distance_km" type="number" step="0.01" required></label>
+            <label><span class="text-[10px] font-bold text-muted uppercase ml-2">เวลา (H:MM:SS)</span><input class="input text-center text-lg font-semibold" id="durationInput" type="text" inputmode="numeric" required></label>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">Avg HR</span><input class="input text-center" id="avgHrInput" name="avg_hr" type="number"></label>
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">Cadence</span><input class="input text-center" id="cadenceInput" name="cadence" type="number"></label>
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">Power</span><input class="input text-center" id="powerInput" name="avg_power" type="number"></label>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">Vert Osc.</span><input class="input text-center" id="verticalInput" name="vertical_osc_cm" type="number" step="0.1"></label>
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">GCT</span><input class="input text-center" id="gctInput" name="gct_ms" type="number"></label>
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">Stride</span><input class="input text-center" id="strideInput" name="stride_len_m" type="number" step="0.01"></label>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">Elev.</span><input class="input text-center" id="elevationInput" name="elevation_gain" type="number"></label>
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">RPE</span><input class="input text-center" id="rpeInput" name="rpe" type="number" min="1" max="10"></label>
+            <label><span class="text-[9px] font-bold text-muted uppercase ml-1">Pain</span><input class="input text-center" id="painInput" name="pain_score" type="number" min="0" max="10" value="0"></label>
+          </div>
+          <label><span class="text-[10px] font-bold text-muted uppercase ml-2">สรุป/หมายเหตุ</span><textarea class="input min-h-[130px]" id="notesInput" name="notes"></textarea></label>
+          <button id="saveButton" type="submit" class="w-full min-h-14 rounded-full bg-primary dark:bg-white dark:text-primary text-white font-semibold text-lg flex items-center justify-center gap-2 disabled:opacity-50"><span class="material-icons-round">cloud_done</span> บันทึกผลการวิ่ง</button>
+          <div id="saveStatus" class="hidden rounded-2xl p-4 text-sm text-center"></div>
+        </form>
+        <details class="mt-5 border-t border-borderLight dark:border-[#303030] pt-4"><summary class="cursor-pointer text-xs text-muted">ดูข้อความ OCR สำหรับตรวจสอบ</summary><pre id="rawText" class="mt-3 max-h-64 overflow-auto text-[10px] whitespace-pre-wrap bg-page dark:bg-[#121212] rounded-2xl p-4"></pre></details>
+      </section>
+    </section>
+  </main>
+
+  <script type="module" src="workout-import-page.js"></script>
+</body>
+</html>

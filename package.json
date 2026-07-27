@@ -1,0 +1,26 @@
+{
+  "name": "myserver-web",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build:public": "node scripts/build-public-site.mjs",
+    "build:private": "node scripts/build-private-site.mjs",
+    "build:private:cloud": "node scripts/build-private-site.mjs _private_cloud --cloud",
+    "verify:public": "node scripts/verify-public-site.mjs _site",
+    "verify:private": "node scripts/verify-private-site.mjs _private_site",
+    "verify:private:cloud": "node scripts/verify-private-site.mjs _private_cloud --cloud",
+    "check:secrets": "node scripts/check-tracked-secrets.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "pages:dev": "npm run build:private:cloud && wrangler pages dev _private_cloud",
+    "deploy:private": "npm run build:private:cloud && npm run verify:private:cloud && wrangler pages deploy _private_cloud --project-name myserver-private"
+  },
+  "dependencies": {
+    "jose": "6.2.4"
+  },
+  "devDependencies": {
+    "wrangler": "4.114.0"
+  }
+}

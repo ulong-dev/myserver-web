@@ -38,6 +38,7 @@
       </div>
       <div class="flex items-center gap-2">
         <a href="index.html" title="Today" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">today</span></a>
+        <a href="import.html" title="วิเคราะห์ภาพการวิ่ง" class="w-10 h-10 flex items-center justify-center rounded-full bg-accent text-white shadow-md shadow-accent/20"><span class="material-icons-round">document_scanner</span></a>
         <a href="dashboard.html" title="Coach Dashboard" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">insert_chart_outlined</span></a>
         <a href="tests.html" title="Fitness Test Lab" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">science</span></a>
         <a href="calendar.html" title="Calendar Export" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">event</span></a>
@@ -157,7 +158,7 @@
   <template id="metricTemplate"><div class="rounded-2xl bg-page dark:bg-[#121212] p-4 border border-borderLight dark:border-[#2A2A2A]"><div class="text-[10px] text-muted font-bold uppercase metric-label">Label</div><div class="font-black text-2xl mt-1 metric-value">-</div></div></template>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbw28UAw8r8T4V9bAiLRHnm12lB2Ow557TeQ8RUY2CI1KmqkPqKmoBvjJ3nfdcP4Cv0/exec";
+    const API_URL = "/api/running";
     const html = document.documentElement;
     const todayDate = new Date().toISOString().slice(0,10);
     let currentContext = null;
@@ -170,7 +171,7 @@
     document.getElementById('dateInput').addEventListener('change', reloadContext);
 
     function toggleTheme(){const next=html.classList.contains('dark')?'light':'dark';html.classList.toggle('dark',next==='dark');localStorage.setItem('elite_theme',next);document.getElementById('themeIcon').innerText=next==='dark'?'light_mode':'dark_mode';}
-    function apiUrl(action,params={}){const u=new URL(API_URL);u.searchParams.set('action',action);Object.entries(params).forEach(([k,v])=>{if(v!==undefined&&v!==null&&v!=='')u.searchParams.set(k,v)});return u.toString();}
+    function apiUrl(action,params={}){const u=new URL(API_URL, window.location.origin);u.searchParams.set('action',action);Object.entries(params).forEach(([k,v])=>{if(v!==undefined&&v!==null&&v!=='')u.searchParams.set(k,v)});return u.toString();}
     async function apiGet(action,params={}){const r=await fetch(apiUrl(action,params));const d=await r.json();if(!r.ok||d.status==='error')throw new Error(d.message||`HTTP ${r.status}`);return d;}
     async function apiPost(action,payload={}){const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})});const d=await r.json();if(!r.ok||d.status==='error')throw new Error(d.message||`HTTP ${r.status}`);return d;}
 

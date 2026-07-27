@@ -17,10 +17,40 @@ jobs:
       - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
+      - name: Use Node.js 22
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
       - name: Verify public artifact
         run: |
           node scripts/build-public-site.mjs
           node scripts/verify-public-site.mjs _site
+
+      - name: Verify private local and cloud artifacts
+        run: |
+          npm run build:private
+          npm run verify:private
+          npm run build:private:cloud
+          npm run verify:private:cloud
+
+      - name: Build Cloudflare Pages Functions
+        run: npx wrangler pages functions build --outdir .wrangler/functions-build
+
+      - name: Preserve Pages Functions bundle
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: pages-functions-${{ github.sha }}
+          path: .wrangler/functions-build
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Run unit tests
+        run: npm test
 
       - name: Scan tracked files for common secret formats
         run: node scripts/check-tracked-secrets.mjs
@@ -34,3 +64,11 @@ jobs:
           space-game/index.html
           typing-trainer/index.html
           library/index.html
+          running-app/index.html
+          running-app/today.html
+          running-app/log.html
+          running-app/dashboard.html
+          running-app/calendar.html
+          running-app/strava.html
+          running-app/tests.html
+          coffee-shop/index.html
