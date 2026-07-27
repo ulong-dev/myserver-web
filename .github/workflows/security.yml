@@ -1,0 +1,36 @@
+name: Security checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "23 2 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Verify public artifact
+        run: |
+          node scripts/build-public-site.mjs
+          node scripts/verify-public-site.mjs _site
+
+      - name: Scan tracked files for common secret formats
+        run: node scripts/check-tracked-secrets.mjs
+
+      - name: Validate inline JavaScript syntax
+        run: >-
+          node scripts/check-inline-scripts.mjs
+          public-site/index.html
+          public-site/404.html
+          guitar-learning/index.html
+          space-game/index.html
+          typing-trainer/index.html
+          library/index.html

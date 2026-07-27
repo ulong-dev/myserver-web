@@ -1,6 +1,6 @@
 # 🚨 คู่มือฉุกเฉิน: กู้คืนระบบ VS Code Remote Tunnel และ Home Server
 
-อัปเดตล่าสุด: 2026-07-03
+อัปเดตล่าสุด: 2026-07-27
 
 คู่มือนี้ใช้สำหรับเครื่อง iMac ของ `2pfamily` และโปรเจกต์ `myserver` เมื่อเกิดเหตุไฟตก เครื่องดับ รีสตาร์ทแล้วเข้า VS Code Tunnel ไม่ได้ หรือเว็บ/API ทำงานผิดปกติ
 
@@ -41,15 +41,11 @@ myserver/
 ├─ guitar-learning/                   Guitar Learning 12 weeks / 84 days
 ├─ library/                           Library Lab
 ├─ running-app/                       Running Log + Dashboard
-├─ space-game/                        Space Explorer
-└─ fire-api/                          Node.js API + dashboard ถังดับเพลิง
-   ├─ server.js
-   ├─ public/index.html
-   ├─ public/scan.html
-   └─ public/check.html
+└─ space-game/                        Space Explorer
 ```
 
-หน้า static หลักเปิดผ่านเว็บเซิร์ฟเวอร์ของเครื่องได้ ส่วน `fire-api` ต้องรัน Node.js API ถ้าจะใช้ dashboard/API ถังดับเพลิง
+Fire API ถูกถอดออกจาก repository และเก็บแบบ private นอก iCloud ตั้งแต่
+2026-07-27 เพราะไม่พบการใช้งานจริง
 
 ---
 
@@ -109,55 +105,7 @@ Tunnel service successfully started
 
 ---
 
-## 6. เช็ก Fire API
-
-เข้าโฟลเดอร์ API:
-
-```bash
-cd "/Users/2pfamily/Library/Mobile Documents/com~apple~CloudDocs/myserver/fire-api"
-```
-
-ติดตั้ง dependency ถ้ายังไม่มี:
-
-```bash
-npm install
-```
-
-เช็ก syntax:
-
-```bash
-npm test
-```
-
-รัน API:
-
-```bash
-npm start
-```
-
-ค่าเริ่มต้นคือ:
-
-```text
-http://localhost:3000
-```
-
-ไฟล์ลับที่ต้องมีในเครื่องแต่ห้าม commit:
-
-```text
-fire-api/credentials.json
-fire-api/.env
-fire-api/public/uploads/
-```
-
-ดูตัวอย่างค่า env ได้ที่:
-
-```text
-fire-api/.env.example
-```
-
----
-
-## 7. เช็ก Git ว่า commit/push สำเร็จหรือยัง
+## 6. เช็ก Git ว่า commit/push สำเร็จหรือยัง
 
 เข้า root โปรเจกต์:
 
@@ -218,18 +166,17 @@ git push
 
 ---
 
-## 8. กฎเหล็ก
+## 7. กฎเหล็ก
 
 1. ห้าม commit ไฟล์ลับ เช่น `credentials.json`, `.env`, รูป upload จริง, log, `node_modules/`
 2. อย่าใช้ `git reset --hard` ถ้าไม่แน่ใจ
 3. ก่อน commit ให้เช็ก `git status --short --branch`
 4. ถ้า VS Code เปิดหน้า `COMMIT_EDITMSG` แปลว่า commit อาจยังรอข้อความอยู่ ให้ใส่ข้อความ commit แล้ว save/close
 5. หลังแก้เว็บ static ให้เช็ก path ของลิงก์แบบ relative เช่น `../index.html`
-6. หลังแก้ `fire-api/server.js` ให้รัน `npm test`
 
 ---
 
-## 9. วิธีเข้าใช้งานปกติ
+## 8. วิธีเข้าใช้งานปกติ
 
 ใช้เครื่องหลักเข้า VS Code ผ่าน Tunnel ชื่อ:
 

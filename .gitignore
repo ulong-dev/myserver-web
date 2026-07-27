@@ -8,12 +8,8 @@ nohup.out
 
 # Node dependencies and generated files
 node_modules/
-fire-api/node_modules/
-fire-api/public/uploads/
+_site/
 
 # Secrets
-.env
-.env.*
+.env*
 !.env.example
-!fire-api/.env.example
-fire-api/credentials.json

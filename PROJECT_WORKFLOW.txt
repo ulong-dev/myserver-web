@@ -1,5 +1,5 @@
 2PFamily myserver - Project Workflow
-อัปเดตล่าสุด: 2026-07-03
+อัปเดตล่าสุด: 2026-07-27
 
 เป้าหมาย
 ใช้ไฟล์นี้เป็น workflow ประจำวันสำหรับแก้เว็บ, เช็กระบบ, commit, และ push โปรเจกต์ myserver
@@ -26,38 +26,17 @@ running-app/
 space-game/
   Space Explorer game
 
-fire-api/
-  Node.js Express API + หน้า dashboard/check/scan ของระบบถังดับเพลิง
-
 workflow แก้เว็บ static
 1. เปิดไฟล์ app ที่ต้องแก้ เช่น coffee-shop/index.html หรือ running-app/index.html
 2. แก้เฉพาะส่วนที่เกี่ยวข้องกับงาน
 3. ถ้าเพิ่มลิงก์กลับ Home:
    - หน้าในโฟลเดอร์ชั้นเดียวกับ app ใช้ ../index.html
-   - หน้าใน fire-api/public ใช้ ../../index.html เมื่อเปิดตาม path ใน repo
 4. เช็กหน้าตาใน browser
 5. เช็ก diff:
    git diff -- ไฟล์ที่แก้
 6. เช็ก whitespace:
    git diff --check
 7. commit และ push ตาม workflow Git ด้านล่าง
-
-workflow แก้ Fire API
-1. เข้าโฟลเดอร์:
-   cd "fire-api"
-2. ติดตั้ง dependency ถ้าจำเป็น:
-   npm install
-3. เช็ก syntax:
-   npm test
-4. รัน local:
-   npm start
-5. เปิด:
-   http://localhost:3000
-6. ไฟล์ที่ต้องมีในเครื่องแต่ห้าม commit:
-   fire-api/credentials.json
-   fire-api/.env
-   fire-api/public/uploads/
-7. ถ้าแก้ server.js ต้องรัน npm test ก่อน commit
 
 workflow Git ประจำวัน
 1. กลับ root โปรเจกต์:
@@ -106,6 +85,10 @@ COMMIT_EDITMSG เปิดอยู่
    public/uploads/
    .DS_Store
    nohup.out
+6. รัน security checks:
+   node scripts/build-public-site.mjs
+   node scripts/verify-public-site.mjs _site
+   node scripts/check-tracked-secrets.mjs
 
 หลังแก้หน้า Home
 1. เช็กการ์ดใน index.html
@@ -116,8 +99,7 @@ COMMIT_EDITMSG เปิดอยู่
 หลังแก้ปุ่มกลับ Home
 1. app ชั้นเดียว เช่น space-game/index.html ใช้ ../index.html
 2. dashboard ภายใน running-app ใช้ ../index.html เพื่อกลับ Home หลัก
-3. หน้าใน fire-api/public ใช้ ../../index.html ถ้าเปิดจากโครงสร้าง repo
-4. ปุ่มไม่ควรทับปุ่มสำคัญเดิม
+3. ปุ่มไม่ควรทับปุ่มสำคัญเดิม
 
 workflow กู้ระบบ VS Code Tunnel
 1. เข้า iMac ด้วย AnyDesk

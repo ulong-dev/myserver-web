@@ -71,6 +71,9 @@
         <i class="fas fa-arrow-left text-[11px]"></i> Home
       </a>
       <div class="absolute top-6 right-6 flex gap-2">
+        <button onclick="openBookModal('wishlist')" aria-label="เพิ่มหนังสือที่อยากได้" title="เพิ่มหนังสือที่อยากได้" class="bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/40 w-[38px] h-[38px] rounded-full backdrop-blur-md transition-all flex items-center justify-center border border-borderLight dark:border-gray-800 shadow-sm text-accent">
+          <i class="fas fa-cart-plus text-sm"></i>
+        </button>
         <button onclick="openBookModal('create')" class="bg-white/50 dark:bg-black/20 hover:bg-white dark:hover:bg-black/40 px-5 py-2 rounded-full text-[13px] backdrop-blur-md transition-all text-primary dark:text-gray-300 border border-borderLight dark:border-gray-800 shadow-sm font-medium">
           <i class="fas fa-plus mr-1"></i> Add Book
         </button>
@@ -91,10 +94,14 @@
 
       <div class="flex flex-wrap justify-center gap-3 mt-10">
         <button onclick="showBookList('all')" class="bg-white dark:bg-[#252322] px-5 py-2 rounded-full shadow-sm border border-borderLight dark:border-gray-800 text-[12px] font-medium text-primary dark:text-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2">
-          <span class="text-muted font-light">ทั้งหมด</span> <span id="statTotal" class="font-bold">0</span>
+          <span class="text-muted font-light">ในคลัง</span> <span id="statTotal" class="font-bold">0</span>
         </button>
         <button onclick="showBookList('read')" class="bg-white dark:bg-[#252322] px-5 py-2 rounded-full shadow-sm border border-borderLight dark:border-gray-800 text-[12px] font-medium text-primary dark:text-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2">
           <span class="text-muted font-light">อ่านจบ</span> <span id="statRead" class="font-bold">0</span>
+        </button>
+        <button onclick="showWishlist()" class="bg-white dark:bg-[#252322] px-5 py-2 rounded-full shadow-sm border border-accent/20 dark:border-accent/30 text-[12px] font-medium text-primary dark:text-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2">
+          <i class="fas fa-shopping-basket text-accent text-[11px]"></i>
+          <span class="text-muted font-light">อยากได้</span> <span id="statWishlist" class="font-bold text-accent">0</span>
         </button>
         <button onclick="showAllNotes()" class="bg-white dark:bg-[#252322] px-5 py-2 rounded-full shadow-sm border border-borderLight dark:border-gray-800 text-[12px] font-medium text-primary dark:text-gray-300 hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-2">
           <span class="text-muted font-light">บันทึก</span> <span id="statNotes" class="font-bold">0</span>
@@ -254,6 +261,7 @@
                 <option value="Reading">กำลังอ่าน</option>
                 <option value="Done">อ่านจบแล้ว</option>
                 <option value="To Read" selected>ดองไว้ก่อน</option>
+                <option value="Wishlist">อยากได้ / ยังไม่ได้ซื้อ</option>
               </select>
             </div>
           </div>
@@ -284,7 +292,7 @@
 
         <div>
           <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1 text-center block mb-3">สถานะล่าสุด</label>
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 gap-2">
             <label class="cursor-pointer">
               <input type="radio" name="status" value="Reading" class="peer sr-only">
               <div class="text-center p-3 rounded-xl border border-borderLight dark:border-gray-700 peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white text-[11px] text-muted transition-all">กำลังอ่าน</div>
@@ -296,6 +304,10 @@
             <label class="cursor-pointer">
               <input type="radio" name="status" value="To Read" class="peer sr-only">
               <div class="text-center p-3 rounded-xl border border-borderLight dark:border-gray-700 peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white text-[11px] text-muted transition-all">ดองไว้</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="status" value="Wishlist" class="peer sr-only">
+              <div class="text-center p-3 rounded-xl border border-borderLight dark:border-gray-700 peer-checked:border-accent peer-checked:bg-accent peer-checked:text-white text-[11px] text-muted transition-all"><i class="fas fa-shopping-basket mr-1"></i> อยากได้</div>
             </label>
           </div>
         </div>
@@ -320,13 +332,40 @@
     // Config เดิม ไม่เปลี่ยน
     const API_URL = "https://script.google.com/macros/s/AKfycbyfDj7axGwEbp03yGispxR0k3fb-Xu0NtF6MG4hqdIKlMZoCiko4QYSMbLjwZo-PwxY/exec";
 
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+      })[char]);
+    }
+
+    function safeInlineJsString(value) {
+      return String(value ?? '')
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, '\\x27')
+        .replace(/"/g, '\\x22')
+        .replace(/&/g, '\\x26')
+        .replace(/</g, '\\x3c')
+        .replace(/>/g, '\\x3e')
+        .replace(/\r/g, '\\r')
+        .replace(/\n/g, '\\n');
+    }
+
+    function safeImageUrl(value) {
+      try {
+        const url = new URL(String(value || ''));
+        return url.protocol === 'https:' ? escapeHtml(url.href) : '';
+      } catch (error) {
+        return '';
+      }
+    }
+
     function swalLoading({ title="Loading...", html="Please wait", footer="" } = {}) {
       return Swal.fire({ title, html, footer, allowOutsideClick: false, allowEscapeKey: false, didOpen: () => Swal.showLoading(), customClass: { popup: 'rounded-3xl' } });
     }
 
     function swalError(err, { title="Error", footer="ตรวจสอบการเชื่อมต่อ" } = {}) {
       const msg = (err && err.message) ? err.message : String(err);
-      const html = `<div style="text-align:center; font-size:14px; font-weight:300;">${msg}</div>`;
+      const html = `<div style="text-align:center; font-size:14px; font-weight:300;">${escapeHtml(msg)}</div>`;
       return Swal.fire({ icon:"error", title, html, footer, confirmButtonText:"OK", confirmButtonColor:"#33302E", customClass: { popup: 'rounded-3xl' } });
     }
 
@@ -379,10 +418,15 @@
       document.getElementById('loading').classList.remove('hidden');
 
       try {
-        const [books, stats, home] = await Promise.all([
-          apiPost("getBookList"), apiPost("getDashboardStats"), apiPost("getHomePageData")
+        const [books, stats, home, allBooks] = await Promise.all([
+          apiPost("getBookList"),
+          apiPost("getDashboardStats"),
+          apiPost("getHomePageData"),
+          apiPost("getLibraryBooks", { filterType: "all", filterValue: "" })
         ]);
-        populateBooks(books); updateDashboard(stats); displayHomePage(home);
+        bookCache = {};
+        (allBooks || []).forEach(book => { if (book.type === 'book') bookCache[book.id] = book; });
+        populateBooks(books, allBooks); updateDashboard(stats, allBooks); displayHomePage(home);
       } catch (err) {
         document.getElementById('resultsArea').innerHTML = `<div class="text-center text-muted py-10 text-[13px]">ไม่สามารถโหลดข้อมูลได้</div>`;
       } finally {
@@ -422,21 +466,27 @@
       return html;
     }
 
-    function updateDashboard(stats) {
-      document.getElementById("statTotal").innerText = stats.totalBooks;
+    function updateDashboard(stats, books) {
+      const bookRows = (books || []).filter(item => item.type === 'book');
+      const wishlistCount = bookRows.filter(book => book.status === 'Wishlist').length;
+      const ownedCount = bookRows.filter(book => book.status !== 'Wishlist').length;
+      document.getElementById("statTotal").innerText = ownedCount;
       document.getElementById("statRead").innerText = stats.readCount;
       document.getElementById("statNotes").innerText = stats.totalNotes;
+      document.getElementById("statWishlist").innerText = wishlistCount;
     }
 
     function renderImageOrIcon(url) {
-      return (url && url.length > 5)
-        ? `<img src="${url}" loading="lazy" class="w-full h-full object-cover">`
+      const safeUrl = safeImageUrl(url);
+      return safeUrl
+        ? `<img src="${safeUrl}" loading="lazy" class="w-full h-full object-cover" alt="">`
         : `<div class="w-full h-full bg-page dark:bg-[#1C1A19] flex items-center justify-center text-borderLight dark:text-gray-800"><i class="fas fa-book text-4xl"></i></div>`;
     }
 
     function displayHomePage(books) {
       const container = document.getElementById('resultsArea');
       container.innerHTML = "";
+      books = (books || []).filter(book => book.status !== 'Wishlist');
       if (isEbookMode) books = (books || []).filter(b => b.isEbook === 'TRUE' || b.isEbook === true);
 
       if (!books || books.length === 0) {
@@ -451,6 +501,7 @@
       books.forEach(book => {
         const imgHtml = renderImageOrIcon(book.coverUrl);
         const starsHtml = renderStars(book.rating || 0);
+        const safeBookId = safeInlineJsString(book.id);
         const ebookIcon = (book.isEbook === 'TRUE' || book.isEbook === true) ? '<i class="fas fa-tablet-alt ml-1 opacity-50"></i>' : '';
         
         let statusBadge = '';
@@ -462,9 +513,9 @@
           <div class="shelf-card bg-card dark:bg-[#252322] p-3 rounded-[24px] shadow-glow hover:shadow-glow-hover flex flex-col relative group transition-all duration-300 border border-transparent dark:border-gray-800 hover:-translate-y-1">
             
             <div class="absolute top-5 right-5 flex flex-col gap-1 z-20 action-btn">
-              <button onclick="openStatusModalWithBook('${book.id}')" class="bg-white/90 dark:bg-black/50 backdrop-blur text-primary dark:text-white hover:text-accent w-8 h-8 rounded-full shadow-sm flex items-center justify-center text-[11px] transition-colors"><i class="fas fa-sync-alt"></i></button>
-              <button onclick="openBookModal('edit', '${book.id}')" class="bg-white/90 dark:bg-black/50 backdrop-blur text-primary dark:text-white hover:text-accent w-8 h-8 rounded-full shadow-sm flex items-center justify-center text-[11px] transition-colors"><i class="fas fa-pen"></i></button>
-              <button onclick="confirmDelete('${book.id}')" class="bg-white/90 dark:bg-black/50 backdrop-blur text-red-400 hover:text-red-500 w-8 h-8 rounded-full shadow-sm flex items-center justify-center text-[11px] transition-colors"><i class="fas fa-trash"></i></button>
+              <button onclick="openStatusModalWithBook('${safeBookId}')" class="bg-white/90 dark:bg-black/50 backdrop-blur text-primary dark:text-white hover:text-accent w-8 h-8 rounded-full shadow-sm flex items-center justify-center text-[11px] transition-colors"><i class="fas fa-sync-alt"></i></button>
+              <button onclick="openBookModal('edit', '${safeBookId}')" class="bg-white/90 dark:bg-black/50 backdrop-blur text-primary dark:text-white hover:text-accent w-8 h-8 rounded-full shadow-sm flex items-center justify-center text-[11px] transition-colors"><i class="fas fa-pen"></i></button>
+              <button onclick="confirmDelete('${safeBookId}')" class="bg-white/90 dark:bg-black/50 backdrop-blur text-red-400 hover:text-red-500 w-8 h-8 rounded-full shadow-sm flex items-center justify-center text-[11px] transition-colors"><i class="fas fa-trash"></i></button>
             </div>
 
             <div class="w-full aspect-[3/4] mb-4 rounded-[16px] overflow-hidden bg-page dark:bg-[#1C1A19] relative border border-borderLight dark:border-gray-800">
@@ -474,13 +525,13 @@
             <div class="px-2 pb-1 flex-1 flex flex-col justify-between">
               <div>
                 <div class="mb-1">${starsHtml}</div>
-                <h3 class="font-bold text-primary dark:text-gray-100 text-[13px] line-clamp-2 leading-tight mb-1">${book.title || "-"}</h3>
-                <div class="text-[11px] text-muted truncate font-light">${book.author || '-'} ${ebookIcon}</div>
+                <h3 class="font-bold text-primary dark:text-gray-100 text-[13px] line-clamp-2 leading-tight mb-1">${escapeHtml(book.title || "-")}</h3>
+                <div class="text-[11px] text-muted truncate font-light">${escapeHtml(book.author || '-')} ${ebookIcon}</div>
               </div>
               
               <div class="flex justify-between items-center mt-4">
                 ${statusBadge}
-                <button onclick="openStatusModalWithBook('${book.id}')" class="text-[10px] font-medium px-3 py-1 border border-borderLight dark:border-gray-700 text-primary dark:text-gray-300 rounded-full hover:bg-page dark:hover:bg-gray-800 transition-colors flex items-center gap-1">Open <i class="fas fa-arrow-right text-[8px] opacity-50"></i></button>
+                <button onclick="openStatusModalWithBook('${safeBookId}')" class="text-[10px] font-medium px-3 py-1 border border-borderLight dark:border-gray-700 text-primary dark:text-gray-300 rounded-full hover:bg-page dark:hover:bg-gray-800 transition-colors flex items-center gap-1">Open <i class="fas fa-arrow-right text-[8px] opacity-50"></i></button>
               </div>
             </div>
           </div>`;
@@ -490,39 +541,49 @@
       container.innerHTML = html;
     }
 
-    function displayResults(data) {
+    function displayResults(data, emptyMessage = 'No results found.') {
       const container = document.getElementById('resultsArea');
       container.innerHTML = "";
       data = data || [];
       if (isEbookMode) data = data.filter(item => (item.isEbook === 'TRUE' || item.isEbook === true));
-      if (data.length === 0) { container.innerHTML = `<div class="text-center text-muted py-20 text-[13px] font-light">No results found.</div>`; return; }
+      if (data.length === 0) { container.innerHTML = `<div class="text-center text-muted py-20 text-[13px] font-light">${escapeHtml(emptyMessage)}</div>`; return; }
 
       let html = `<div class="flex flex-col gap-4">`;
 
       data.forEach(item => {
         if (item.type === 'book') {
           bookCache[item.id] = item;
-          const listImg = item.coverUrl ? `<img src="${item.coverUrl}" loading="lazy" class="h-24 w-16 object-cover rounded-xl shadow-sm">` : `<div class="h-24 w-16 bg-page dark:bg-[#1C1A19] rounded-xl border border-borderLight dark:border-gray-800 flex justify-center items-center text-borderLight dark:text-gray-700"><i class="fas fa-book"></i></div>`;
+          const safeCoverUrl = safeImageUrl(item.coverUrl);
+          const safeItemId = safeInlineJsString(item.id);
+          const listImg = safeCoverUrl ? `<img src="${safeCoverUrl}" loading="lazy" class="h-24 w-16 object-cover rounded-xl shadow-sm" alt="">` : `<div class="h-24 w-16 bg-page dark:bg-[#1C1A19] rounded-xl border border-borderLight dark:border-gray-800 flex justify-center items-center text-borderLight dark:text-gray-700"><i class="fas fa-book"></i></div>`;
           const starsHtml = renderStars(item.rating || 0);
           const ebookIcon = (item.isEbook === 'TRUE' || item.isEbook === true) ? '<span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-primary dark:text-gray-300 rounded-md ml-2"><i class="fas fa-tablet-alt"></i> EBOOK</span>' : '';
           
-          let statusLabel = item.status;
+          const isWishlist = item.status === 'Wishlist';
+          const statusLabel = isWishlist ? 'อยากได้' : item.status;
+          const statusClass = isWishlist
+            ? 'bg-accent/10 border-accent/20 text-accent'
+            : 'bg-page dark:bg-[#1C1A19] border-borderLight dark:border-gray-800 text-muted';
+          const purchasedButton = isWishlist
+            ? `<button onclick="markAsPurchased('${safeItemId}')" title="ซื้อแล้ว ย้ายเข้าคลัง" class="h-7 px-3 flex items-center justify-center gap-1 rounded-full bg-accent text-white hover:opacity-90 transition text-[10px] font-medium"><i class="fas fa-shopping-bag"></i> ซื้อแล้ว</button>`
+            : '';
 
           html += `
             <div class="bg-card dark:bg-[#252322] p-4 rounded-[24px] shadow-sm hover:shadow-glow transition-all border border-borderLight dark:border-gray-800 flex gap-4 items-center relative group">
               <div class="flex-shrink-0">${listImg}</div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center mb-1">
-                  <h3 class="font-bold text-primary dark:text-gray-100 text-[14px] truncate">${item.bookTitle || item.title || "-"}</h3> ${ebookIcon}
+                  <h3 class="font-bold text-primary dark:text-gray-100 text-[14px] truncate">${escapeHtml(item.bookTitle || item.title || "-")}</h3> ${ebookIcon}
                 </div>
-                <div class="text-[12px] text-muted font-light mb-1">${item.author || '-'}</div>
+                <div class="text-[12px] text-muted font-light mb-1">${escapeHtml(item.author || '-')}</div>
                 ${starsHtml}
               </div>
               <div class="flex flex-col items-end gap-2 shrink-0">
-                <span class="text-[10px] font-bold px-3 py-1 bg-page dark:bg-[#1C1A19] border border-borderLight dark:border-gray-800 text-muted rounded-full uppercase tracking-wider">${statusLabel}</span>
-                <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onclick="openStatusModalWithBook('${item.id}')" class="w-7 h-7 flex items-center justify-center rounded-full border border-borderLight dark:border-gray-700 text-muted hover:text-primary dark:hover:text-white transition"><i class="fas fa-sync-alt text-[10px]"></i></button>
-                  <button onclick="openBookModal('edit', '${item.id}')" class="w-7 h-7 flex items-center justify-center rounded-full border border-borderLight dark:border-gray-700 text-muted hover:text-primary dark:hover:text-white transition"><i class="fas fa-pen text-[10px]"></i></button>
+                <span class="text-[10px] font-bold px-3 py-1 border rounded-full uppercase tracking-wider ${statusClass}">${escapeHtml(statusLabel || '-')}</span>
+                <div class="flex gap-1 items-center">
+                  ${purchasedButton}
+                  <button onclick="openStatusModalWithBook('${safeItemId}')" class="w-7 h-7 flex items-center justify-center rounded-full border border-borderLight dark:border-gray-700 text-muted hover:text-primary dark:hover:text-white transition"><i class="fas fa-sync-alt text-[10px]"></i></button>
+                  <button onclick="openBookModal('edit', '${safeItemId}')" class="w-7 h-7 flex items-center justify-center rounded-full border border-borderLight dark:border-gray-700 text-muted hover:text-primary dark:hover:text-white transition"><i class="fas fa-pen text-[10px]"></i></button>
                 </div>
               </div>
             </div>`;
@@ -532,14 +593,14 @@
             <div class="bg-card dark:bg-[#252322] p-6 rounded-[24px] shadow-sm hover:shadow-glow transition-all border border-borderLight dark:border-gray-800">
               <div class="flex justify-between items-start mb-4">
                 <div>
-                  <h3 class="font-bold text-primary dark:text-gray-100 text-[14px]">${item.bookTitle || "-"}</h3>
-                  <div class="text-[11px] text-muted font-light mt-0.5">${item.author || '-'}</div>
+                  <h3 class="font-bold text-primary dark:text-gray-100 text-[14px]">${escapeHtml(item.bookTitle || "-")}</h3>
+                  <div class="text-[11px] text-muted font-light mt-0.5">${escapeHtml(item.author || '-')}</div>
                 </div>
-                <span class="text-[10px] font-bold px-3 py-1 bg-page dark:bg-[#1C1A19] text-muted rounded-full border border-borderLight dark:border-gray-800">P. ${item.page || '-'}</span>
+                <span class="text-[10px] font-bold px-3 py-1 bg-page dark:bg-[#1C1A19] text-muted rounded-full border border-borderLight dark:border-gray-800">P. ${escapeHtml(item.page || '-')}</span>
               </div>
-              <p class="text-[14px] text-primary dark:text-gray-300 leading-relaxed font-serif italic relative pl-4 border-l-2 border-accent/30">"${item.content || ''}"</p>
+              <p class="text-[14px] text-primary dark:text-gray-300 leading-relaxed font-serif italic relative pl-4 border-l-2 border-accent/30">"${escapeHtml(item.content || '')}"</p>
               <div class="mt-4 flex gap-2">
-                <span class="text-[11px] text-accent font-medium">${item.tags || ''}</span>
+                <span class="text-[11px] text-accent font-medium">${escapeHtml(item.tags || '')}</span>
               </div>
             </div>`;
         }
@@ -571,8 +632,22 @@
       try {
         const filterType = (type === 'read') ? 'status' : 'all';
         const filterValue = (type === 'read') ? 'Done' : '';
-        const res = await apiPost("getLibraryBooks", { filterType, filterValue }); displayResults(res);
+        const res = await apiPost("getLibraryBooks", { filterType, filterValue });
+        const visibleBooks = type === 'all' ? (res || []).filter(item => item.type !== 'book' || item.status !== 'Wishlist') : res;
+        displayResults(visibleBooks);
       } catch (err) { } 
+      finally { document.getElementById('loading').classList.add('hidden'); }
+    }
+
+    async function showWishlist() {
+      document.getElementById('searchInput').value = "";
+      document.getElementById('searchCategory').value = "";
+      isEbookMode = false; updateEbookModeUI();
+      document.getElementById('loading').classList.remove('hidden');
+      try {
+        const res = await apiPost("getLibraryBooks", { filterType: "all", filterValue: "" });
+        displayResults((res || []).filter(item => item.type === 'book' && item.status === 'Wishlist'), 'ตะกร้ายังว่าง กดไอคอนตะกร้าด้านบนเพื่อเพิ่มหนังสือที่อยากได้');
+      } catch (err) { await swalError(err); }
       finally { document.getElementById('loading').classList.add('hidden'); }
     }
 
@@ -593,12 +668,19 @@
       document.getElementById('statusModal').classList.add('hidden');
     }
 
-    function populateBooks(books) {
+    function populateBooks(books, allBooks) {
       const select = document.getElementById("bookSelect");
       const selectStatus = document.getElementById("bookSelectUpdate");
-      let opts = '<option value="" disabled selected>-- เลือกหนังสือ --</option>';
-      (books || []).forEach(b => { opts += `<option value="${b.id}">${b.title}</option>`; });
-      select.innerHTML = opts; selectStatus.innerHTML = opts;
+      const wishlistIds = new Set((allBooks || []).filter(book => book.status === 'Wishlist').map(book => String(book.id)));
+      let noteOptions = '<option value="" disabled selected>-- เลือกหนังสือ --</option>';
+      let statusOptions = '<option value="" disabled selected>-- เลือกหนังสือ --</option>';
+      (books || []).forEach(book => {
+        const option = `<option value="${escapeHtml(book.id)}">${escapeHtml(book.title)}</option>`;
+        statusOptions += option;
+        if (!wishlistIds.has(String(book.id))) noteOptions += option;
+      });
+      select.innerHTML = noteOptions;
+      selectStatus.innerHTML = statusOptions;
     }
 
     function openStatusModalWithBook(bookId) {
@@ -637,10 +719,36 @@
         document.getElementById('inputIsEbook').checked = (book.isEbook === 'TRUE' || book.isEbook === true);
       } else {
         form.reset(); isbnSec.classList.remove('hidden');
-        title.innerHTML = 'Add Book'; subtitle.innerHTML = 'เพิ่มหนังสือใหม่เข้าคลัง'; btn.innerText = "Add to Library";
-        document.getElementById('bookMode').value = 'create'; document.getElementById('editBookId').value = "";
+        const isWishlist = mode === 'wishlist';
+        title.textContent = isWishlist ? 'Wishlist' : 'Add Book';
+        subtitle.textContent = isWishlist ? 'เก็บหนังสือที่อยากอ่านแต่ยังไม่ได้ซื้อ' : 'เพิ่มหนังสือใหม่เข้าคลัง';
+        btn.innerText = isWishlist ? 'ใส่ตะกร้า' : 'Add to Library';
+        document.getElementById('bookMode').value = isWishlist ? 'wishlist' : 'create';
+        document.getElementById('editBookId').value = "";
+        document.getElementById('inputStatus').value = isWishlist ? 'Wishlist' : 'To Read';
         setRating(0); document.getElementById('inputIsEbook').checked = false;
       }
+    }
+
+    async function markAsPurchased(bookId) {
+      const book = bookCache[bookId] || {};
+      const result = await Swal.fire({
+        icon: 'question',
+        title: 'ซื้อหนังสือแล้ว?',
+        text: `ย้าย “${book.title || book.bookTitle || 'หนังสือเล่มนี้'}” เข้าคลังและตั้งสถานะเป็นดองไว้ก่อน`,
+        showCancelButton: true,
+        confirmButtonText: 'ย้ายเข้าคลัง',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#A68A79',
+        customClass: { popup: 'rounded-3xl' }
+      });
+      if (!result.isConfirmed) return;
+      swalLoading({ title: 'กำลังย้ายเข้าคลัง...' });
+      try {
+        await apiPost('updateBookStatus', { bookId, status: 'To Read', rating: book.rating || '0' });
+        await swalSuccess({ title: 'ย้ายเข้าคลังแล้ว' });
+        refreshData();
+      } catch (err) { await swalError(err); }
     }
 
     async function confirmDelete(id) {
@@ -693,7 +801,7 @@
       const mode = document.getElementById('bookMode').value;
       const payload = {
         title: e.target.title.value, author: e.target.author.value, pages: e.target.pages.value,
-        status: e.target.status.value, category: e.target.category.value, coverUrl: e.target.coverUrl.value,
+        status: mode === 'wishlist' ? 'Wishlist' : e.target.status.value, category: e.target.category.value, coverUrl: e.target.coverUrl.value,
         rating: document.getElementById('inputRating').value || "0",
         isEbook: document.getElementById('inputIsEbook').checked ? "TRUE" : "FALSE"
       };

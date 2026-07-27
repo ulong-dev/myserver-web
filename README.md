@@ -1,14 +1,15 @@
 # myserver-web
 
-เว็บ static รวมหลายหน้า พร้อม API สำหรับระบบตรวจเช็คถังดับเพลิง
+Monorepo ส่วนตัวสำหรับเว็บและ API หลายระบบ โดย GitHub Pages ต้องเผยแพร่เฉพาะ
+artifact ที่ผ่าน allowlist เท่านั้น
 
 ## โครงสร้างโปรเจ็ค
 
 ```text
 myserver/
-├─ index.html                 # หน้าเว็บหลัก
+├─ public-site/               # หน้าแรกสำหรับ GitHub Pages
+├─ index.html                 # หน้า Home ภายในระบบส่วนตัว
 ├─ coffee-shop/               # เว็บร้านกาแฟ static
-├─ fire-api/                  # Node.js API + dashboard ถังดับเพลิง
 ├─ guitar-learning/           # หน้าเรียนกีตาร์และฝึก scale
 ├─ library/                   # เว็บ library static
 ├─ running-app/               # เว็บ running app static
@@ -16,24 +17,30 @@ myserver/
 └─ space-game/                # เกม static
 ```
 
-## Fire API
+## ระบบที่เก็บเข้าคลัง
+
+Fire API ถูกถอดออกจาก repository เมื่อ 2026-07-27 เนื่องจากไม่พบการใช้งานจริง
+และเก็บแบบ private นอก iCloud ที่
+`~/.config/myserver/archive/fire-api-2026-07-27/` ห้ามนำกลับมารันโดยใช้
+credential เดิม ต้องตรวจ sharing ของ `fire_DB` และออก credential ใหม่ก่อนเสมอ
+
+## GitHub Pages
+
+`.github/workflows/pages.yml` สร้าง `_site` จาก allowlist ต่อไปนี้เท่านั้น:
+
+- `guitar-learning/`
+- `space-game/`
+- `typing-trainer/`
+
+Running, Library, Coffee POS, API/backend, runbook และไฟล์ operation ต้องไม่อยู่ใน
+Pages artifact รันคำสั่งนี้เพื่อตรวจในเครื่อง:
 
 ```bash
-cd fire-api
-npm install
-npm start
+node scripts/build-public-site.mjs
+node scripts/verify-public-site.mjs _site
 ```
-
-ค่าเริ่มต้นของ API คือ `http://localhost:3000`
-
-ไฟล์ที่ต้องมีในเครื่องแต่ไม่ควร commit:
-
-- `fire-api/credentials.json`
-- `.env` หรือ `.env.*`
-- `fire-api/public/uploads/`
-
-ตัวแปรแวดล้อมสำคัญดูตัวอย่างได้ที่ `fire-api/.env.example`
 
 ## Git hygiene
 
-โปรเจ็คนี้ ignore ไฟล์ generated เช่น `node_modules/`, `.DS_Store`, log และรูปที่อัปโหลดแล้ว ให้ติดตั้ง dependency ใหม่ด้วย `npm install` จาก `fire-api/package-lock.json`
+โปรเจ็คนี้ ignore ไฟล์ generated และไฟล์ลับ เช่น `node_modules/`, `.DS_Store`,
+log, `_site` และ `.env*`
