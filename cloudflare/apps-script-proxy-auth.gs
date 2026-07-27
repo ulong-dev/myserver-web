@@ -19,7 +19,7 @@ function verifyCloudProxy_(e, expectedMethod) {
     const method = String(firstParameter_(parameters, '_proxy_method'));
     const suppliedBodyHash = String(firstParameter_(parameters, '_proxy_body_sha256'));
     const suppliedSignature = String(firstParameter_(parameters, '_proxy_sig'));
-    const secret = PropertiesService.getScriptProperties().getProperty('MY_SERVER_PROXY_SECRET') || '';
+    const secret = String(PropertiesService.getScriptProperties().getProperty('MY_SERVER_PROXY_SECRET') || '').trim();
     if (secret.length < 32 || !/^\d{10}$/.test(timestamp) || !/^[A-Za-z0-9_-]{20,}$/.test(nonce)) return false;
     if (method !== 'GET' && method !== 'POST') return false;
     if (expectedMethod && method !== expectedMethod) return false;
