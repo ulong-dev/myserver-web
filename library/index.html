@@ -35,6 +35,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://unpkg.com/@zxing/browser@0.1.5/umd/zxing-browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
@@ -1139,6 +1140,21 @@
             decodedText = results.map(result => result.rawValue).find(value => isValidIsbn(normalizeIsbn(value))) || '';
           } catch {
             // Browser API อาจรองรับไม่ครบ จึงให้ตัวอ่านสำรองทำงานต่อได้เสมอ.
+          }
+        }
+        if (!decodedText && window.ZXingBrowser) {
+          // ZXing เป็นตัวอ่าน 1D barcode เพิ่มเติม โดยทำงานกับไฟล์จากกล้องของระบบได้
+          // แม้ browser จะไม่มี BarcodeDetector หรืออ่านไฟล์รูปแบบนั้นไม่ได้.
+          const imageUrl = URL.createObjectURL(file);
+          try {
+            setScanStatus('กำลังวิเคราะห์บาร์โค้ดจากภาพ…');
+            const reader = new ZXingBrowser.BrowserMultiFormatOneDReader();
+            const result = await reader.decodeFromImageUrl(imageUrl);
+            decodedText = result?.getText?.() || '';
+          } catch {
+            // ให้ html5-qrcode ทดลองต่อเป็นตัวสำรองสุดท้าย.
+          } finally {
+            URL.revokeObjectURL(imageUrl);
           }
         }
         if (!decodedText && window.Html5Qrcode) {
