@@ -58,7 +58,7 @@ function initializeTheme() {
 }
 
 function clearFiles() {
-  state.urls.forEach(URL.revokeObjectURL);
+  state.urls.forEach(url => URL.revokeObjectURL(url));
   state.files = [];
   state.urls = [];
   byId('imageInput').value = '';
@@ -106,6 +106,59 @@ function setProgress(percent, text) {
   byId('progressText').textContent = text;
 }
 
+async function loadDrawable(file) {
+  if ('createImageBitmap' in window) {
+    const bitmap = await createImageBitmap(file);
+    return { drawable: bitmap, width: bitmap.width, height: bitmap.height, close: () => bitmap.close() };
+  }
+  const url = URL.createObjectURL(file);
+  const image = new Image();
+  await new Promise((resolve, reject) => {
+    image.onload = resolve;
+    image.onerror = () => reject(new Error('เปิดภาพไม่ได้'));
+    image.src = url;
+  });
+  return { drawable: image, width: image.naturalWidth, height: image.naturalHeight, close: () => URL.revokeObjectURL(url) };
+}
+
+async function prepareImageForOcr(file) {
+  let source;
+  try {
+    source = await loadDrawable(file);
+    const targetWidth = Math.min(1600, Math.max(1300, source.width));
+    const scale = targetWidth / source.width;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(source.width * scale);
+    canvas.height = Math.round(source.height * scale);
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    context.drawImage(source.drawable, 0, 0, canvas.width, canvas.height);
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+    let sampleTotal = 0;
+    let sampleCount = 0;
+    const sampleStep = Math.max(4, Math.floor(pixels.data.length / 16000 / 4) * 4);
+    for (let index = 0; index < pixels.data.length; index += sampleStep) {
+      sampleTotal += Math.max(pixels.data[index], pixels.data[index + 1], pixels.data[index + 2]);
+      sampleCount += 1;
+    }
+    const darkScreenshot = sampleTotal / sampleCount < 125;
+    for (let index = 0; index < pixels.data.length; index += 4) {
+      const brightness = Math.max(pixels.data[index], pixels.data[index + 1], pixels.data[index + 2]);
+      const ink = darkScreenshot ? brightness > 65 : brightness < 185;
+      const value = ink ? 0 : 255;
+      pixels.data[index] = value;
+      pixels.data[index + 1] = value;
+      pixels.data[index + 2] = value;
+      pixels.data[index + 3] = 255;
+    }
+    context.putImageData(pixels, 0, 0);
+    return await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('เตรียมภาพไม่ได้')), 'image/png'));
+  } catch {
+    return file;
+  } finally {
+    source?.close();
+  }
+}
+
 async function loadContext(date) {
   try {
     const output = await apiGet('getLogContext', { date });
@@ -136,10 +189,11 @@ async function analyzeImages() {
         setProgress(overall, labels[message.status] || `กำลังประมวลผลภาพ ${currentIndex + 1}/${state.files.length}`);
       }
     });
-    await worker.setParameters({ preserve_interword_spaces: '1' });
+    await worker.setParameters({ preserve_interword_spaces: '1', user_defined_dpi: '300' });
     for (currentIndex = 0; currentIndex < state.files.length; currentIndex += 1) {
-      setProgress(currentIndex / state.files.length * 100, `กำลังอ่านภาพ ${currentIndex + 1}/${state.files.length}`);
-      const result = await worker.recognize(state.files[currentIndex]);
+      setProgress(currentIndex / state.files.length * 100, `กำลังปรับภาพ ${currentIndex + 1}/${state.files.length}`);
+      const preparedImage = await prepareImageForOcr(state.files[currentIndex]);
+      const result = await worker.recognize(preparedImage);
       texts.push(result.data.text || '');
     }
     setProgress(96, 'กำลังรวมข้อมูลและวิเคราะห์…');

@@ -12,6 +12,11 @@ function firstMatch(text, pattern, group = 1) {
   return text.match(pattern)?.[group] ?? '';
 }
 
+function firstPositive(text, pattern, group = 1) {
+  const value = finite(firstMatch(text, pattern, group));
+  return value && value > 0 ? value : null;
+}
+
 function parseClock(value) {
   const parts = String(value || '').match(/\d+/g)?.map(Number) || [];
   if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
@@ -89,10 +94,20 @@ function parseRecovery(text) {
 
 export function parseWorkoutScreens(ocrTexts, options = {}) {
   const fallbackDate = options.fallbackDate || new Date().toISOString().slice(0, 10);
-  const text = normalizeOcrText(Array.isArray(ocrTexts) ? ocrTexts.join('\n\n') : ocrTexts);
+  const pages = (Array.isArray(ocrTexts) ? ocrTexts : [ocrTexts]).map(normalizeOcrText).filter(Boolean);
+  const text = pages.join('\n\n');
   const upper = text.toUpperCase();
+  const summaryPage = pages
+    .map(page => page.toUpperCase())
+    .map(page => ({
+      page,
+      score: ['WORKOUT TIME', 'DISTANCE', 'ACTIVE KILOCALORIES', 'AVG. PACE', 'AVG PACE', 'OUTDOOR RUN']
+        .reduce((score, marker) => score + (page.includes(marker) ? 1 : 0), 0)
+    }))
+    .sort((a, b) => b.score - a.score)[0]?.page || upper;
   const durationValue = firstMatch(upper, /WORKOUT TIME[\s\S]{0,35}?(\d{1,2}\s*:\s*\d{2}\s*:\s*\d{2})/i);
-  const paceMatch = upper.match(/AVG\.?\s*PACE[\s\S]{0,35}?(\d{1,2})\s*[':]\s*(\d{2})/i);
+  const paceMatch = upper.match(/AVG\.?\s*PACE[\s\S]{0,35}?(\d{1,2})\s*[':]\s*(\d{2})/i)
+    || summaryPage.match(/\b(\d{1,2})\s*[':]\s*(\d{2})\s*"?\s*\/?\s*KM\b/i);
   const elapsedValue = firstMatch(upper, /ELAPSED TIME[\s\S]{0,35}?(\d{1,2}\s*:\s*\d{2}\s*:\s*\d{2})/i);
   const effortMatch = upper.match(/EFFORT[\s\S]{0,28}?\b(10|[1-9])\b/i);
   const verticalMatch = upper.match(/VERTICAL OSCILLATION[\s\S]{0,45}?AVERAGE\s*:?\s*(\d+(?:\.\d+)?)\s*CM/i);
@@ -108,10 +123,13 @@ export function parseWorkoutScreens(ocrTexts, options = {}) {
     active_kcal: finite(firstMatch(upper, /ACTIVE KILOCALORIES[\s\S]{0,24}?(\d+)\s*KCAL/i)),
     total_kcal: finite(firstMatch(upper, /TOTAL KILOCALORIES[\s\S]{0,24}?(\d+)\s*KCAL/i)),
     elevation_gain: finite(firstMatch(upper, /ELEVATION GAIN[\s\S]{0,24}?(\d+(?:\.\d+)?)\s*M/i)),
-    avg_power: finite(firstMatch(upper, /AVG\.?\s*POWER[\s\S]{0,24}?(\d+)\s*W/i)),
-    cadence: finite(firstMatch(upper, /AVG\.?\s*CADENCE[\s\S]{0,24}?(\d+)\s*SPM/i)),
+    avg_power: firstPositive(upper, /AVG\.?\s*POWER[\s\S]{0,50}?(\d{2,4})\s*W\b/i)
+      || firstPositive(summaryPage, /\b(\d{2,4})\s*W\b/i),
+    cadence: firstPositive(upper, /AVG\.?\s*CAD(?:ENCE|ANCE)[\s\S]{0,55}?(\d{2,3})\s*[S5]\s*P\s*M\b/i)
+      || firstPositive(summaryPage, /\b(\d{2,3})\s*[S5]\s*P\s*M\b/i),
     avg_pace_sec: paceMatch ? paceSeconds(paceMatch[1], paceMatch[2]) : null,
-    avg_hr: finite(firstMatch(upper, /AVG\.?\s*HEART RATE[\s\S]{0,28}?(\d+)\s*BPM/i)),
+    avg_hr: firstPositive(upper, /AVG\.?\s*HEART RATE[\s\S]{0,60}?(\d{2,3})\s*[B8]\s*P\s*M\b/i)
+      || firstPositive(summaryPage, /\b(\d{2,3})\s*[B8]\s*P\s*M\b/i),
     rpe: effortMatch ? Number(effortMatch[1]) : null,
     vertical_osc_cm: verticalMatch ? Number(verticalMatch[1]) : null,
     gct_ms: gctMatch ? Number(gctMatch[1]) : null,

@@ -52,3 +52,12 @@ test('pace and duration can fill each other when OCR misses one value', () => {
   assert.equal(parsed.avg_pace_sec, 360);
   assert.ok(parsed.missing.includes('หัวใจเฉลี่ย'));
 });
+
+test('summary metrics survive Apple two-column OCR reading order', () => {
+  const twoColumnOcr = `Mon, 27 Jul\nOutdoor Run\nWorkout Time Elapsed Time\n0:47:26 0:48:05\nDistance Active Kilocalories\n6.32KM 325KCAL\nAvg. Power Avg. Cardance\n136W 164SPM\nAvg. Pace Avg. Heart Rate\n7'30"/KM 1368PM`;
+  const parsed = parseWorkoutScreens(twoColumnOcr, { fallbackDate: '2026-07-27' });
+  assert.equal(parsed.avg_power, 136);
+  assert.equal(parsed.cadence, 164);
+  assert.equal(parsed.avg_hr, 136);
+  assert.equal(parsed.avg_pace_sec, 450);
+});
