@@ -240,8 +240,8 @@
   </template>
 
   <script>
-    // 1) ใส่ Web App URL จาก Apps Script Deployment ตรงนี้
-    const API_URL = "https://script.google.com/macros/s/AKfycbw28UAw8r8T4V9bAiLRHnm12lB2Ow557TeQ8RUY2CI1KmqkPqKmoBvjJ3nfdcP4Cv0/exec";
+    // Same-origin only: the private server validates the user and proxies upstream.
+    const API_URL = "/api/running";
 
     const html = document.documentElement;
     const todayDate = new Date().toISOString().slice(0, 10);
@@ -279,7 +279,7 @@
 
     async function apiGet(action, params = {}) {
       assertApiReady();
-      const url = new URL(API_URL);
+      const url = new URL(API_URL, window.location.origin);
       url.searchParams.set('action', action);
       Object.entries(params).forEach(([k, v]) => {
         if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, v);
@@ -303,9 +303,7 @@
     }
 
     function assertApiReady() {
-      if (!API_URL || API_URL.includes('PUT_YOUR_APPS_SCRIPT')) {
-        throw new Error('ยังไม่ได้ตั้งค่า API_URL ใน today.html');
-      }
+      if (!API_URL.startsWith('/api/')) throw new Error('Private API proxy is not configured');
     }
 
     async function reloadToday() {
@@ -489,7 +487,7 @@
       document.getElementById('heroTitle').innerText = 'Setup Required';
       document.getElementById('heroSub').innerText = message;
       document.getElementById('recommendTitle').innerText = 'ตรวจสอบการตั้งค่า';
-      document.getElementById('recommendMessage').innerText = 'ให้ Deploy Apps Script แล้วนำ Web App URL มาใส่ในตัวแปร API_URL ของไฟล์ today.html';
+      document.getElementById('recommendMessage').innerText = 'Private API ยังไม่พร้อม โปรดตรวจ Cloudflare Access และ backend proxy';
     }
 
     function showStatus(el, message, ok) {

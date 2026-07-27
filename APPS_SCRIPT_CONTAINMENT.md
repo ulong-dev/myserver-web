@@ -21,5 +21,11 @@ For each affected Apps Script project:
    books, Strava settings, Calendar actions, and all mutation actions return an
    authorization error.
 
+The private Cloudflare design uses a same-origin Pages Functions proxy plus
+HMAC-signed upstream requests. Follow `CLOUDFLARE_PRIVATE_DEPLOYMENT.md` and add
+`cloudflare/apps-script-proxy-auth.gs` to both Apps Script projects before any
+private cloud deployment. Cloudflare Access on the HTML alone does not protect
+an anonymous Apps Script endpoint.
+
 The current anonymous deployments must be considered discoverable even after a
 new URL is issued because the old URLs exist in Git history and browser caches.

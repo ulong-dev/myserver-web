@@ -136,7 +136,7 @@
   <template id="miniMetricTemplate"><div class="rounded-2xl bg-page dark:bg-[#121212] p-3 border border-borderLight dark:border-[#2A2A2A]"><div class="text-[10px] text-muted uppercase font-bold mini-label"></div><div class="text-xl font-black text-accent mini-value">-</div></div></template>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbw28UAw8r8T4V9bAiLRHnm12lB2Ow557TeQ8RUY2CI1KmqkPqKmoBvjJ3nfdcP4Cv0/exec";
+    const API_URL = "/api/running";
     const html = document.documentElement;
     let charts = [];
 
@@ -165,7 +165,7 @@
     window.addEventListener('resize', () => charts.forEach(c => c && c.resize()));
 
     function toggleTheme(){const next=html.classList.contains('dark')?'light':'dark';html.classList.toggle('dark',next==='dark');localStorage.setItem('elite_theme',next);document.getElementById('themeIcon').innerText=next==='dark'?'light_mode':'dark_mode';reloadDashboard();}
-    async function apiGet(action, params={}){const u=new URL(API_URL);u.searchParams.set('action',action);Object.entries(params).forEach(([k,v])=>{if(v!==undefined&&v!==null&&v!=='')u.searchParams.set(k,v)});const r=await fetch(u.toString());const d=await r.json();if(!r.ok||d.status==='error')throw new Error(d.message||`HTTP ${r.status}`);return d;}
+    async function apiGet(action, params={}){const u=new URL(API_URL, window.location.origin);u.searchParams.set('action',action);Object.entries(params).forEach(([k,v])=>{if(v!==undefined&&v!==null&&v!=='')u.searchParams.set(k,v)});const r=await fetch(u.toString());const d=await r.json();if(!r.ok||d.status==='error')throw new Error(d.message||`HTTP ${r.status}`);return d;}
     async function apiPost(action, payload={}){const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})});const d=await r.json();if(!r.ok||d.status==='error')throw new Error(d.message||`HTTP ${r.status}`);return d;}
     async function adaptWeekFromDashboard(){try{document.body.style.cursor='progress';const out=await apiPost('adaptWeek',{date:new Date().toISOString().slice(0,10),days:7});alert(`Adapt This Week สำเร็จ: ปรับ ${out.result?.changed_count ?? 0} รายการ · severity ${out.result?.severity || '-'}`);await reloadDashboard();}catch(err){alert('Adapt ล้มเหลว: '+err.message)}finally{document.body.style.cursor='';}}
     async function reloadDashboard(){try{document.body.style.cursor='progress';const out=await apiGet('getDashboardSummary');renderDashboard(out.dashboard);}catch(err){renderError(err.message)}finally{document.body.style.cursor='';}}

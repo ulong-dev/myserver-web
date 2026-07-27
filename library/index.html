@@ -329,8 +329,8 @@
   </div>
 
   <script>
-    // Config เดิม ไม่เปลี่ยน
-    const API_URL = "https://script.google.com/macros/s/AKfycbyfDj7axGwEbp03yGispxR0k3fb-Xu0NtF6MG4hqdIKlMZoCiko4QYSMbLjwZo-PwxY/exec";
+    // Same-origin only: the server validates the signed-in user before proxying upstream.
+    const API_URL = "/api/library";
 
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -374,7 +374,7 @@
     }
 
     async function apiPost(action, data = {}) {
-      const url = new URL(API_URL);
+      const url = new URL(API_URL, window.location.origin);
       url.searchParams.set("action", action);
       const body = new URLSearchParams();
       Object.entries(data).forEach(([k, v]) => body.append(k, v ?? ""));
