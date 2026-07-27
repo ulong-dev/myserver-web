@@ -335,6 +335,16 @@
     </div>
   </div>
 
+  <div id="coverLightbox" class="fixed inset-0 hidden z-[70] bg-black/90 backdrop-blur-sm items-center justify-center p-4 md:p-8" onclick="if(event.target === this) closeCoverLightbox()" role="dialog" aria-modal="true" aria-labelledby="coverLightboxTitle">
+    <button id="coverLightboxClose" type="button" onclick="closeCoverLightbox()" class="absolute top-5 right-5 z-10 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition" aria-label="ปิดภาพขยาย">
+      <i class="fas fa-times text-lg"></i>
+    </button>
+    <figure class="max-w-5xl w-full h-full flex flex-col items-center justify-center gap-4" onclick="event.stopPropagation()">
+      <img id="coverLightboxImage" class="max-w-full max-h-[82vh] object-contain rounded-2xl shadow-2xl" alt="">
+      <figcaption id="coverLightboxTitle" class="text-white/90 text-sm md:text-base text-center font-medium"></figcaption>
+    </figure>
+  </div>
+
   <script>
     // Same-origin only: the server validates the signed-in user before proxying upstream.
     const API_URL = "/api/library";
@@ -422,6 +432,35 @@
       image.classList.add('hidden');
       image.nextElementSibling?.classList.remove('hidden');
     }
+
+    function openCoverLightbox(src, title = '') {
+      const url = parseHttpsImageUrl(src);
+      if (!url) return;
+      const lightbox = document.getElementById('coverLightbox');
+      const image = document.getElementById('coverLightboxImage');
+      const caption = document.getElementById('coverLightboxTitle');
+      image.src = url;
+      image.alt = `รูปปก ${title || 'หนังสือ'}`;
+      caption.textContent = title || 'รูปปกหนังสือ';
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+      document.getElementById('coverLightboxClose').focus();
+    }
+
+    function closeCoverLightbox() {
+      const lightbox = document.getElementById('coverLightbox');
+      lightbox.classList.add('hidden');
+      lightbox.classList.remove('flex');
+      document.getElementById('coverLightboxImage').removeAttribute('src');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !document.getElementById('coverLightbox').classList.contains('hidden')) {
+        closeCoverLightbox();
+      }
+    });
 
     function swalLoading({ title="Loading...", html="Please wait", footer="" } = {}) {
       return Swal.fire({ title, html, footer, allowOutsideClick: false, allowEscapeKey: false, didOpen: () => Swal.showLoading(), customClass: { popup: 'rounded-3xl' } });
@@ -554,7 +593,7 @@
       const safeUrl = safeImageUrl(resolveBookCoverUrl(url, title));
       const fallback = renderGeneratedCover(title, author);
       return safeUrl
-        ? `<img src="${safeUrl}" loading="lazy" onerror="handleCoverImageError(this)" class="w-full h-full object-cover" alt="รูปปก ${escapeHtml(title || 'หนังสือ')}"><div class="hidden w-full h-full">${fallback}</div>`
+        ? `<img src="${safeUrl}" loading="lazy" onerror="handleCoverImageError(this)" onclick="openCoverLightbox(this.currentSrc, this.dataset.coverTitle)" onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); this.click(); }" data-cover-title="${escapeHtml(title || 'หนังสือ')}" tabindex="0" role="button" class="w-full h-full object-cover cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent" alt="รูปปก ${escapeHtml(title || 'หนังสือ')}" title="คลิกเพื่อขยายภาพ"><div class="hidden w-full h-full">${fallback}</div>`
         : fallback;
     }
 
@@ -740,6 +779,7 @@
       document.getElementById('noteModal').classList.add('hidden');
       document.getElementById('bookModal').classList.add('hidden');
       document.getElementById('statusModal').classList.add('hidden');
+      closeCoverLightbox();
     }
 
     function populateBooks(books, allBooks) {
