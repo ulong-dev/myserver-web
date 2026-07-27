@@ -210,7 +210,14 @@
 
           <div>
             <label class="text-[10px] font-bold text-muted uppercase tracking-[0.1em] ml-1">รูปปก (URL)</label>
-            <input type="text" name="coverUrl" id="inputCover" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none placeholder-borderLight focus:border-accent transition">
+            <input type="url" name="coverUrl" id="inputCover" oninput="updateCoverPreview()" class="w-full mt-2 p-3.5 border border-borderLight dark:border-gray-700 rounded-2xl bg-white dark:bg-[#1C1A19] text-[13px] dark:text-gray-200 outline-none placeholder-borderLight focus:border-accent transition" placeholder="https://...">
+            <div id="coverPreview" class="hidden mt-3 min-h-32 rounded-2xl border border-borderLight dark:border-gray-700 bg-page dark:bg-[#1C1A19] p-3 items-center justify-center">
+              <img id="coverPreviewImage" class="hidden max-h-48 max-w-full rounded-xl object-contain shadow-sm" alt="ตัวอย่างรูปปก">
+              <div id="coverPreviewError" class="hidden text-center text-[11px] text-muted py-8">
+                <i class="fas fa-image text-2xl mb-2 block text-borderLight"></i>
+                ไม่สามารถโหลดภาพจาก URL นี้ได้
+              </div>
+            </div>
           </div>
 
           <div class="flex items-center gap-3 p-4 bg-page dark:bg-[#1C1A19] rounded-2xl border border-borderLight dark:border-gray-800">
@@ -350,13 +357,55 @@
         .replace(/\n/g, '\\n');
     }
 
-    function safeImageUrl(value) {
+    function parseHttpsImageUrl(value) {
       try {
         const url = new URL(String(value || ''));
-        return url.protocol === 'https:' ? escapeHtml(url.href) : '';
+        return url.protocol === 'https:' ? url.href : '';
       } catch (error) {
         return '';
       }
+    }
+
+    function safeImageUrl(value) {
+      const url = parseHttpsImageUrl(value);
+      return url ? escapeHtml(url) : '';
+    }
+
+    function updateCoverPreview() {
+      const container = document.getElementById('coverPreview');
+      const image = document.getElementById('coverPreviewImage');
+      const error = document.getElementById('coverPreviewError');
+      const url = parseHttpsImageUrl(document.getElementById('inputCover').value);
+
+      image.onload = null;
+      image.onerror = null;
+      if (!url) {
+        container.classList.add('hidden');
+        container.classList.remove('flex');
+        image.classList.add('hidden');
+        error.classList.add('hidden');
+        image.removeAttribute('src');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      container.classList.add('flex');
+      image.classList.add('hidden');
+      error.classList.add('hidden');
+      image.onload = () => {
+        image.classList.remove('hidden');
+        error.classList.add('hidden');
+      };
+      image.onerror = () => {
+        image.classList.add('hidden');
+        error.classList.remove('hidden');
+      };
+      image.src = url;
+    }
+
+    function handleCoverImageError(image) {
+      image.classList.add('hidden');
+      image.nextElementSibling?.classList.remove('hidden');
     }
 
     function swalLoading({ title="Loading...", html="Please wait", footer="" } = {}) {
@@ -479,7 +528,7 @@
     function renderImageOrIcon(url) {
       const safeUrl = safeImageUrl(url);
       return safeUrl
-        ? `<img src="${safeUrl}" loading="lazy" class="w-full h-full object-cover" alt="">`
+        ? `<img src="${safeUrl}" loading="lazy" onerror="handleCoverImageError(this)" class="w-full h-full object-cover" alt="รูปปกหนังสือ"><div class="hidden w-full h-full bg-page dark:bg-[#1C1A19] flex items-center justify-center text-borderLight dark:text-gray-800"><i class="fas fa-book text-4xl"></i></div>`
         : `<div class="w-full h-full bg-page dark:bg-[#1C1A19] flex items-center justify-center text-borderLight dark:text-gray-800"><i class="fas fa-book text-4xl"></i></div>`;
     }
 
@@ -555,7 +604,7 @@
           bookCache[item.id] = item;
           const safeCoverUrl = safeImageUrl(item.coverUrl);
           const safeItemId = safeInlineJsString(item.id);
-          const listImg = safeCoverUrl ? `<img src="${safeCoverUrl}" loading="lazy" class="h-24 w-16 object-cover rounded-xl shadow-sm" alt="">` : `<div class="h-24 w-16 bg-page dark:bg-[#1C1A19] rounded-xl border border-borderLight dark:border-gray-800 flex justify-center items-center text-borderLight dark:text-gray-700"><i class="fas fa-book"></i></div>`;
+          const listImg = safeCoverUrl ? `<div class="h-24 w-16 rounded-xl overflow-hidden shadow-sm"><img src="${safeCoverUrl}" loading="lazy" onerror="handleCoverImageError(this)" class="h-full w-full object-cover" alt="รูปปกหนังสือ"><div class="hidden h-full w-full bg-page dark:bg-[#1C1A19] border border-borderLight dark:border-gray-800 flex items-center justify-center text-borderLight dark:text-gray-700"><i class="fas fa-book"></i></div></div>` : `<div class="h-24 w-16 bg-page dark:bg-[#1C1A19] rounded-xl border border-borderLight dark:border-gray-800 flex justify-center items-center text-borderLight dark:text-gray-700"><i class="fas fa-book"></i></div>`;
           const starsHtml = renderStars(item.rating || 0);
           const ebookIcon = (item.isEbook === 'TRUE' || item.isEbook === true) ? '<span class="text-[10px] font-bold px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-primary dark:text-gray-300 rounded-md ml-2"><i class="fas fa-tablet-alt"></i> EBOOK</span>' : '';
           
@@ -728,6 +777,7 @@
         document.getElementById('inputStatus').value = isWishlist ? 'Wishlist' : 'To Read';
         setRating(0); document.getElementById('inputIsEbook').checked = false;
       }
+      updateCoverPreview();
     }
 
     async function markAsPurchased(bookId) {
@@ -863,6 +913,7 @@
           document.getElementById('inputAuthor').value = data.author || "";
           document.getElementById('inputPages').value = data.pages || "";
           document.getElementById('inputCover').value = data.coverUrl || "";
+          updateCoverPreview();
           await swalSuccess({ title: 'พบหนังสือแล้ว', footer: `ข้อมูลจาก ${escapeHtml(data.source || 'ฐานข้อมูลหนังสือ')}` });
         } else {
           await Swal.fire({
