@@ -190,7 +190,7 @@
         <div id="isbnSection" class="bg-page dark:bg-[#1C1A19] p-5 rounded-[20px] border border-borderLight dark:border-gray-800">
           <label class="text-[10px] font-bold text-accent uppercase tracking-[0.1em] mb-3 block"><i class="fas fa-barcode mr-1"></i> สแกน ISBN</label>
           <div class="flex gap-2 mb-2">
-            <input type="text" id="isbnInput" class="flex-1 p-3 border border-borderLight dark:border-gray-700 rounded-xl bg-white dark:bg-[#252322] text-[13px] dark:text-gray-200 outline-none placeholder-muted focus:border-accent transition" placeholder="ISBN 13 หลัก...">
+            <input type="text" id="isbnInput" inputmode="numeric" autocomplete="off" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); handleIsbnSearch(); }" class="flex-1 p-3 border border-borderLight dark:border-gray-700 rounded-xl bg-white dark:bg-[#252322] text-[13px] dark:text-gray-200 outline-none placeholder-muted focus:border-accent transition" placeholder="ISBN-10 หรือ ISBN-13...">
             <button onclick="startQuagga()" type="button" class="bg-white dark:bg-[#252322] border border-borderLight dark:border-gray-700 hover:border-accent text-primary dark:text-gray-200 px-4 rounded-xl transition shadow-sm"><i class="fas fa-camera"></i></button>
             <button onclick="handleIsbnSearch()" id="btnIsbn" type="button" class="bg-primary dark:bg-white text-white dark:text-primary px-5 rounded-xl transition shadow-sm text-[13px] font-medium">ค้นหา</button>
           </div>
@@ -763,21 +763,96 @@
       } catch (err) { await swalError(err); }
     }
 
-    async function handleIsbnSearch() {
-      const isbn = document.getElementById('isbnInput').value.trim();
-      const btn = document.getElementById('btnIsbn');
-      if (isbn.length < 10) return Swal.fire({ icon:"info", title:"Invalid ISBN", customClass: { popup: 'rounded-3xl' } });
-      const original = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
-      swalLoading();
+    function normalizeIsbn(value) {
+      const thaiDigits = '๐๑๒๓๔๕๖๗๘๙';
+      return String(value || '')
+        .normalize('NFKC')
+        .replace(/[๐-๙]/g, digit => String(thaiDigits.indexOf(digit)))
+        .toUpperCase()
+        .replace(/[^0-9X]/g, '');
+    }
+
+    function isValidIsbn(isbn) {
+      if (/^(978|979)\d{10}$/.test(isbn)) {
+        const sum = isbn.split('').reduce((total, digit, index) => total + Number(digit) * (index % 2 === 0 ? 1 : 3), 0);
+        return sum % 10 === 0;
+      }
+      if (/^\d{9}[\dX]$/.test(isbn)) {
+        const sum = isbn.split('').reduce((total, digit, index) => {
+          const value = digit === 'X' ? 10 : Number(digit);
+          return total + value * (10 - index);
+        }, 0);
+        return sum % 11 === 0;
+      }
+      return false;
+    }
+
+    async function lookupBookOnOpenLibrary(isbn) {
+      const key = `ISBN:${isbn}`;
+      const url = new URL('https://openlibrary.org/api/books');
+      url.search = new URLSearchParams({ bibkeys: key, format: 'json', jscmd: 'data' }).toString();
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        cache: 'no-store'
+      });
+      if (!response.ok) throw new Error(`Open Library HTTP ${response.status}`);
+      const payload = await response.json();
+      const book = payload[key];
+      if (!book) return { found: false };
+      return {
+        found: true,
+        title: book.title || '',
+        author: (book.authors || []).map(author => author.name).filter(Boolean).join(', '),
+        pages: book.number_of_pages || '',
+        coverUrl: book.cover?.large || book.cover?.medium || book.cover?.small || '',
+        source: 'Open Library'
+      };
+    }
+
+    async function lookupBookByIsbn(isbn) {
       try {
-        const data = await apiPost("fetchBookByIsbn", { isbn });
+        const primary = await apiPost("fetchBookByIsbn", { isbn });
+        if (primary?.found) return { ...primary, source: primary.source || 'Library API' };
+      } catch (error) {
+        // ใช้แหล่งสำรองเมื่อ Google Books/API เดิมติดโควตาหรือใช้งานไม่ได้
+      }
+      return lookupBookOnOpenLibrary(isbn);
+    }
+
+    async function handleIsbnSearch() {
+      const input = document.getElementById('isbnInput');
+      const isbn = normalizeIsbn(input.value);
+      const btn = document.getElementById('btnIsbn');
+      input.value = isbn;
+      if (!isValidIsbn(isbn)) {
+        return Swal.fire({
+          icon: 'info',
+          title: 'ISBN ไม่ถูกต้อง',
+          text: 'กรอก ISBN-10 หรือ ISBN-13 ได้ทั้งแบบมีและไม่มีขีด',
+          confirmButtonColor: '#33302E',
+          customClass: { popup: 'rounded-3xl' }
+        });
+      }
+      const original = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+      swalLoading({ title: 'กำลังค้นหา ISBN...', html: 'ตรวจ Library API และ Open Library' });
+      try {
+        const data = await lookupBookByIsbn(isbn);
         if (data.found) {
           document.getElementById('inputTitle').value = data.title || "";
           document.getElementById('inputAuthor').value = data.author || "";
           document.getElementById('inputPages').value = data.pages || "";
           document.getElementById('inputCover').value = data.coverUrl || "";
-          await swalSuccess({ title: "Found It!" });
-        } else { await Swal.fire({ icon:"error", title:"Not Found", customClass: { popup: 'rounded-3xl' } }); }
+          await swalSuccess({ title: 'พบหนังสือแล้ว', footer: `ข้อมูลจาก ${escapeHtml(data.source || 'ฐานข้อมูลหนังสือ')}` });
+        } else {
+          await Swal.fire({
+            icon: 'info',
+            title: 'ยังไม่พบข้อมูล ISBN นี้',
+            text: 'สามารถกรอกชื่อหนังสือและผู้แต่งเอง แล้วบันทึกเข้าคลังหรือตะกร้าได้',
+            confirmButtonColor: '#33302E',
+            customClass: { popup: 'rounded-3xl' }
+          });
+        }
       } catch (err) { await swalError(err); }
       finally { Swal.close(); btn.innerHTML = original; btn.disabled = false; }
     }
@@ -831,21 +906,28 @@
     function startQuagga() {
       const viewport = document.getElementById('interactive'); const status = document.getElementById('scanStatus');
       if (isScanning) { stopQuagga(); return; }
+      status.textContent = 'กำลังประมวลผลกล้อง...';
       viewport.classList.remove('hidden'); status.classList.remove('hidden'); isScanning = true;
       Quagga.init({
         inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#interactive'), constraints: { facingMode: "environment", width: 640, height: 480 } },
-        decoder: { readers: ["ean_reader", "code_128_reader", "code_39_reader"] }, locate: true
+        decoder: { readers: ["ean_reader"] }, locate: true
       }, function(err) {
         if (err) { Swal.fire({ icon:"error", title:"Camera Error", customClass: { popup: 'rounded-3xl' } }); stopQuagga(); return; }
         Quagga.start();
       });
-      Quagga.onDetected(function(result) {
-        var code = result.codeResult.code;
-        if (code && code.length >= 5) {
-          document.getElementById('isbnInput').value = code; stopQuagga();
-          if (navigator.vibrate) navigator.vibrate(200); setTimeout(handleIsbnSearch, 400);
-        }
-      });
+      if (typeof Quagga.offDetected === 'function') Quagga.offDetected(handleQuaggaDetected);
+      Quagga.onDetected(handleQuaggaDetected);
+    }
+    function handleQuaggaDetected(result) {
+      const code = normalizeIsbn(result?.codeResult?.code);
+      if (isValidIsbn(code)) {
+        document.getElementById('isbnInput').value = code;
+        stopQuagga();
+        if (navigator.vibrate) navigator.vibrate(200);
+        setTimeout(handleIsbnSearch, 400);
+      } else if (code) {
+        document.getElementById('scanStatus').textContent = `พบ ${code} แต่ยังไม่ใช่ ISBN ที่ถูกต้อง กำลังสแกนต่อ...`;
+      }
     }
     function stopQuagga() {
       try { Quagga.stop(); } catch(e){}
