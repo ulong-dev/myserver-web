@@ -190,11 +190,13 @@
           <label class="text-[10px] font-bold text-accent uppercase tracking-[0.1em] mb-3 block"><i class="fas fa-barcode mr-1"></i> สแกน ISBN</label>
           <div class="flex gap-2 mb-2">
             <input type="text" id="isbnInput" inputmode="numeric" autocomplete="off" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); handleIsbnSearch(); }" class="flex-1 p-3 border border-borderLight dark:border-gray-700 rounded-xl bg-white dark:bg-[#252322] text-[13px] dark:text-gray-200 outline-none placeholder-muted focus:border-accent transition" placeholder="ISBN-10 หรือ ISBN-13...">
-            <button onclick="startIsbnScanner()" type="button" aria-label="เปิดกล้องสแกน ISBN" title="เปิดกล้องสแกน ISBN" class="bg-white dark:bg-[#252322] border border-borderLight dark:border-gray-700 hover:border-accent text-primary dark:text-gray-200 px-4 rounded-xl transition shadow-sm"><i class="fas fa-camera"></i></button>
-            <button onclick="document.getElementById('isbnImageInput').click()" type="button" aria-label="ถ่ายรูปบาร์โค้ด ISBN" title="ถ่ายรูปบาร์โค้ด ISBN" class="bg-white dark:bg-[#252322] border border-borderLight dark:border-gray-700 hover:border-accent text-primary dark:text-gray-200 px-4 rounded-xl transition shadow-sm"><i class="fas fa-image"></i></button>
+            <button onclick="openIsbnCamera()" type="button" aria-label="ถ่ายบาร์โค้ด ISBN" title="ถ่ายบาร์โค้ด ISBN" class="bg-white dark:bg-[#252322] border border-borderLight dark:border-gray-700 hover:border-accent text-primary dark:text-gray-200 px-4 rounded-xl transition shadow-sm"><i class="fas fa-camera"></i></button>
+            <button onclick="document.getElementById('isbnImageInput').click()" type="button" aria-label="เลือกรูปบาร์โค้ด ISBN" title="เลือกรูปบาร์โค้ด ISBN" class="bg-white dark:bg-[#252322] border border-borderLight dark:border-gray-700 hover:border-accent text-primary dark:text-gray-200 px-4 rounded-xl transition shadow-sm"><i class="fas fa-images"></i></button>
             <button onclick="handleIsbnSearch()" id="btnIsbn" type="button" class="bg-primary dark:bg-white text-white dark:text-primary px-5 rounded-xl transition shadow-sm text-[13px] font-medium">ค้นหา</button>
           </div>
-          <input id="isbnImageInput" type="file" accept="image/*" capture="environment" class="hidden" onchange="scanIsbnImage(event)">
+          <input id="isbnCameraInput" type="file" accept="image/*" capture="environment" class="hidden" onchange="scanIsbnImage(event)">
+          <input id="isbnImageInput" type="file" accept="image/*" class="hidden" onchange="scanIsbnImage(event)">
+          <p class="text-[10px] text-muted mt-2 leading-relaxed"><i class="fas fa-camera mr-1"></i>ถ่ายให้บาร์โค้ดเต็มกรอบ ชัด และไม่สะท้อนแสง</p>
           <div id="interactive" class="viewport hidden border border-borderLight mt-3"></div>
           <div id="scanStatus" class="text-[11px] text-center text-muted mt-2 hidden">กำลังเตรียมกล้อง…</div>
         </div>
@@ -1067,6 +1069,12 @@
       return 'เปิดกล้องไม่สำเร็จ ลองใช้ปุ่มรูปภาพเพื่อถ่ายบาร์โค้ด';
     }
 
+    // ใช้ตัวเลือกกล้องของระบบเป็นทางหลัก: บน iPhone/iPad เสถียรกว่า
+    // getUserMedia ใน browser และไม่ต้องจัดการสิทธิ์กล้องของเว็บแยกต่างหาก.
+    function openIsbnCamera() {
+      document.getElementById('isbnCameraInput').click();
+    }
+
     async function startIsbnScanner() {
       if (isScanning) { await stopIsbnScanner(); return; }
       if (!window.Html5Qrcode) {
@@ -1115,6 +1123,7 @@
       const file = event.target.files?.[0];
       event.target.value = '';
       if (!file) return;
+      isbnScanHandled = false;
       const viewport = document.getElementById('interactive');
       viewport.innerHTML = '';
       viewport.classList.remove('hidden');
@@ -1122,11 +1131,15 @@
       try {
         let decodedText = '';
         if ('BarcodeDetector' in window) {
-          const detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
-          const bitmap = await createImageBitmap(file);
-          const results = await detector.detect(bitmap);
-          bitmap.close?.();
-          decodedText = results[0]?.rawValue || '';
+          try {
+            const detector = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e'] });
+            const bitmap = await createImageBitmap(file);
+            const results = await detector.detect(bitmap);
+            bitmap.close?.();
+            decodedText = results.map(result => result.rawValue).find(value => isValidIsbn(normalizeIsbn(value))) || '';
+          } catch {
+            // Browser API อาจรองรับไม่ครบ จึงให้ตัวอ่านสำรองทำงานต่อได้เสมอ.
+          }
         }
         if (!decodedText && window.Html5Qrcode) {
           const imageScanner = new Html5Qrcode('interactive', { formatsToSupport: isbnFormats() });
@@ -1141,7 +1154,7 @@
       } catch (error) {
         document.getElementById('interactive').classList.add('hidden');
         document.getElementById('scanStatus').classList.add('hidden');
-        Swal.fire({ icon: 'info', title: 'อ่านบาร์โค้ดจากภาพไม่ได้', text: 'ลองถ่ายให้เห็นเฉพาะบาร์โค้ดชัด ๆ ไม่มีเงาหรือแสงสะท้อน แล้วลองอีกครั้ง', confirmButtonColor: '#33302E', customClass: { popup: 'rounded-3xl' } });
+        Swal.fire({ icon: 'info', title: 'อ่านบาร์โค้ดจากภาพไม่ได้', text: 'ลองถ่ายให้เห็นเฉพาะบาร์โค้ดชัด ๆ ไม่มีเงาหรือแสงสะท้อน หรือกรอก ISBN 13 หลักในช่องด้านบน', confirmButtonColor: '#33302E', customClass: { popup: 'rounded-3xl' } });
       }
     }
 
