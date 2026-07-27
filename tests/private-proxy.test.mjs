@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import { ProxyError, createSignedUpstreamRequest, testing } from '../cloudflare/lib/proxy.js';
+import { createPrivateApiForwardRequest } from '../functions/_middleware.js';
 
 globalThis.crypto ||= webcrypto;
 
@@ -58,6 +59,31 @@ test('callers cannot inject reserved proxy parameters', async () => {
       { email: 'owner@example.com' }
     ),
     error => error instanceof ProxyError && error.status === 400
+  );
+});
+
+test('preview API forwarding is restricted to the production Pages origin', async () => {
+  const request = new Request('https://private.myserver-private.pages.dev/api/library?action=getBookList', {
+    headers: { 'cf-access-jwt-assertion': 'verified-access-token' }
+  });
+  const forwarded = createPrivateApiForwardRequest(request, 'https://myserver-private.pages.dev');
+
+  assert.equal(forwarded.url, 'https://myserver-private.pages.dev/api/library?action=getBookList');
+  assert.equal(forwarded.headers.get('cf-access-jwt-assertion'), 'verified-access-token');
+  assert.equal(createPrivateApiForwardRequest(
+    new Request('https://private.myserver-private.pages.dev/library/'),
+    'https://myserver-private.pages.dev'
+  ), null);
+  assert.throws(
+    () => createPrivateApiForwardRequest(request, 'https://attacker.example'),
+    error => error.status === 503
+  );
+  assert.throws(
+    () => createPrivateApiForwardRequest(
+      new Request('https://myserver-private.pages.dev/api/library'),
+      'https://myserver-private.pages.dev'
+    ),
+    error => error.status === 503
   );
 });
 
