@@ -316,7 +316,8 @@ async function saveWorkout(event) {
   try {
     const output = await apiPost('saveActivity', { activity });
     const result = output.activity || {};
-    showSaveStatus(`บันทึกแล้ว · ${result.post_run_status || 'สำเร็จ'}${result.compliance_score != null ? ` · score ${result.compliance_score}` : ''}`, true);
+    showSaveStatus(`บันทึกแล้ว · ${result.post_run_status || 'สำเร็จ'}${result.compliance_score != null ? ` · score ${result.compliance_score}` : ''} · กำลังเปิด Dashboard`, true);
+    setTimeout(() => { window.location.href = 'index.html?updated=1'; }, 1100);
   } catch (error) {
     showSaveStatus(error.message || 'บันทึกไม่สำเร็จ', false);
   } finally {
