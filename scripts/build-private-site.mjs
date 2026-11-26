@@ -12,7 +12,7 @@ if (outputRoot === repositoryRoot || !outputRoot.startsWith(`${repositoryRoot}${
   throw new Error('Private artifact output must be a directory inside the repository');
 }
 
-const files = ['index.html'];
+const files = ['index.html', 'apple-touch-icon.png'];
 const directories = [
   'coffee-shop',
   'guitar-learning',

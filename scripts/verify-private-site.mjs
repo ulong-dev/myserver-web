@@ -4,6 +4,7 @@ import path from 'node:path';
 const outputRoot = path.resolve(process.argv[2] || '_private_site');
 const cloudBuild = process.argv.includes('--cloud');
 const allowedTopLevel = new Set([
+  'apple-touch-icon.png',
   '.private-site',
   ...(cloudBuild ? ['_headers'] : []),
   'coffee-shop',
