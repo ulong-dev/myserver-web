@@ -8,7 +8,12 @@ nohup.out
 
 # Node dependencies and generated files
 node_modules/
+__pycache__/
+*.py[cod]
 _site/
+_private_site/
+_private_cloud/
+.wrangler/
 
 # Secrets
 .env*

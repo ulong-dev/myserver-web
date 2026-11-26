@@ -1,533 +1,100 @@
 <!DOCTYPE html>
 <html lang="th" class="scroll-smooth">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AW2P Running Coach OS — Today</title>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>AW2P Running — ความฟิตของฉัน</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            page: '#FCFBF9',
-            card: '#FFFFFF',
-            primary: '#33302E',
-            muted: '#9E9892',
-            accent: '#FC4C02',
-            borderLight: '#F3F0EC'
-          },
-          fontFamily: {
-            sans: ['Kanit', 'sans-serif'],
-            serif: ['Playfair Display', 'serif']
-          },
-          boxShadow: {
-            glow: '0 20px 40px -10px rgba(0,0,0,0.06)'
-          }
-        }
-      }
-    }
+    tailwind.config={darkMode:'class',theme:{extend:{colors:{page:'#F7F6F3',card:'#FFFFFF',ink:'#242321',muted:'#8C8781',accent:'#FC4C02',line:'#ECE8E2'},fontFamily:{sans:['Kanit','sans-serif'],serif:['Playfair Display','serif']},boxShadow:{soft:'0 18px 50px -24px rgba(22,18,14,.22)'}}}}
   </script>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Kanit:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <style>
-    body { font-family: 'Kanit', sans-serif; background-color:#FCFBF9; }
-    .glass { background: rgba(255,255,255,.86); backdrop-filter: blur(16px); }
-    .dark .glass { background: rgba(18,18,18,.86); }
-    .range-clean { accent-color:#FC4C02; }
-    .pulse-dot { animation: pulse 1.6s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.55; transform:scale(.86)} }
+    body{font-family:'Kanit',sans-serif}.safe-bottom{padding-bottom:max(6.5rem,env(safe-area-inset-bottom))}.chart-wrap{position:relative;height:220px}.skeleton{background:linear-gradient(90deg,rgba(0,0,0,.04),rgba(0,0,0,.09),rgba(0,0,0,.04));background-size:200% 100%;animation:shine 1.25s infinite}@keyframes shine{to{background-position:-200% 0}}.dark .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.1),rgba(255,255,255,.04));background-size:200% 100%}
   </style>
 </head>
-
-<body class="bg-page text-primary dark:bg-[#121212] dark:text-gray-200 min-h-screen transition-colors duration-500 pb-12">
-  <nav class="sticky top-0 z-50 glass border-b border-borderLight dark:border-[#2A2A2A]">
-    <div class="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-3">
-      <div class="font-serif text-xl md:text-2xl font-semibold tracking-wide flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-accent inline-block pulse-dot"></span>
-        AW2P <span class="text-muted font-light">RUNNING COACH OS</span>
-      </div>
+<body class="bg-page text-ink dark:bg-[#0F0F0F] dark:text-gray-100 min-h-screen safe-bottom transition-colors">
+  <nav class="sticky top-0 z-40 bg-page/90 dark:bg-[#0F0F0F]/90 backdrop-blur-xl border-b border-line dark:border-[#282828]">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <a href="../index.html" class="flex items-center gap-2 min-w-0" aria-label="กลับหน้าหลัก">
+        <span class="w-10 h-10 rounded-2xl bg-accent text-white flex items-center justify-center"><span class="material-icons-round">directions_run</span></span>
+        <span><span class="font-semibold block leading-tight">Running</span><span class="text-[10px] text-muted block">MY FITNESS</span></span>
+      </a>
       <div class="flex items-center gap-2">
-        <a href="dashboard.html" title="Coach Dashboard" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">insert_chart_outlined</span></a>
-        <a href="log.html" title="Post-run Log" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">edit_note</span></a>
-        <a href="tests.html" title="Fitness Test Lab" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">science</span></a>
-        <a href="../index.html" title="กลับ Home" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">arrow_back</span></a>
-        <a href="calendar.html" title="Calendar Export" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">event</span></a>
-        <a href="strava.html" title="Strava Import" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">route</span></a>
-        <button onclick="reloadToday()" title="Reload" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round">sync</span></button>
-        <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted"><span class="material-icons-round" id="themeIcon">dark_mode</span></button>
+        <a href="import.html" class="hidden sm:flex h-11 px-5 rounded-full bg-accent text-white items-center gap-2 font-semibold shadow-lg shadow-accent/20"><span class="material-icons-round text-lg">add_photo_alternate</span> อัปโหลดภาพ</a>
+        <button id="refreshButton" class="w-11 h-11 rounded-full border border-line dark:border-[#303030] flex items-center justify-center" aria-label="โหลดข้อมูลใหม่"><span class="material-icons-round">refresh</span></button>
+        <button id="themeButton" class="w-11 h-11 rounded-full border border-line dark:border-[#303030] flex items-center justify-center" aria-label="เปลี่ยนธีม"><span id="themeIcon" class="material-icons-round">dark_mode</span></button>
       </div>
     </div>
   </nav>
 
-  <main class="max-w-7xl mx-auto px-4 md:px-8 py-6 space-y-5 md:space-y-6">
-    <section class="rounded-[32px] p-5 md:p-8 shadow-glow overflow-hidden relative bg-gradient-to-br from-[#181511] via-[#2A2520] to-[#6B2C11] text-white">
-      <div class="absolute -right-16 -top-16 w-52 h-52 bg-accent/20 rounded-full blur-2xl"></div>
-      <div class="relative z-10 grid lg:grid-cols-[1fr_360px] gap-6 items-end">
+  <main class="max-w-5xl mx-auto px-4 py-6 md:py-10 space-y-5 md:space-y-6">
+    <div id="updatedNotice" class="hidden rounded-2xl p-4 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 text-sm flex items-center gap-3"><span class="material-icons-round">check_circle</span><span>บันทึกการวิ่งแล้ว Dashboard อัปเดตเรียบร้อย</span></div>
+    <div id="errorNotice" class="hidden rounded-2xl p-4 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300 text-sm"></div>
+
+    <section class="rounded-[34px] overflow-hidden bg-gradient-to-br from-[#171411] via-[#28211D] to-[#8B3212] text-white shadow-soft relative">
+      <div class="absolute -right-24 -top-24 w-72 h-72 rounded-full bg-accent/30 blur-3xl"></div>
+      <div class="relative p-6 md:p-10 grid md:grid-cols-[1fr_auto] gap-8 items-center">
         <div>
-          <div class="text-[11px] font-bold tracking-[0.18em] text-orange-200 uppercase mb-2">Today’s Prescription</div>
-          <h1 class="font-serif text-4xl md:text-6xl leading-tight" id="heroTitle">Loading...</h1>
-          <p class="text-orange-100/90 mt-3 max-w-3xl" id="heroSub">กำลังโหลดแผนซ้อมวันนี้</p>
-          <div class="flex flex-wrap gap-2 mt-5">
-            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="phaseBadge">Phase</span>
-            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="distanceBadge">0 km</span>
-            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="rpeBadge">RPE -</span>
-            <span class="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-sm" id="hrBadge">HR -</span>
-          </div>
+          <div class="text-[10px] font-bold tracking-[.2em] text-orange-200 uppercase">Fitness today</div>
+          <div class="flex items-end gap-3 mt-3"><span id="fitnessScore" class="text-7xl md:text-8xl leading-none font-black">—</span><span class="text-orange-100/70 text-xl pb-2">/100</span></div>
+          <h1 id="fitnessLabel" class="font-serif text-3xl md:text-5xl mt-4">กำลังประเมินความฟิต</h1>
+          <p id="fitnessSummary" class="text-orange-100/80 mt-3 max-w-xl font-light">กำลังรวมข้อมูลการซ้อมล่าสุด</p>
+          <div class="h-2 rounded-full bg-white/10 overflow-hidden mt-6 max-w-xl"><div id="fitnessBar" class="h-full bg-gradient-to-r from-orange-300 to-accent rounded-full transition-all duration-700" style="width:0%"></div></div>
+          <div id="lastUpdated" class="text-[10px] text-orange-100/50 mt-3">—</div>
         </div>
-        <div class="bg-white/10 border border-white/15 rounded-[28px] p-5">
-          <div class="text-[10px] font-bold tracking-[0.16em] text-orange-100 uppercase">Readiness</div>
-          <div class="flex items-end gap-3 mt-2">
-            <div class="text-6xl font-black leading-none" id="readinessScore">-</div>
-            <div class="pb-2 text-orange-100">/100</div>
-          </div>
-          <div class="mt-3 text-sm leading-relaxed" id="readinessText">ยังไม่มีข้อมูล</div>
-        </div>
+        <a href="import.html" class="w-full md:w-56 min-h-28 rounded-[26px] bg-white text-ink flex md:flex-col items-center justify-center gap-3 px-5 py-5 font-semibold hover:scale-[1.02] transition shadow-xl">
+          <span class="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center"><span class="material-icons-round">add_photo_alternate</span></span>
+          <span class="text-center"><span class="block">อัปโหลดภาพการวิ่ง</span><span class="block text-xs font-normal text-muted mt-1">เลือกภาพแล้ววิเคราะห์ทันที</span></span>
+        </a>
       </div>
     </section>
 
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
-      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[24px] p-5 shadow-glow">
-        <div class="text-[10px] font-bold text-muted uppercase tracking-[0.14em]">Acute Load</div>
-        <div class="text-3xl font-black mt-2" id="acuteLoad">0</div>
-        <div class="text-xs text-muted mt-1">7-day</div>
-      </div>
-      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[24px] p-5 shadow-glow">
-        <div class="text-[10px] font-bold text-muted uppercase tracking-[0.14em]">Chronic Load</div>
-        <div class="text-3xl font-black mt-2" id="chronicLoad">0</div>
-        <div class="text-xs text-muted mt-1">42-day</div>
-      </div>
-      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[24px] p-5 shadow-glow">
-        <div class="text-[10px] font-bold text-muted uppercase tracking-[0.14em]">Form</div>
-        <div class="text-3xl font-black mt-2" id="formScore">0</div>
-        <div class="text-xs text-muted mt-1">Chronic - Acute</div>
-      </div>
-      <div class="bg-card dark:bg-[#1E1E1E] border border-accent rounded-[24px] p-5 shadow-glow">
-        <div class="text-[10px] font-bold text-accent uppercase tracking-[0.14em]">Risk</div>
-        <div class="text-2xl font-black mt-2 text-accent" id="riskText">-</div>
-        <div class="text-xs text-muted mt-1" id="loadComment">-</div>
-      </div>
+    <section class="grid grid-cols-3 gap-3 md:gap-5">
+      <div class="bg-card dark:bg-[#1A1A1A] border border-line dark:border-[#2A2A2A] rounded-[24px] p-4 md:p-5 shadow-soft"><div class="flex items-center gap-2 text-[10px] font-bold text-muted uppercase"><span class="material-icons-round text-base text-sky-500">favorite</span><span class="truncate">ความพร้อม</span></div><div class="mt-2"><span id="readinessValue" class="text-2xl md:text-3xl font-black">—</span><span class="text-xs text-muted">/100</span></div></div>
+      <div class="bg-card dark:bg-[#1A1A1A] border border-line dark:border-[#2A2A2A] rounded-[24px] p-4 md:p-5 shadow-soft"><div class="flex items-center gap-2 text-[10px] font-bold text-muted uppercase"><span class="material-icons-round text-base text-accent">route</span><span class="truncate">7 วัน</span></div><div class="mt-2"><span id="distanceValue" class="text-2xl md:text-3xl font-black">—</span><span class="text-xs text-muted"> km</span></div></div>
+      <div class="bg-card dark:bg-[#1A1A1A] border border-line dark:border-[#2A2A2A] rounded-[24px] p-4 md:p-5 shadow-soft"><div class="flex items-center gap-2 text-[10px] font-bold text-muted uppercase"><span class="material-icons-round text-base text-green-500">event_available</span><span class="truncate">สม่ำเสมอ</span></div><div class="mt-2"><span id="consistencyValue" class="text-2xl md:text-3xl font-black">—</span><span class="text-xs text-muted">%</span></div></div>
     </section>
 
     <section class="grid lg:grid-cols-[1.15fr_.85fr] gap-5 md:gap-6">
-      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
-        <div class="flex items-start justify-between gap-3 mb-5">
-          <div>
-            <h2 class="text-xl font-semibold">Workout Structure</h2>
-            <p class="text-sm text-muted mt-1">ดู prescription ก่อนออกวิ่ง และคุม intensity ตามเป้า</p>
-          </div>
-          <span class="px-3 py-1 rounded-full bg-accent/10 text-accent text-xs font-bold" id="workoutTypeBadge">-</span>
-        </div>
-
-        <div class="grid md:grid-cols-3 gap-3 mb-5">
-          <div class="rounded-2xl bg-page dark:bg-[#121212] p-4 border border-borderLight dark:border-[#2A2A2A]">
-            <div class="text-[10px] text-muted font-bold uppercase">Warm-up</div>
-            <div class="font-medium mt-1" id="warmupText">-</div>
-          </div>
-          <div class="rounded-2xl bg-page dark:bg-[#121212] p-4 border border-borderLight dark:border-[#2A2A2A] md:col-span-1">
-            <div class="text-[10px] text-muted font-bold uppercase">Main Set</div>
-            <div class="font-semibold mt-1 text-accent" id="mainSetText">-</div>
-          </div>
-          <div class="rounded-2xl bg-page dark:bg-[#121212] p-4 border border-borderLight dark:border-[#2A2A2A]">
-            <div class="text-[10px] text-muted font-bold uppercase">Cool-down / Strength</div>
-            <div class="font-medium mt-1" id="cooldownText">-</div>
-          </div>
-        </div>
-
-        <div class="rounded-[24px] border border-borderLight dark:border-[#2A2A2A] bg-page dark:bg-[#121212] p-5">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 shrink-0 rounded-full flex items-center justify-center bg-accent text-white"><span class="material-icons-round">psychology</span></div>
-            <div>
-              <div class="font-semibold" id="recommendTitle">Recommendation</div>
-              <div class="text-sm text-muted mt-1 leading-relaxed" id="recommendMessage">-</div>
-            </div>
-          </div>
-        </div>
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-          <a href="log.html" class="inline-flex items-center justify-center gap-2 rounded-full bg-accent py-3.5 text-white font-semibold hover:shadow-lg hover:shadow-accent/25 transition"><span class="material-icons-round">edit_note</span> Log Result หลังซ้อม</a>
-          <button type="button" onclick="adaptTomorrow()" class="inline-flex items-center justify-center gap-2 rounded-full bg-primary dark:bg-white dark:text-primary py-3.5 text-white font-semibold hover:opacity-90 transition"><span class="material-icons-round">auto_fix_high</span> Adapt Tomorrow</button>
-          <button type="button" onclick="adaptWeek()" class="inline-flex items-center justify-center gap-2 rounded-full bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A] py-3.5 font-semibold hover:border-accent transition"><span class="material-icons-round text-accent">event_repeat</span> Adapt This Week</button>
-        </div>
-        <div id="adaptStatus" class="mt-3 text-sm text-center hidden rounded-2xl py-2"></div>
-      </div>
-
-      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
-        <div class="flex items-start justify-between gap-3 mb-5">
-          <div>
-            <h2 class="text-xl font-semibold">Daily Readiness</h2>
-            <p class="text-sm text-muted mt-1">บันทึกความพร้อมวันนี้ก่อนซ้อม</p>
-          </div>
-          <span class="text-[10px] text-muted font-bold uppercase tracking-[0.12em]" id="readinessDate">Today</span>
-        </div>
-
-        <form id="readinessForm" class="space-y-4" onsubmit="saveReadiness(event)">
-          <div class="grid grid-cols-2 gap-3">
-            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Sleep Hours</span><input class="input" name="sleep_hours" type="number" step="0.1" value="7" /></label>
-            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Resting HR</span><input class="input" name="resting_hr" type="number" placeholder="55" /></label>
-          </div>
-          <RangeInput name="sleep_quality" label="Sleep Quality" value="7"></RangeInput>
-          <RangeInput name="fatigue" label="Fatigue" value="4"></RangeInput>
-          <RangeInput name="soreness" label="Soreness" value="3"></RangeInput>
-          <RangeInput name="stress" label="Stress" value="3"></RangeInput>
-          <RangeInput name="motivation" label="Motivation" value="7"></RangeInput>
-          <RangeInput name="pain_score" label="Pain Score" value="0"></RangeInput>
-
-          <button id="saveReadinessBtn" class="w-full bg-accent text-white rounded-full py-3.5 font-semibold hover:shadow-lg hover:shadow-accent/25 transition">บันทึก Readiness</button>
-          <div id="readinessSaveStatus" class="text-sm text-center hidden rounded-2xl py-2"></div>
-        </form>
-      </div>
+      <article class="bg-card dark:bg-[#1A1A1A] border border-line dark:border-[#2A2A2A] rounded-[30px] p-5 md:p-7 shadow-soft">
+        <div class="flex items-start gap-4"><span class="w-12 h-12 shrink-0 rounded-2xl bg-accent/10 text-accent flex items-center justify-center"><span class="material-icons-round">tips_and_updates</span></span><div><div class="text-[10px] font-bold tracking-[.14em] text-accent uppercase">ทำอะไรวันนี้</div><h2 id="actionTitle" class="text-xl md:text-2xl font-semibold mt-1">กำลังดูแผนวันนี้</h2><p id="actionMessage" class="text-sm text-muted mt-2 leading-relaxed">—</p></div></div>
+      </article>
+      <article class="bg-card dark:bg-[#1A1A1A] border border-line dark:border-[#2A2A2A] rounded-[30px] p-5 md:p-7 shadow-soft">
+        <div class="flex items-start gap-4"><span class="w-12 h-12 shrink-0 rounded-2xl bg-green-500/10 text-green-500 flex items-center justify-center"><span class="material-icons-round">health_and_safety</span></span><div><div class="text-[10px] font-bold tracking-[.14em] text-muted uppercase">Training risk</div><h2 id="riskTitle" class="text-xl font-semibold mt-1">กำลังประเมิน</h2><p id="riskMessage" class="text-sm text-muted mt-2 leading-relaxed">—</p></div></div>
+      </article>
     </section>
 
-    <section class="grid lg:grid-cols-[.9fr_1.1fr] gap-5 md:gap-6">
-      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
-        <div class="flex items-start justify-between gap-3 mb-5">
-          <div>
-            <h2 class="text-xl font-semibold">Athlete Profile</h2>
-            <p class="text-sm text-muted mt-1">ตั้งค่าเป้าหมายเพื่อสร้างแผน 12 สัปดาห์</p>
-          </div>
-          <span class="material-icons-round text-muted">settings</span>
-        </div>
-
-        <form id="profileForm" class="space-y-3" onsubmit="saveProfile(event)">
-          <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Name</span><input class="input" name="name" id="profileName" value="Ulong" /></label>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Goal Race</span><input class="input" name="goal_race" id="goalRace" value="Half Marathon" /></label>
-            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Goal Date</span><input class="input" name="goal_date" id="goalDate" type="date" /></label>
-          </div>
-          <div class="grid grid-cols-3 gap-3">
-            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Distance</span><input class="input" name="goal_distance_km" id="goalDistance" type="number" step="0.0001" value="21.0975" /></label>
-            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Goal Min</span><input class="input" name="goal_time_min" id="goalTime" type="number" value="90" /></label>
-            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Weekly KM</span><input class="input" name="current_weekly_km" id="weeklyKm" type="number" value="30" /></label>
-          </div>
-          <div class="grid grid-cols-3 gap-3">
-            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Max HR</span><input class="input" name="max_hr" id="maxHr" type="number" value="185" /></label>
-            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Rest HR</span><input class="input" name="resting_hr" id="restHr" type="number" value="55" /></label>
-            <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Threshold HR</span><input class="input" name="threshold_hr" id="thresholdHr" type="number" value="168" /></label>
-          </div>
-          <label class="block"><span class="text-[10px] font-bold text-muted uppercase ml-2">Injury Note</span><input class="input" name="injury_note" id="injuryNote" placeholder="เช่น เจ็บเข่าซ้าย / ITB / ไม่มี" /></label>
-          <div class="grid grid-cols-2 gap-3 pt-2">
-            <button class="bg-primary dark:bg-white dark:text-primary text-white rounded-full py-3 font-semibold">Save Profile</button>
-            <button type="button" onclick="generatePlan()" class="bg-accent text-white rounded-full py-3 font-semibold">Generate Plan</button>
-          </div>
-          <div id="profileSaveStatus" class="text-sm text-center hidden rounded-2xl py-2"></div>
-        </form>
-      </div>
-
-      <div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[32px] p-5 md:p-7 shadow-glow">
-        <div class="flex items-start justify-between gap-3 mb-5">
-          <div>
-            <h2 class="text-xl font-semibold">Next 7 Days</h2>
-            <p class="text-sm text-muted mt-1">แผน 1 สัปดาห์ข้างหน้า</p>
-          </div>
-          <span class="px-3 py-1 rounded-full bg-page dark:bg-[#121212] text-xs text-muted border border-borderLight dark:border-[#2A2A2A]">Sprint 4</span>
-        </div>
-        <div id="next7Box" class="space-y-3"></div>
-      </div>
+    <section class="grid lg:grid-cols-2 gap-5 md:gap-6">
+      <article class="bg-card dark:bg-[#1A1A1A] border border-line dark:border-[#2A2A2A] rounded-[30px] p-5 md:p-7 shadow-soft">
+        <div><h2 class="text-xl font-semibold">แนวโน้มความพร้อม</h2><p class="text-xs text-muted mt-1">14 วันล่าสุด · ค่ายิ่งสูงยิ่งพร้อม</p></div>
+        <div class="chart-wrap mt-5"><canvas id="readinessChart"></canvas><div id="readinessEmpty" class="hidden absolute inset-0 items-center justify-center text-sm text-muted">ยังไม่มีข้อมูลเพียงพอ</div></div>
+      </article>
+      <article class="bg-card dark:bg-[#1A1A1A] border border-line dark:border-[#2A2A2A] rounded-[30px] p-5 md:p-7 shadow-soft">
+        <div><h2 class="text-xl font-semibold">ระยะวิ่งต่อสัปดาห์</h2><p class="text-xs text-muted mt-1">เปรียบเทียบระยะจริงกับแผน</p></div>
+        <div class="chart-wrap mt-5"><canvas id="weeklyChart"></canvas><div id="weeklyEmpty" class="hidden absolute inset-0 items-center justify-center text-sm text-muted">ยังไม่มีข้อมูลเพียงพอ</div></div>
+      </article>
     </section>
+
+    <section class="bg-card dark:bg-[#1A1A1A] border border-line dark:border-[#2A2A2A] rounded-[30px] p-5 md:p-7 shadow-soft">
+      <div class="flex items-center justify-between gap-3"><div><h2 class="text-xl font-semibold">การวิ่งล่าสุด</h2><p class="text-xs text-muted mt-1">ผลจากภาพที่บันทึกล่าสุด</p></div><a href="import.html" class="text-sm text-accent font-semibold">เพิ่มใหม่</a></div>
+      <div id="recentRun" class="mt-5"></div>
+    </section>
+
+    <details class="bg-card dark:bg-[#1A1A1A] border border-line dark:border-[#2A2A2A] rounded-[26px] shadow-soft overflow-hidden">
+      <summary class="cursor-pointer list-none p-5 flex items-center justify-between"><span><span class="font-semibold">ดูข้อมูลเพิ่มเติม</span><span class="text-xs text-muted block mt-1">สำหรับวันที่ต้องการดูตัวเลขเชิงเทคนิคหรือกรอกมือ</span></span><span class="material-icons-round text-muted">expand_more</span></summary>
+      <div class="border-t border-line dark:border-[#2A2A2A] p-5 grid sm:grid-cols-2 gap-3">
+        <div class="rounded-2xl bg-page dark:bg-[#121212] p-4"><div class="text-xs text-muted">ระยะ 28 วัน</div><div id="distance28Value" class="font-black text-xl mt-1">—</div></div>
+        <div class="rounded-2xl bg-page dark:bg-[#121212] p-4"><div class="text-xs text-muted">Load ratio</div><div id="loadRatioValue" class="font-black text-xl mt-1">—</div></div>
+        <a href="log.html" class="rounded-2xl border border-line dark:border-[#303030] p-4 flex items-center gap-3"><span class="material-icons-round text-muted">edit_note</span><span><span class="font-semibold block">กรอกผลด้วยตนเอง</span><span class="text-xs text-muted">ใช้เมื่อ OCR อ่านไม่ได้</span></span></a>
+        <a href="tests.html" class="rounded-2xl border border-line dark:border-[#303030] p-4 flex items-center gap-3"><span class="material-icons-round text-muted">science</span><span><span class="font-semibold block">Fitness Test</span><span class="text-xs text-muted">สำหรับการทดสอบเฉพาะทาง</span></span></a>
+      </div>
+    </details>
   </main>
 
-  <template id="rangeTemplate">
-    <label class="block range-block">
-      <div class="flex justify-between items-end mb-1">
-        <span class="text-[10px] font-bold text-muted uppercase ml-2 range-label">Label</span>
-        <span class="text-lg font-serif text-accent range-val">0</span>
-      </div>
-      <input class="range-clean w-full" type="range" min="0" max="10" step="1" name="" value="0" oninput="this.closest('.range-block').querySelector('.range-val').innerText=this.value" />
-    </label>
-  </template>
-
-  <script>
-    // 1) ใส่ Web App URL จาก Apps Script Deployment ตรงนี้
-    const API_URL = "https://script.google.com/macros/s/AKfycbw28UAw8r8T4V9bAiLRHnm12lB2Ow557TeQ8RUY2CI1KmqkPqKmoBvjJ3nfdcP4Cv0/exec";
-
-    const html = document.documentElement;
-    const todayDate = new Date().toISOString().slice(0, 10);
-    let currentToday = null;
-
-    document.querySelectorAll('RangeInput').forEach(el => {
-      const t = document.getElementById('rangeTemplate').content.cloneNode(true);
-      const label = el.getAttribute('label');
-      const name = el.getAttribute('name');
-      const value = el.getAttribute('value') || '0';
-      t.querySelector('.range-label').innerText = label;
-      t.querySelector('.range-val').innerText = value;
-      const input = t.querySelector('input');
-      input.name = name;
-      input.value = value;
-      el.replaceWith(t);
-    });
-
-    document.getElementById('readinessDate').innerText = todayDate;
-
-    const saved = localStorage.getItem('elite_theme') || 'light';
-    if (saved === 'dark' || (!localStorage.getItem('elite_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      html.classList.add('dark');
-      document.getElementById('themeIcon').innerText = 'light_mode';
-    }
-
-    window.addEventListener('load', reloadToday);
-
-    function toggleTheme() {
-      const next = html.classList.contains('dark') ? 'light' : 'dark';
-      html.classList.toggle('dark', next === 'dark');
-      localStorage.setItem('elite_theme', next);
-      document.getElementById('themeIcon').innerText = next === 'dark' ? 'light_mode' : 'dark_mode';
-    }
-
-    async function apiGet(action, params = {}) {
-      assertApiReady();
-      const url = new URL(API_URL);
-      url.searchParams.set('action', action);
-      Object.entries(params).forEach(([k, v]) => {
-        if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, v);
-      });
-      const res = await fetch(url.toString(), { method: 'GET' });
-      const data = await res.json();
-      if (!res.ok || data.status === 'error') throw new Error(data.message || `HTTP ${res.status}`);
-      return data;
-    }
-
-    async function apiPost(action, payload = {}) {
-      assertApiReady();
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action, ...payload })
-      });
-      const data = await res.json();
-      if (!res.ok || data.status === 'error') throw new Error(data.message || `HTTP ${res.status}`);
-      return data;
-    }
-
-    function assertApiReady() {
-      if (!API_URL || API_URL.includes('PUT_YOUR_APPS_SCRIPT')) {
-        throw new Error('ยังไม่ได้ตั้งค่า API_URL ใน today.html');
-      }
-    }
-
-    async function reloadToday() {
-      try {
-        setLoading(true);
-        const data = await apiGet('getToday', { date: todayDate });
-        currentToday = data.today;
-        renderToday(data.today);
-        fillProfile(data.today.profile || {});
-      } catch (err) {
-        renderError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    function renderToday(today) {
-      const w = today.workout || {};
-      const r = today.readiness || {};
-      const load = today.load || {};
-      const rec = today.recommendation || {};
-
-      document.getElementById('heroTitle').innerText = w.title || 'No Workout';
-      document.getElementById('heroSub').innerText = w.purpose || '-';
-      document.getElementById('phaseBadge').innerText = `${w.phase || '-'} · Week ${w.week_no || '-'}`;
-      document.getElementById('distanceBadge').innerText = `${num(w.planned_distance_km)} km · ${num(w.planned_duration_min)} min`;
-      document.getElementById('rpeBadge').innerText = `RPE ${w.target_rpe || '-'}`;
-      document.getElementById('hrBadge').innerText = `HR ${w.target_hr_zone || '-'}`;
-      document.getElementById('readinessScore').innerText = Math.round(Number(r.readiness_score || 75));
-      document.getElementById('readinessText').innerText = r.recommendation || 'ยังไม่มีข้อมูล readiness วันนี้';
-
-      document.getElementById('acuteLoad').innerText = num(load.acute_load_7d);
-      document.getElementById('chronicLoad').innerText = num(load.chronic_load_42d);
-      document.getElementById('formScore').innerText = num(load.form);
-      document.getElementById('riskText').innerText = load.injury_risk || 'unknown';
-      document.getElementById('loadComment').innerText = load.comment || 'ยังไม่มีข้อมูล load';
-
-      document.getElementById('workoutTypeBadge').innerText = w.workout_type || '-';
-      document.getElementById('warmupText').innerText = w.warmup || '-';
-      document.getElementById('mainSetText').innerText = w.main_set || '-';
-      document.getElementById('cooldownText').innerText = [w.cooldown, w.strength].filter(Boolean).join(' · ') || '-';
-      document.getElementById('recommendTitle').innerText = rec.title || 'Recommendation';
-      document.getElementById('recommendMessage').innerText = rec.message || '-';
-
-      renderNext7(today.next7 || []);
-    }
-
-    function renderNext7(plan) {
-      const box = document.getElementById('next7Box');
-      if (!plan.length) {
-        box.innerHTML = '<div class="text-sm text-muted rounded-2xl p-4 bg-page dark:bg-[#121212] border border-borderLight dark:border-[#2A2A2A]">ยังไม่มีแผน กด Generate Plan ก่อน</div>';
-        return;
-      }
-      box.innerHTML = plan.map(item => {
-        const isToday = item.date === todayDate;
-        return `
-          <div class="rounded-2xl p-4 border ${isToday ? 'border-accent bg-accent/5' : 'border-borderLight dark:border-[#2A2A2A] bg-page dark:bg-[#121212]'}">
-            <div class="flex justify-between gap-3 items-start">
-              <div>
-                <div class="text-xs text-muted">${escapeHtml(formatThaiDate(item.date))} · ${escapeHtml(item.phase || '')}</div>
-                <div class="font-semibold mt-1">${escapeHtml(item.title || '-')}</div>
-                <div class="text-sm text-muted mt-1">${escapeHtml(item.main_set || '-')}</div>
-              </div>
-              <div class="text-right shrink-0">
-                <div class="font-black text-accent">${num(item.planned_distance_km)} km</div>
-                <div class="text-xs text-muted">RPE ${escapeHtml(String(item.target_rpe || '-'))}</div>
-              </div>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    async function saveReadiness(e) {
-      e.preventDefault();
-      const btn = document.getElementById('saveReadinessBtn');
-      const status = document.getElementById('readinessSaveStatus');
-      btn.disabled = true;
-      btn.innerText = 'กำลังบันทึก...';
-      try {
-        const readiness = formObj(e.target);
-        readiness.date = todayDate;
-        const out = await apiPost('saveReadiness', { readiness });
-        showStatus(status, out.message || 'บันทึกแล้ว', true);
-        await reloadToday();
-      } catch (err) {
-        showStatus(status, err.message, false);
-      } finally {
-        btn.disabled = false;
-        btn.innerText = 'บันทึก Readiness';
-      }
-    }
-
-    async function saveProfile(e) {
-      e.preventDefault();
-      const status = document.getElementById('profileSaveStatus');
-      try {
-        const profile = formObj(e.target);
-        const out = await apiPost('saveProfile', { profile });
-        showStatus(status, out.message || 'บันทึกแล้ว', true);
-        await reloadToday();
-      } catch (err) {
-        showStatus(status, err.message, false);
-      }
-    }
-
-    async function generatePlan() {
-      const status = document.getElementById('profileSaveStatus');
-      try {
-        const profile = formObj(document.getElementById('profileForm'));
-        await apiPost('saveProfile', { profile });
-        const out = await apiPost('generatePlan', { options: { clearExisting: true } });
-        showStatus(status, `${out.message} (${out.result.workouts} workouts)`, true);
-        await reloadToday();
-      } catch (err) {
-        showStatus(status, err.message, false);
-      }
-    }
-
-    async function adaptTomorrow() {
-      const status = document.getElementById('adaptStatus');
-      try {
-        const out = await apiPost('adaptTomorrow', { date: todayDate });
-        const changed = out.result?.changed_count ?? 0;
-        const severity = out.result?.severity || '-';
-        showStatus(status, `Adapt Tomorrow สำเร็จ: ปรับ ${changed} รายการ · severity ${severity}`, true);
-        await reloadToday();
-      } catch (err) {
-        showStatus(status, err.message, false);
-      }
-    }
-
-    async function adaptWeek() {
-      const status = document.getElementById('adaptStatus');
-      try {
-        const out = await apiPost('adaptWeek', { date: todayDate, days: 7 });
-        const changed = out.result?.changed_count ?? 0;
-        const severity = out.result?.severity || '-';
-        showStatus(status, `Adapt This Week สำเร็จ: ปรับ ${changed} รายการ · severity ${severity}`, true);
-        await reloadToday();
-      } catch (err) {
-        showStatus(status, err.message, false);
-      }
-    }
-
-    function fillProfile(p) {
-      if (!p) return;
-      setVal('profileName', p.name);
-      setVal('goalRace', p.goal_race);
-      setVal('goalDate', p.goal_date);
-      setVal('goalDistance', p.goal_distance_km);
-      setVal('goalTime', p.goal_time_min);
-      setVal('weeklyKm', p.current_weekly_km);
-      setVal('maxHr', p.max_hr);
-      setVal('restHr', p.resting_hr);
-      setVal('thresholdHr', p.threshold_hr);
-      setVal('injuryNote', p.injury_note);
-    }
-
-    function setVal(id, value) {
-      const el = document.getElementById(id);
-      if (el && value !== undefined && value !== null && value !== '') el.value = value;
-    }
-
-    function formObj(form) {
-      const fd = new FormData(form);
-      const obj = Object.fromEntries(fd.entries());
-      Object.keys(obj).forEach(k => {
-        const v = obj[k];
-        if (v !== '' && !Number.isNaN(Number(v)) && ['sleep_hours','sleep_quality','resting_hr','hrv','fatigue','soreness','stress','motivation','pain_score','goal_distance_km','goal_time_min','current_weekly_km','max_hr','resting_hr','threshold_hr'].includes(k)) {
-          obj[k] = Number(v);
-        }
-      });
-      return obj;
-    }
-
-    function setLoading(isLoading) {
-      document.body.style.cursor = isLoading ? 'progress' : '';
-    }
-
-    function renderError(message) {
-      document.getElementById('heroTitle').innerText = 'Setup Required';
-      document.getElementById('heroSub').innerText = message;
-      document.getElementById('recommendTitle').innerText = 'ตรวจสอบการตั้งค่า';
-      document.getElementById('recommendMessage').innerText = 'ให้ Deploy Apps Script แล้วนำ Web App URL มาใส่ในตัวแปร API_URL ของไฟล์ today.html';
-    }
-
-    function showStatus(el, message, ok) {
-      el.className = `text-sm text-center rounded-2xl py-2 ${ok ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300' : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300'}`;
-      el.innerText = message;
-      el.classList.remove('hidden');
-      setTimeout(() => el.classList.add('hidden'), 3200);
-    }
-
-    function num(v) {
-      const n = Number(v || 0);
-      if (!Number.isFinite(n)) return '0';
-      return Math.abs(n % 1) > 0 ? n.toFixed(1) : String(n);
-    }
-
-    function formatThaiDate(s) {
-      try { return new Date(s + 'T00:00:00').toLocaleDateString('th-TH', { weekday:'short', day:'numeric', month:'short' }); }
-      catch { return s || '-'; }
-    }
-
-    function escapeHtml(s) {
-      return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-  </script>
-
-  <style>
-    .input {
-      width:100%;
-      background:#FCFBF9;
-      border:1px solid #F3F0EC;
-      border-radius:16px;
-      padding:12px 14px;
-      outline:none;
-      color:#33302E;
-      min-height:46px;
-    }
-    .input:focus { border-color:#FC4C02; }
-    .dark .input { background:#121212; border-color:#2A2A2A; color:#e5e7eb; }
-  </style>
+  <a href="import.html" class="sm:hidden fixed z-40 left-4 right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] h-16 rounded-full bg-accent text-white flex items-center justify-center gap-3 font-semibold text-lg shadow-2xl shadow-accent/30"><span class="material-icons-round">add_photo_alternate</span> อัปโหลดภาพการวิ่ง</a>
+  <script type="module" src="simple-dashboard.js"></script>
 </body>
 </html>

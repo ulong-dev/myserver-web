@@ -44,3 +44,19 @@ node scripts/verify-public-site.mjs _site
 
 โปรเจ็คนี้ ignore ไฟล์ generated และไฟล์ลับ เช่น `node_modules/`, `.DS_Store`,
 log, `_site` และ `.env*`
+
+## Private cloud deployment
+
+Library, Running และ Coffee สามารถ build เป็น private Cloudflare Pages artifact
+ที่ผ่าน allowlist ได้ด้วยคำสั่ง:
+
+```bash
+npm ci
+npm run build:private:cloud
+npm run verify:private:cloud
+```
+
+Private deployment ต้องมี Cloudflare Access, email allowlist และ Apps Script HMAC
+ครบก่อน deploy ดูขั้นตอนและ deployment gate ใน
+`CLOUDFLARE_PRIVATE_DEPLOYMENT.md` ห้ามนำ Apps Script URL หรือ secret กลับไปใส่
+ใน HTML/JavaScript ฝั่ง browser

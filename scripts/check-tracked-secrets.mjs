@@ -10,6 +10,7 @@ const patterns = [
   { name: "private key", regex: /-----BEGIN [A-Z ]*PRIVATE KEY-----/ },
   { name: "GitHub token", regex: /gh[pousr]_[A-Za-z0-9]{20,}/ },
   { name: "Google API key", regex: /AIza[A-Za-z0-9_-]{20,}/ },
+  { name: "Google Apps Script deployment URL", regex: /https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]{20,}\/exec/ },
   { name: "OpenAI-style key", regex: /sk-[A-Za-z0-9_-]{20,}/ },
   { name: "Slack token", regex: /xox[baprs]-[A-Za-z0-9-]{10,}/ }
 ];

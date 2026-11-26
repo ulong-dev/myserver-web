@@ -106,7 +106,7 @@
   </main>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbw28UAw8r8T4V9bAiLRHnm12lB2Ow557TeQ8RUY2CI1KmqkPqKmoBvjJ3nfdcP4Cv0/exec";
+    const API_URL = "/api/running";
     const html = document.documentElement;
     document.getElementById('dateInput').value = new Date().toISOString().slice(0,10);
     const saved = localStorage.getItem('elite_theme') || 'light';
@@ -115,7 +115,7 @@
 
     function toggleTheme(){ const next = html.classList.contains('dark') ? 'light' : 'dark'; html.classList.toggle('dark', next === 'dark'); localStorage.setItem('elite_theme', next); document.getElementById('themeIcon').innerText = next === 'dark' ? 'light_mode' : 'dark_mode'; }
     function syncDistance(){ const t=document.getElementById('testType').value.toLowerCase(); const d=document.getElementById('distanceInput'); if(t.includes('3k')) d.value=3; else if(t.includes('5k')) d.value=5; else if(t.includes('10k')) d.value=10; else if(t.includes('half')) d.value=21.0975; }
-    async function apiGet(action){ const url=new URL(API_URL); url.searchParams.set('action', action); const res=await fetch(url); const data=await res.json(); if(!res.ok || data.status==='error') throw new Error(data.message || `HTTP ${res.status}`); return data; }
+    async function apiGet(action){ const url=new URL(API_URL, window.location.origin); url.searchParams.set('action', action); const res=await fetch(url); const data=await res.json(); if(!res.ok || data.status==='error') throw new Error(data.message || `HTTP ${res.status}`); return data; }
     async function apiPost(action, payload){ const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})}); const data=await res.json(); if(!res.ok || data.status==='error') throw new Error(data.message || `HTTP ${res.status}`); return data; }
 
     async function reloadLab(){ try{ document.body.style.cursor='progress'; const data=await apiGet('getTestContext'); renderLab(data.context); }catch(err){ alert(err.message); }finally{ document.body.style.cursor=''; } }

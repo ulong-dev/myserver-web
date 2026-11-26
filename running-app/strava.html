@@ -119,7 +119,7 @@
   <template id="kpiTemplate"><div class="bg-card dark:bg-[#1E1E1E] border border-borderLight dark:border-[#2A2A2A] rounded-[24px] p-5 shadow-glow"><div class="text-[10px] text-muted font-bold uppercase tracking-[0.14em] k-label">Label</div><div class="text-2xl font-black mt-2 k-value">-</div><div class="text-xs text-muted mt-1 k-sub">Sprint 7</div></div></template>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbw28UAw8r8T4V9bAiLRHnm12lB2Ow557TeQ8RUY2CI1KmqkPqKmoBvjJ3nfdcP4Cv0/exec";
+    const API_URL = "/api/running";
     const html = document.documentElement;
     let currentContext = null;
     document.querySelectorAll('KpiCard').forEach(el => { const t=document.getElementById('kpiTemplate').content.cloneNode(true); t.querySelector('.k-label').innerText=el.getAttribute('label'); t.querySelector('.k-value').id=el.getAttribute('id'); el.replaceWith(t); });
@@ -130,7 +130,7 @@
     window.addEventListener('load', reloadStrava);
 
     function toggleTheme(){ const next=html.classList.contains('dark')?'light':'dark'; html.classList.toggle('dark',next==='dark'); localStorage.setItem('elite_theme',next); document.getElementById('themeIcon').innerText=next==='dark'?'light_mode':'dark_mode'; }
-    async function apiGet(action, params={}){ const url=new URL(API_URL); url.searchParams.set('action',action); Object.entries(params).forEach(([k,v])=>{ if(v!==undefined && v!==null && v!=='') url.searchParams.set(k,v); }); const res=await fetch(url); const data=await res.json(); if(!res.ok || data.status==='error') throw new Error(data.message || `HTTP ${res.status}`); return data; }
+    async function apiGet(action, params={}){ const url=new URL(API_URL, window.location.origin); url.searchParams.set('action',action); Object.entries(params).forEach(([k,v])=>{ if(v!==undefined && v!==null && v!=='') url.searchParams.set(k,v); }); const res=await fetch(url); const data=await res.json(); if(!res.ok || data.status==='error') throw new Error(data.message || `HTTP ${res.status}`); return data; }
     async function apiPost(action, payload={}){ const res=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,...payload})}); const data=await res.json(); if(!res.ok || data.status==='error') throw new Error(data.message || `HTTP ${res.status}`); return data; }
     function rangeParams(){ return { from:document.getElementById('fromInput').value, to:document.getElementById('toInput').value, per_page:document.getElementById('perPageInput').value, max_pages:document.getElementById('maxPagesInput').value }; }
 

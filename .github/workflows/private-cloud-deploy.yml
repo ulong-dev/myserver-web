@@ -1,0 +1,55 @@
+name: Deploy authenticated private cloud site
+
+on:
+  workflow_dispatch:
+    inputs:
+      safety_confirmation:
+        description: Type ACCESS_AND_HMAC_VERIFIED after Access and Apps Script HMAC checks pass
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: cloudflare-private-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: ${{ inputs.safety_confirmation == 'ACCESS_AND_HMAC_VERIFIED' }}
+    runs-on: ubuntu-latest
+    environment: cloudflare-private-production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build and verify private artifact
+        run: |
+          npm run build:private:cloud
+          npm run verify:private:cloud
+          npm test
+          npm run check:secrets
+          npx wrangler pages functions build --outdir .wrangler/functions-build
+
+      - name: Deploy to protected Cloudflare Pages project
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy _private_cloud
+            --project-name=myserver-private
+            --branch=main
+            --commit-hash=${{ github.sha }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
